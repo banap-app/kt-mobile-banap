@@ -22,7 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.banap.banap.app.presentation.field.ui.registration.components.dropdownTextField
+import com.banap.banap.core.ui.components.DropdownTextField
+import com.banap.banap.app.presentation.validation.cultivation.event.CultivationTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.cultivation.utils.validationDataCultivation
+import com.banap.banap.app.presentation.validation.cultivation.viewmodel.CultivationTextFieldViewModel
 import com.banap.banap.core.ui.components.ButtonRegistration
 import com.banap.banap.core.ui.components.RegistrationHeader
 import com.banap.banap.core.ui.components.TextBoxRegistration
@@ -46,17 +49,22 @@ fun NewFieldThirdPage (
     val viewModelDescription = viewModel<DescriptionTextFieldViewModel>()
     val stateDescription = viewModelDescription.state
 
+    val viewModelCultivation = viewModel<CultivationTextFieldViewModel>()
+    val stateCultivation = viewModelCultivation.state
+
     val validationDataDescription = validationDataDescription(
         context = context,
         viewModelDescription = viewModelDescription,
         stateDescription = stateDescription
     )
 
-    var isCultivationValidated by remember {
-        mutableStateOf(false)
-    }
+    val validationDataCultivation = validationDataCultivation(
+        context = context,
+        viewModelCultivation = viewModelCultivation,
+        stateCultivation = stateCultivation
+    )
 
-    val isValidationSuccessful = validationDataDescription && isCultivationValidated
+    val isValidationSuccessful = validationDataDescription && validationDataCultivation
 
     var backgroundColorButton by remember {
         mutableStateOf(CINZA_CLARO)
@@ -155,7 +163,22 @@ fun NewFieldThirdPage (
                         maxLines = 10
                     )
 
-                    isCultivationValidated = dropdownTextField()
+                    DropdownTextField(
+                        label = "Cultura",
+                        value = stateCultivation.cultivation,
+                        placeholder = "Escolha uma cultura",
+                        options = listOf(
+                            "Banana Nanica",
+                            "Banana Prata",
+                            "Banana da Terra",
+                            "Banana Maçã",
+                            "Banana Ouro"
+                        ),
+                        onOptionSelected = {
+                            viewModelCultivation.onEvent(CultivationTextFieldFormEvent.CultivationChanged(it))
+                            viewModelCultivation.onEvent(CultivationTextFieldFormEvent.Submit)
+                        }
+                    )
                 }
 
                 ButtonRegistration(

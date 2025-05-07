@@ -28,6 +28,7 @@ import com.banap.banap.app.presentation.property.ui.listing.screen.Property
 import com.banap.banap.app.presentation.property.ui.registration.NewProperty
 import com.banap.banap.app.presentation.readytostart.ui.ReadyToStart
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
+import com.banap.banap.app.presentation.task.ui.registration.screen.NewTask
 import com.banap.banap.app.presentation.tutorial.ui.Tutorial
 import com.banap.banap.app.presentation.userchoice.ui.UserChoice
 import com.banap.banap.core.ui.components.SplashScreen
@@ -349,6 +350,22 @@ fun Navigation() {
             }
         ) {
             Property(navigationController)
+        }
+
+        composable(
+            route = "NewTask",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            NewTask(navigationController)
         }
     }
 }

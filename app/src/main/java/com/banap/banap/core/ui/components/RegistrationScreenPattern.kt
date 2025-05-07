@@ -1,4 +1,4 @@
-package com.banap.banap.app.presentation.analysis.ui.registration.components
+package com.banap.banap.core.ui.components
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
@@ -21,10 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.banap.banap.core.ui.components.ButtonRegistration
-import com.banap.banap.core.ui.components.LoadingScreen
-import com.banap.banap.core.ui.components.RegistrationHeader
-import com.banap.banap.core.ui.components.TitleRegistration
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
@@ -33,10 +29,12 @@ import com.banap.banap.core.ui.theme.VERDE_ESCURO
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun NewAnalysisScreen(
+fun RegistrationScreenPattern(
     navigationController: NavController,
+    fallbackRoute: String,
     texto: String,
     textoASerDestacado: String,
+    tamanhoTextoDestacado: Int = 32,
     subTitulo: String,
     children: @Composable () -> Unit,
     onClick: () -> Unit,
@@ -103,7 +101,7 @@ fun NewAnalysisScreen(
             ) {
                 RegistrationHeader(
                     navigationController = navigationController,
-                    fallbackRoute = "Information"
+                    fallbackRoute = fallbackRoute
                 )
 
                 TitleRegistration(
@@ -111,7 +109,7 @@ fun NewAnalysisScreen(
                     textoASerDestacado = textoASerDestacado,
                     corEmDestaque = VERDE_ESCURO,
                     subTexto = "",
-                    tamanhoTextoDestacado = 32.sp,
+                    tamanhoTextoDestacado = tamanhoTextoDestacado.sp,
                     paginaUsuario = false,
                     subtituloDestacado = "",
                     subtitulo = subTitulo

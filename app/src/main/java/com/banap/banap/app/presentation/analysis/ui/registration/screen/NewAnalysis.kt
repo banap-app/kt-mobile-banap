@@ -16,11 +16,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.app.presentation.analysis.ui.registration.components.AnalysisResult
-import com.banap.banap.app.presentation.analysis.ui.registration.components.NewAnalysisScreen
 import com.banap.banap.app.presentation.analysis.ui.registration.components.ResultCard
 import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.name.utils.validationDataName
 import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
+import com.banap.banap.core.ui.components.RegistrationScreenPattern
 import com.banap.banap.core.ui.components.TextBoxRegistration
 import kotlinx.coroutines.delay
 
@@ -59,8 +59,9 @@ fun NewAnalysis(
         }
     }
 
-    NewAnalysisScreen(
+    RegistrationScreenPattern(
         navigationController = navigationController,
+        fallbackRoute = "Information",
         isValidationSuccessful = isValidationSuccessful,
         stateError = stateName.nameError,
         texto = "Cálculo de Calagem do ",

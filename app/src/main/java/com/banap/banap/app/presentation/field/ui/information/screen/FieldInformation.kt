@@ -127,7 +127,7 @@ fun FieldInformation(
                                 hasIcon = true,
                                 shape = ShapeProperty.small,
                                 onClick = {
-                                    navigationController.navigate("NewFieldFirstPage")
+                                    navigationController.navigate("NewTask")
                                 },
                                 backgroundColor = VERDE_CLARO,
                                 contentColor = BRANCO,
