@@ -1,4 +1,4 @@
-package com.banap.banap.app.presentation.field.ui.information.components
+package com.banap.banap.core.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -42,7 +42,7 @@ fun Information (
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = icon),
-                contentDescription = "Icone de Descrição",
+                contentDescription = "Icone de Informação",
                 tint = VERDE_ESCURO
             )
 

@@ -1,4 +1,4 @@
-package com.banap.banap.app.presentation.field.ui.information.components
+package com.banap.banap.core.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -22,17 +22,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.banap.banap.R
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 
 @Composable
-fun FieldImage(
-    cultivation: String,
-    numberCultivation: String,
-    image: Int
+fun ImageInformation(
+    image: Int,
+    icon: Int,
+    text: String,
+    child: @Composable () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -71,25 +71,20 @@ fun FieldImage(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.fieldiconplant),
+                        imageVector = ImageVector.vectorResource(id = icon),
                         contentDescription = "Icone de Talhão",
                         tint = VERDE_ESCURO
                     )
 
                     Text(
-                        text = cultivation,
+                        text = text,
                         style = Typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
                         color = VERDE_CLARO
                     )
                 }
 
-                Text(
-                    text = numberCultivation,
-                    style = Typography.bodyLarge,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = VERDE_CLARO
-                )
+                child()
             }
         }
 

@@ -1,4 +1,4 @@
-package com.banap.banap.app.presentation.field.ui.information.components
+package com.banap.banap.core.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -11,13 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import com.banap.banap.R
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 
 @Composable
-fun FieldTitle(
-    title: String
+fun TitleInformation(
+    title: String,
+    icon: Int
 ) {
     Row(
         modifier = Modifier
@@ -29,7 +29,7 @@ fun FieldTitle(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = ImageVector.vectorResource(id = R.drawable.field),
+            imageVector = ImageVector.vectorResource(id = icon),
             contentDescription = "Icone de Talhão",
             tint = VERDE_ESCURO
         )
