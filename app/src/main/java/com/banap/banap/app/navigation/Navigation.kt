@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.banap.banap.app.navigation.viewmodel.NavigationViewModel
+import com.banap.banap.app.presentation.analysis.ui.information.screen.AnalysisInformation
 import com.banap.banap.app.presentation.analysis.ui.registration.screen.ExplanationFormData
 import com.banap.banap.app.presentation.analysis.ui.registration.screen.NewAnalysis
 import com.banap.banap.app.presentation.engineer.ui.registration.NewEngineerFirstPage
@@ -366,6 +367,22 @@ fun Navigation() {
             }
         ) {
             NewTask(navigationController)
+        }
+
+        composable(
+            route = "AnalysisInformation",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            AnalysisInformation(navigationController)
         }
     }
 }
