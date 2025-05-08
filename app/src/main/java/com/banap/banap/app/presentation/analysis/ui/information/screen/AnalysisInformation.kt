@@ -273,7 +273,7 @@ fun AnalysisInformation(
                     icon = ImageVector.vectorResource(id = R.drawable.baseline_read_more_24),
                     shape = ShapeProperty.small,
                     onClick = {
-                        navigationController.navigate("")
+                        navigationController.navigate("ReadMore")
                     },
                     backgroundColor = VERDE_CLARO,
                     contentColor = BRANCO,
