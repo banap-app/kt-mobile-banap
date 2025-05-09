@@ -1,5 +1,6 @@
 package com.banap.banap.app.presentation.analysis.ui.readmore.screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -29,6 +33,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.banap.banap.R
 import com.banap.banap.app.presentation.analysis.ui.readmore.components.ReadMoreContainer
@@ -96,40 +101,71 @@ fun ReadMore(
                     .padding(horizontal = 30.dp)
                     .align(Alignment.TopCenter)
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(
-                    space = 15.dp
-                ),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Card(
-                    modifier = Modifier
-                        .size(40.dp),
-                    shape = CircleShape,
-                    colors = CardDefaults.cardColors(
-                        containerColor = VERDE_CLARO,
-                        contentColor = BRANCO
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(
+                        space = 15.dp
                     ),
-                    content = {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = (pagerState.currentPage + 1).toString(),
-                                style = Typography.labelSmall,
-                                fontWeight = FontWeight.Black
-                            )
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .size(40.dp),
+                        shape = CircleShape,
+                        colors = CardDefaults.cardColors(
+                            containerColor = VERDE_CLARO,
+                            contentColor = BRANCO
+                        ),
+                        content = {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = (pagerState.currentPage + 1).toString(),
+                                    style = Typography.labelSmall,
+                                    fontWeight = FontWeight.Black
+                                )
+                            }
                         }
-                    }
-                )
+                    )
 
-                Text(
-                    text = etapa,
-                    style = Typography.headlineLarge,
-                    color = VERDE_CLARO
-                )
+                    Text(
+                        text = etapa,
+                        style = Typography.headlineLarge,
+                        color = VERDE_CLARO
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        navigationController.navigate("AnalysisInformation")
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = BRANCO,
+                        contentColor = VERDE_CLARO
+                    ),
+                    shape = RoundedCornerShape(10.dp),
+                    border = BorderStroke(
+                        0.5.dp,
+                        VERDE_CLARO.copy(
+                            alpha = 0.2F
+                        )
+                    ),
+                    elevation = ButtonDefaults.elevatedButtonElevation(
+                        defaultElevation = 2.dp
+                    )
+                ) {
+                    Text(
+                        text = "Pular",
+                        style = Typography.bodyMedium,
+                        fontSize = 14.sp
+                    )
+                }
             }
 
             HorizontalPager(

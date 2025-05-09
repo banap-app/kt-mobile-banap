@@ -1,5 +1,6 @@
 package com.banap.banap.core.network
 
+import com.banap.banap.common.Constants.MOBILE_URL
 import com.banap.banap.common.Constants.BASE_URL
 import com.banap.banap.data.remote.login.LoginService
 import com.banap.banap.core.data.local.token.TokenManager
