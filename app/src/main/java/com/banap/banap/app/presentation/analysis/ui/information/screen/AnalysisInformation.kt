@@ -88,9 +88,7 @@ fun AnalysisInformation(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(
-                            space = 20.dp
-                        ),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         AnalysisCard(
                             modifier = Modifier
@@ -203,9 +201,7 @@ fun AnalysisInformation(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(
-                            space = 20.dp
-                        ),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         AnalysisCard(
                             modifier = Modifier

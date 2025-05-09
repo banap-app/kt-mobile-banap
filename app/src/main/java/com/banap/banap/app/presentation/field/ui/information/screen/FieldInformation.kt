@@ -159,7 +159,7 @@ fun FieldInformation(
                             hasIcon = true,
                             shape = ShapeProperty.small,
                             onClick = {
-                                navigationController.navigate("NewAnalysis")
+                                navigationController.navigate("NewLimingCalculation")
                             },
                             backgroundColor = VERDE_CLARO,
                             contentColor = BRANCO,

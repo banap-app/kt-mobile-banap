@@ -12,5 +12,15 @@ data class RegistrationFormState(
     val description: String = "",
     val descriptionError: String? = null,
     val cultivation: String = "",
-    val cultivationError: String? = null
+    val cultivationError: String? = null,
+    val prnt: String = "",
+    val prntError: String? = null,
+    val sba: String = "",
+    val sbaError: String? = null,
+    val ctc: String = "",
+    val ctcError: String? = null,
+    val phosphorus: String = "",
+    val phosphorusError: String? = null,
+    val potassium: String = "",
+    val potassiumError: String? = null
 )

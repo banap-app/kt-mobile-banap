@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -17,25 +18,54 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.app.presentation.analysis.ui.registration.components.AnalysisResult
 import com.banap.banap.app.presentation.analysis.ui.registration.components.ResultCard
-import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.name.utils.validationDataName
-import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
+import com.banap.banap.app.presentation.validation.ctc.event.CTCTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.ctc.utils.validationDataCtc
+import com.banap.banap.app.presentation.validation.ctc.viewmodel.CTCTextFieldViewModel
+import com.banap.banap.app.presentation.validation.prnt.event.PRNTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.prnt.utils.validationDataPrnt
+import com.banap.banap.app.presentation.validation.prnt.viewmodel.PRNTextFieldViewModel
+import com.banap.banap.app.presentation.validation.sba.event.SBATextFieldFormEvent
+import com.banap.banap.app.presentation.validation.sba.utils.validationDataSba
+import com.banap.banap.app.presentation.validation.sba.viewmodel.SBATextFieldViewModel
 import com.banap.banap.core.ui.components.RegistrationScreenPattern
 import com.banap.banap.core.ui.components.TextBoxRegistration
+import com.banap.banap.core.ui.util.limingCalculation
 import kotlinx.coroutines.delay
 
 @Composable
-fun NewAnalysis(
+fun NewLimingCalculation(
     navigationController: NavController
 ) {
     val context = LocalContext.current
 
-    val viewModelName = viewModel<NameTextFieldViewModel>()
-    val stateName = viewModelName.state
+    val viewModelSba = viewModel<SBATextFieldViewModel>()
+    val stateSba = viewModelSba.state
 
-    var isValidationSuccessful by remember {
-        mutableStateOf(false)
-    }
+    val viewModelCtc = viewModel<CTCTextFieldViewModel>()
+    val stateCtc = viewModelCtc.state
+
+    val viewModelPrnt = viewModel<PRNTextFieldViewModel>()
+    val statePrnt = viewModelPrnt.state
+
+    val validationDataSba = validationDataSba(
+        context = context,
+        viewModelSba = viewModelSba,
+        stateSba = stateSba
+    )
+
+    val validationDataCtc = validationDataCtc(
+        context = context,
+        viewModelCtc = viewModelCtc,
+        stateCtc = stateCtc
+    )
+
+    val validationDataPrnt = validationDataPrnt(
+        context = context,
+        viewModelPrnt = viewModelPrnt,
+        statePrnt = statePrnt
+    )
+
+    val isValidationSuccessful = validationDataSba && validationDataCtc && validationDataPrnt
 
     var analysisMade by remember {
         mutableStateOf(false)
@@ -45,11 +75,9 @@ fun NewAnalysis(
         mutableStateOf(false)
     }
 
-    isValidationSuccessful = validationDataName(
-        context = context,
-        viewModelName = viewModelName,
-        stateName = stateName
-    )
+    var limingCalculation by remember {
+        mutableDoubleStateOf(0.0)
+    }
 
     LaunchedEffect(isLoading) {
         if (isLoading) {
@@ -63,10 +91,15 @@ fun NewAnalysis(
         navigationController = navigationController,
         fallbackRoute = "Information",
         isValidationSuccessful = isValidationSuccessful,
-        stateError = stateName.nameError,
+        stateError = stateSba.sbaError,
         texto = "Cálculo de Calagem do ",
         textoASerDestacado = "Solo...",
-        subTitulo = "Método conhecido para calcular a quantidade de calcário necessária a ser aplicada no solo, com o objetivo de corrigir a acidez e alcançar a saturação desejada de bases.",
+        subTitulo =
+            if (!analysisMade) {
+                "Método conhecido para calcular a quantidade de calcário necessária a ser aplicada no solo, com o objetivo de corrigir a acidez e alcançar a saturação desejada de bases."
+            } else {
+                "Esse é o resultado do cálculo de calagem que foi feito baseado nas informações disponibilzadas por você:"
+            },
         children = {
             when {
                 analysisMade -> {
@@ -75,17 +108,7 @@ fun NewAnalysis(
                         children = {
                             ResultCard(
                                 nutrient = "Calcário",
-                                result = "260Kg/ha"
-                            )
-
-                            ResultCard(
-                                nutrient = "Calcário",
-                                result = "260Kg/ha"
-                            )
-
-                            ResultCard(
-                                nutrient = "Calcário",
-                                result = "260Kg/ha"
+                                result = "${String.format("%.2f", limingCalculation)} t/ha"
                             )
                         }
                     )
@@ -96,19 +119,18 @@ fun NewAnalysis(
                         verticalArrangement = Arrangement.spacedBy(40.dp)
                     ) {
                         TextBoxRegistration(
-                            value = stateName.name,
+                            value = stateSba.sba,
                             onValueChange = {
-                                viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
-                                viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+                                viewModelSba.onEvent(SBATextFieldFormEvent.SBAChanged(it))
+                                viewModelSba.onEvent(SBATextFieldFormEvent.Submit)
                             },
-                            isError = stateName.nameError != null,
-                            errorState = stateName.nameError,
+                            isError = stateSba.sbaError != null,
+                            errorState = stateSba.sbaError,
                             label = "SBA em V%",
                             placeholder = "exemplo%",
                             tipoTeclado = KeyboardType.Text,
                             modifier = Modifier
                                 .fillMaxWidth(),
-                            lastOne = true,
                             informationIcon = true,
                             informationIconOnClick = {
                                 navigationController.navigate("ExplanationFormData")
@@ -116,19 +138,18 @@ fun NewAnalysis(
                         )
 
                         TextBoxRegistration(
-                            value = stateName.name,
+                            value = stateCtc.ctc,
                             onValueChange = {
-                                viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
-                                viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+                                viewModelCtc.onEvent(CTCTextFieldFormEvent.CTChanged(it))
+                                viewModelCtc.onEvent(CTCTextFieldFormEvent.Submit)
                             },
-                            isError = stateName.nameError != null,
-                            errorState = stateName.nameError,
+                            isError = stateCtc.ctcError != null,
+                            errorState = stateCtc.ctcError,
                             label = "CTC",
                             placeholder = "exemplo",
                             tipoTeclado = KeyboardType.Text,
                             modifier = Modifier
                                 .fillMaxWidth(),
-                            lastOne = true,
                             informationIcon = true,
                             informationIconOnClick = {
                                 navigationController.navigate("ExplanationFormData")
@@ -136,13 +157,13 @@ fun NewAnalysis(
                         )
 
                         TextBoxRegistration(
-                            value = stateName.name,
+                            value = statePrnt.prnt,
                             onValueChange = {
-                                viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
-                                viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+                                viewModelPrnt.onEvent(PRNTextFieldFormEvent.PRNTChanged(it))
+                                viewModelPrnt.onEvent(PRNTextFieldFormEvent.Submit)
                             },
-                            isError = stateName.nameError != null,
-                            errorState = stateName.nameError,
+                            isError = statePrnt.prntError != null,
+                            errorState = statePrnt.prntError,
                             label = "PRNT em %",
                             placeholder = "exemplo%",
                             tipoTeclado = KeyboardType.Text,
@@ -159,12 +180,21 @@ fun NewAnalysis(
             }
         },
         onClick = {
-            viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+            viewModelSba.onEvent(SBATextFieldFormEvent.Submit)
+            viewModelCtc.onEvent(CTCTextFieldFormEvent.Submit)
+            viewModelPrnt.onEvent(PRNTextFieldFormEvent.Submit)
 
             if (isValidationSuccessful && !analysisMade) {
+                limingCalculation = limingCalculation(
+                    currentSba = stateSba.sba.toDouble(),
+                    desiredSba = 70.0,
+                    ctc = stateCtc.ctc.toDouble(),
+                    prnt = statePrnt.prnt.toDouble()
+                )
+
                 isLoading = true
             } else {
-                navigationController.navigate("Information")
+                navigationController.navigate("NewFertilizationRecommendation")
             }
         },
         buttonValue = if (analysisMade) "Cadastrar" else "Calcular",
