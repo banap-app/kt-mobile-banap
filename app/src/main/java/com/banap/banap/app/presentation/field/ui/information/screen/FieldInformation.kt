@@ -159,6 +159,20 @@ fun FieldInformation(
                             hasIcon = true,
                             shape = ShapeProperty.small,
                             onClick = {
+                                navigationController.navigate("NewAnalysis")
+                            },
+                            backgroundColor = VERDE_CLARO,
+                            contentColor = BRANCO,
+                            defaultElevetion = 3.dp
+                        )
+
+                        Button(
+                            texto = "Informação da Análise",
+                            modifier = Modifier
+                                .padding(vertical = 18.dp, horizontal = 15.dp),
+                            hasIcon = false,
+                            shape = ShapeProperty.small,
+                            onClick = {
                                 navigationController.navigate("AnalysisInformation")
                             },
                             backgroundColor = VERDE_CLARO,
