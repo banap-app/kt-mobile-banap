@@ -23,9 +23,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.core.ui.components.DropdownTextField
-import com.banap.banap.app.presentation.validation.cultivation.event.CultivationTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.cultivation.utils.validationDataCultivation
-import com.banap.banap.app.presentation.validation.cultivation.viewmodel.CultivationTextFieldViewModel
+import com.banap.banap.app.presentation.validation.dropdown.event.DropdownTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.dropdown.utils.validationDataDropdown
+import com.banap.banap.app.presentation.validation.dropdown.viewmodel.DropdownTextFieldViewModel
 import com.banap.banap.core.ui.components.ButtonRegistration
 import com.banap.banap.core.ui.components.RegistrationHeader
 import com.banap.banap.core.ui.components.TextBoxRegistration
@@ -49,8 +49,8 @@ fun NewFieldThirdPage (
     val viewModelDescription = viewModel<DescriptionTextFieldViewModel>()
     val stateDescription = viewModelDescription.state
 
-    val viewModelCultivation = viewModel<CultivationTextFieldViewModel>()
-    val stateCultivation = viewModelCultivation.state
+    val viewModelDropdown = viewModel<DropdownTextFieldViewModel>()
+    val stateDropdown = viewModelDropdown.state
 
     val validationDataDescription = validationDataDescription(
         context = context,
@@ -58,13 +58,13 @@ fun NewFieldThirdPage (
         stateDescription = stateDescription
     )
 
-    val validationDataCultivation = validationDataCultivation(
+    val validationDataDropdown = validationDataDropdown(
         context = context,
-        viewModelCultivation = viewModelCultivation,
-        stateCultivation = stateCultivation
+        viewModelDropdown = viewModelDropdown,
+        stateDropdown = stateDropdown
     )
 
-    val isValidationSuccessful = validationDataDescription && validationDataCultivation
+    val isValidationSuccessful = validationDataDescription && validationDataDropdown
 
     var backgroundColorButton by remember {
         mutableStateOf(CINZA_CLARO)
@@ -165,7 +165,7 @@ fun NewFieldThirdPage (
 
                     DropdownTextField(
                         label = "Cultura",
-                        value = stateCultivation.cultivation,
+                        value = stateDropdown.option,
                         placeholder = "Escolha uma cultura",
                         options = listOf(
                             "Banana Nanica",
@@ -175,9 +175,10 @@ fun NewFieldThirdPage (
                             "Banana Ouro"
                         ),
                         onOptionSelected = {
-                            viewModelCultivation.onEvent(CultivationTextFieldFormEvent.CultivationChanged(it))
-                            viewModelCultivation.onEvent(CultivationTextFieldFormEvent.Submit)
-                        }
+                            viewModelDropdown.onEvent(DropdownTextFieldFormEvent.OptionChanged(it))
+                            viewModelDropdown.onEvent(DropdownTextFieldFormEvent.Submit)
+                        },
+                        errorState = stateDropdown.optionError
                     )
                 }
 

@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -79,9 +80,14 @@ fun NewLimingCalculation(
         mutableDoubleStateOf(0.0)
     }
 
+    var page: Int by remember {
+        mutableIntStateOf(1)
+    }
+
     LaunchedEffect(isLoading) {
         if (isLoading) {
-            delay(2_000)
+            delay(1_000)
+            page = 2
             isLoading = false
             analysisMade = true
         }
@@ -95,11 +101,11 @@ fun NewLimingCalculation(
         texto = "Cálculo de Calagem do ",
         textoASerDestacado = "Solo...",
         subTitulo =
-            if (!analysisMade) {
-                "Método conhecido para calcular a quantidade de calcário necessária a ser aplicada no solo, com o objetivo de corrigir a acidez e alcançar a saturação desejada de bases."
-            } else {
-                "Esse é o resultado do cálculo de calagem que foi feito baseado nas informações disponibilzadas por você:"
-            },
+        if (!analysisMade) {
+            "Método conhecido para calcular a quantidade de calcário necessária a ser aplicada no solo, com o objetivo de corrigir a acidez e alcançar a saturação desejada de bases."
+        } else {
+            "Esse é o resultado do cálculo de calagem que foi feito baseado nas informações disponibilzadas por você:"
+        },
         children = {
             when {
                 analysisMade -> {
@@ -180,19 +186,21 @@ fun NewLimingCalculation(
             }
         },
         onClick = {
-            viewModelSba.onEvent(SBATextFieldFormEvent.Submit)
-            viewModelCtc.onEvent(CTCTextFieldFormEvent.Submit)
-            viewModelPrnt.onEvent(PRNTextFieldFormEvent.Submit)
+            if (page == 1) {
+                viewModelSba.onEvent(SBATextFieldFormEvent.Submit)
+                viewModelCtc.onEvent(CTCTextFieldFormEvent.Submit)
+                viewModelPrnt.onEvent(PRNTextFieldFormEvent.Submit)
 
-            if (isValidationSuccessful && !analysisMade) {
-                limingCalculation = limingCalculation(
-                    currentSba = stateSba.sba.toDouble(),
-                    desiredSba = 70.0,
-                    ctc = stateCtc.ctc.toDouble(),
-                    prnt = statePrnt.prnt.toDouble()
-                )
+                if (isValidationSuccessful && !analysisMade) {
+                    limingCalculation = limingCalculation(
+                        currentSba = stateSba.sba.toDouble(),
+                        desiredSba = 70.0,
+                        ctc = stateCtc.ctc.toDouble(),
+                        prnt = statePrnt.prnt.toDouble()
+                    )
 
-                isLoading = true
+                    isLoading = true
+                }
             } else {
                 navigationController.navigate("NewFertilizationRecommendation")
             }

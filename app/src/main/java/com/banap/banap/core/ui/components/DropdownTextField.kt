@@ -26,6 +26,7 @@ import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.PRETO
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
+import com.banap.banap.core.ui.theme.VERMELHO
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,7 +35,8 @@ fun DropdownTextField(
     value: String,
     placeholder: String,
     options: List<String>,
-    onOptionSelected: (String) -> Unit
+    onOptionSelected: (String) -> Unit,
+    errorState: String?
 ) {
     var isExpanded by remember {
         mutableStateOf(false)
@@ -45,82 +47,96 @@ fun DropdownTextField(
             .padding(horizontal = 30.dp)
             .fillMaxWidth(),
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(15.dp)
-        ) {
-            Text(
-                text = label,
-                style = Typography.titleMedium,
-                color = PRETO
-            )
-
-            ExposedDropdownMenuBox(
-                expanded = isExpanded,
-                onExpandedChange = {
-                    isExpanded = it
-                }
+        Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(15.dp)
             ) {
-                OutlinedTextField(
-                    value = value,
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
-                    },
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
-                        unfocusedContainerColor = VERDE_CLARO,
-                        focusedContainerColor = VERDE_CLARO,
-                        unfocusedTrailingIconColor = BRANCO,
-                        focusedTrailingIconColor = BRANCO,
-                        unfocusedTextColor = BRANCO,
-                        focusedTextColor = BRANCO,
-                        focusedPlaceholderColor = BRANCO,
-                        unfocusedPlaceholderColor = BRANCO,
-                        focusedBorderColor = AZUL_ESCURO,
-                        unfocusedBorderColor = BRANCO
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(),
-                    placeholder = {
-                        Text(
-                            text = placeholder,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    },
-                    shape = RoundedCornerShape(7.dp),
-                    textStyle = Typography.headlineSmall
+                Text(
+                    text = label,
+                    style = Typography.titleMedium,
+                    color = PRETO
                 )
 
-                ExposedDropdownMenu(
+                ExposedDropdownMenuBox(
                     expanded = isExpanded,
-                    onDismissRequest = {
-                        isExpanded = false
-                    },
-                    modifier = Modifier
-                        .clip(
-                            RoundedCornerShape(7.dp)
-                        )
-                        .background(BRANCO)
-                ) {
-                    options.forEach { option ->
-                        DropdownMenuItem(
-                            onClick = {
-                                onOptionSelected(option)
-                                isExpanded = false
-                            },
-                            text = {
-                                Text(
-                                    text = option,
-                                    style = Typography.bodyLarge,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = VERDE_CLARO
-                                )
-                            }
-                        )
+                    onExpandedChange = {
+                        isExpanded = it
                     }
+                ) {
+                    OutlinedTextField(
+                        value = value,
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+                        },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
+                            unfocusedContainerColor = VERDE_CLARO,
+                            focusedContainerColor = VERDE_CLARO,
+                            unfocusedTrailingIconColor = BRANCO,
+                            focusedTrailingIconColor = BRANCO,
+                            unfocusedTextColor = BRANCO,
+                            focusedTextColor = BRANCO,
+                            focusedPlaceholderColor = BRANCO,
+                            unfocusedPlaceholderColor = BRANCO,
+                            focusedBorderColor = AZUL_ESCURO,
+                            unfocusedBorderColor = BRANCO,
+                            errorContainerColor = VERMELHO,
+                            errorPlaceholderColor = BRANCO,
+                            errorTrailingIconColor = BRANCO
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(),
+                        placeholder = {
+                            Text(
+                                text = placeholder,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        },
+                        shape = RoundedCornerShape(7.dp),
+                        textStyle = Typography.headlineSmall,
+                        isError = errorState != null
+                    )
 
+                    ExposedDropdownMenu(
+                        expanded = isExpanded,
+                        onDismissRequest = {
+                            isExpanded = false
+                        },
+                        modifier = Modifier
+                            .clip(
+                                RoundedCornerShape(7.dp)
+                            )
+                            .background(BRANCO)
+                    ) {
+                        options.forEach { option ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    onOptionSelected(option)
+                                    isExpanded = false
+                                },
+                                text = {
+                                    Text(
+                                        text = option,
+                                        style = Typography.bodyLarge,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = VERDE_CLARO
+                                    )
+                                }
+                            )
+                        }
+
+                    }
                 }
+            }
+
+            if (errorState != null) {
+                Text(
+                    text = errorState,
+                    color = VERMELHO,
+                    style = Typography.displaySmall
+                )
             }
         }
     }
