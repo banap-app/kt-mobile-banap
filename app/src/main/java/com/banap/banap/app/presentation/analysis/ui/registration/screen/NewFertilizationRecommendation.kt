@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -18,7 +17,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.app.presentation.analysis.ui.registration.components.AnalysisResult
 import com.banap.banap.app.presentation.analysis.ui.registration.components.ResultCard
-import com.banap.banap.app.presentation.validation.ctc.event.CTCTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.cultivation.event.CultivationTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.cultivation.utils.validationDataCultivation
 import com.banap.banap.app.presentation.validation.cultivation.viewmodel.CultivationTextFieldViewModel
@@ -31,6 +29,8 @@ import com.banap.banap.app.presentation.validation.potassium.viewmodel.Potassium
 import com.banap.banap.core.ui.components.DropdownTextField
 import com.banap.banap.core.ui.components.RegistrationScreenPattern
 import com.banap.banap.core.ui.components.TextBoxRegistration
+import com.banap.banap.core.ui.util.FertilizerCalculator
+import com.banap.banap.domain.model.NPKResult
 import kotlinx.coroutines.delay
 
 @Composable
@@ -66,8 +66,7 @@ fun NewFertilizationRecommendation(
         statePotassium = statePotassium
     )
 
-    val isValidationSuccessful =
-        validationDataCultivation && validationDataPhosphorus && validationDataPotassium
+    val isValidationSuccessful = validationDataCultivation && validationDataPhosphorus && validationDataPotassium
 
     var analysisMade by remember {
         mutableStateOf(false)
@@ -77,8 +76,8 @@ fun NewFertilizationRecommendation(
         mutableStateOf(false)
     }
 
-    var fertilizationRecommendation by remember {
-        mutableDoubleStateOf(0.0)
+    var npkResult: NPKResult? by remember {
+        mutableStateOf(null)
     }
 
     LaunchedEffect(isLoading) {
@@ -110,17 +109,17 @@ fun NewFertilizationRecommendation(
                         children = {
                             ResultCard(
                                 nutrient = "Potássio",
-                                result = "resultado"
+                                result = npkResult?.potassium.toString()
                             )
 
                             ResultCard(
                                 nutrient = "Fosfóro",
-                                result = "resultado"
+                                result = npkResult?.phosphor.toString()
                             )
 
                             ResultCard(
                                 nutrient = "Nitrogênio",
-                                result = "resultado"
+                                result = npkResult?.nitrogen.toString()
                             )
                         }
                     )
@@ -199,6 +198,18 @@ fun NewFertilizationRecommendation(
             viewModelCultivation.onEvent(CultivationTextFieldFormEvent.Submit)
 
             if (isValidationSuccessful && !analysisMade) {
+                npkResult = FertilizerCalculator.calculateNPK(
+                    phosphor = statePhosphorus.phosphorus.toDouble(),
+                    potassium = statePotassium.potassium.toDouble(),
+                    expectedProductivity =
+                    when (stateCultivation.cultivation) {
+                        "Menor que 20%" -> 19
+                        "Entre 20 e 30%" -> 29
+                        "Entre 30 e 40%" -> 39
+                        "Entre 40 e 50%" -> 49
+                        else -> 0
+                    }
+                )
                 isLoading = true
             } else {
                 navigationController.navigate("Information")

@@ -1,12 +1,9 @@
-package com.banap.banap.app.presentation.property.ui.listing.components
+package com.banap.banap.core.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -15,34 +12,32 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
-import com.banap.banap.R
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 
 @Composable
-fun PropertyCard(
-    fieldName: String
+fun ListItemCard(
+    modifier: Modifier,
+    title: String,
+    titleStyle: TextStyle,
+    name: String,
+    nameStyle: TextStyle,
+    child: @Composable () -> Unit
 ) {
     Card (
-        modifier = Modifier
-            .height(
-                max(
-                    150.dp,
-                    150.dp
-                )
-            )
-            .fillMaxWidth(),
+        modifier = modifier,
         colors = CardDefaults.cardColors(
             containerColor = VERDE_CLARO,
             contentColor = BRANCO
         ),
-        shape = RoundedCornerShape(30.dp)
+        shape = RoundedCornerShape(30.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 3.dp
+        )
     ) {
         Row (
             modifier = Modifier
@@ -53,21 +48,18 @@ fun PropertyCard(
         ) {
             Column {
                 Text(
-                    text = "Talhão",
-                    style = Typography.titleMedium,
+                    text = title,
+                    style = titleStyle,
                     fontWeight = FontWeight.Normal
                 )
 
                 Text(
-                    text = fieldName,
-                    style = Typography.displayLarge
+                    text = name,
+                    style = nameStyle
                 )
             }
 
-            Image(
-                imageVector = ImageVector.vectorResource(id = R.drawable.propertyimagefield),
-                contentDescription = "Imagem do Talhao da Propriedade"
-            )
+            child()
         }
     }
 }
