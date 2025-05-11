@@ -1,8 +1,11 @@
 package com.banap.banap.app.presentation.property.ui.listing.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
@@ -12,12 +15,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.banap.banap.R
 import com.banap.banap.app.presentation.property.ui.listing.components.Container
-import com.banap.banap.app.presentation.property.ui.listing.components.PropertyCard
+import com.banap.banap.core.ui.components.ListItemCard
 import com.banap.banap.core.ui.components.Button
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
@@ -92,9 +98,20 @@ fun Property(
                         verticalArrangement = Arrangement.spacedBy(20.dp)
                     ) {
                         items(propertyList.size) {
-                            PropertyCard(
-                                fieldName = propertyList[it]
-                            )
+                            ListItemCard(
+                                modifier = Modifier
+                                    .height(150.dp)
+                                    .fillMaxWidth(),
+                                title = "Talhão",
+                                titleStyle = Typography.titleMedium,
+                                nameStyle = Typography.displayLarge,
+                                name = propertyList[it]
+                            ) {
+                                Image(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.propertyimagefield),
+                                    contentDescription = "Imagem do Talhao da Propriedade"
+                                )
+                            }
                         }
                     }
                 }

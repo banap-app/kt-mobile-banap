@@ -16,7 +16,8 @@ import com.banap.banap.app.navigation.viewmodel.NavigationViewModel
 import com.banap.banap.app.presentation.analysis.ui.information.screen.AnalysisInformation
 import com.banap.banap.app.presentation.analysis.ui.readmore.screen.ReadMore
 import com.banap.banap.app.presentation.analysis.ui.registration.screen.ExplanationFormData
-import com.banap.banap.app.presentation.analysis.ui.registration.screen.NewAnalysis
+import com.banap.banap.app.presentation.analysis.ui.registration.screen.NewFertilizationRecommendation
+import com.banap.banap.app.presentation.analysis.ui.registration.screen.NewLimingCalculation
 import com.banap.banap.app.presentation.engineer.ui.registration.NewEngineerFirstPage
 import com.banap.banap.app.presentation.engineer.ui.registration.NewEngineerSecondPage
 import com.banap.banap.app.presentation.field.ui.information.screen.FieldInformation
@@ -301,7 +302,7 @@ fun Navigation() {
         }
 
         composable(
-            route = "NewAnalysis",
+            route = "NewLimingCalculation",
             enterTransition = {
                 fadeIn(
                     animationSpec = tween(animationDuration)
@@ -313,7 +314,23 @@ fun Navigation() {
                 )
             }
         ) {
-            NewAnalysis(navigationController)
+            NewLimingCalculation(navigationController)
+        }
+
+        composable(
+            route = "NewFertilizationRecommendation",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            NewFertilizationRecommendation(navigationController)
         }
 
         composable(
