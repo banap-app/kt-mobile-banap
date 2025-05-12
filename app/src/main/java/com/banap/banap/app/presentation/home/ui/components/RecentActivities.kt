@@ -1,9 +1,8 @@
 package com.banap.banap.app.presentation.home.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,39 +12,42 @@ import androidx.compose.ui.unit.dp
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
+import com.banap.banap.data.model.LogList
 
 @Composable
 fun RecentActivities(
-    titulo: String,
-    atividadeRealizada: String,
-    autorAtividade: String
+    title: String,
+    list: MutableList<LogList>
 ) {
-    Column (
+    Column(
         modifier = Modifier
             .padding(horizontal = 30.dp)
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(
+            space = 20.dp
+
+        )
     ) {
         Text(
-            text = titulo,
+            text = title,
             style = Typography.titleLarge,
             color = VERDE_ESCURO
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Column(
+            verticalArrangement = Arrangement.spacedBy(
+                space = 10.dp
+            )
+        ) {
+            list.forEach { activity ->
+                Activities(
+                    activity.author,
+                    activity.activity
+                )
+            }
 
-        Activities(
-            atividadeRealizada,
-            autorAtividade
-        )
+        }
 
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Activities(
-            atividadeRealizada,
-            autorAtividade
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
             text = "10 de Maio 2025 ás 17:54",

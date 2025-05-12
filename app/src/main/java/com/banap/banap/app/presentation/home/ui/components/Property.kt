@@ -77,16 +77,14 @@ fun Property(
             modifier = Modifier
                 .horizontalScroll(rememberScrollState())
                 .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(
+                space = 25.dp
+            )
         ) {
             FieldCard(
                 nomeTalhao = "Talhão 01",
                 navigationController
-            )
-
-            Spacer(
-                modifier = Modifier
-                    .width(25.dp)
             )
 
             NewFieldCard(

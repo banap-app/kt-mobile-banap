@@ -31,6 +31,9 @@ import com.banap.banap.app.presentation.home.ui.components.Tasks
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.skeleton.ui.home.HomeSkeleton
 import com.banap.banap.core.ui.theme.BRANCO
+import com.banap.banap.data.model.LogList
+import com.banap.banap.data.model.Task
+import com.banap.banap.data.model.TaskList
 import com.banap.banap.domain.viewmodel.TokenVerificationViewModel
 import kotlinx.coroutines.delay
 
@@ -51,6 +54,43 @@ fun Home(
     var hasToken: String? by remember {
         mutableStateOf(null)
     }
+
+    val taskList: MutableList<TaskList> = mutableListOf(
+        TaskList(
+            propertyName = "Propriedade 01",
+            tasks = listOf(
+                Task(
+                    fieldName = "Talhão 01",
+                    taskName = listOf(
+                        "Semear",
+                        "Cultivar"
+                    )
+                )
+            )
+        ),
+        TaskList(
+            propertyName = "Propriedade 02",
+            tasks = listOf(
+                Task(
+                    fieldName = "Talhão 01",
+                    taskName = listOf(
+                        "Semear"
+                    )
+                )
+            )
+        )
+    )
+
+    val logList: MutableList<LogList> = mutableListOf(
+        LogList(
+            author = "Gilmar",
+            activity = "cadastrou uma propriedade."
+        ),
+        LogList(
+            author = "Gilmar",
+            activity = "criou um talhão."
+        )
+    )
 
     LaunchedEffect(context) {
         Log.d("TOKEN", tokenViewModel.getToken("token").toString())
@@ -128,9 +168,8 @@ fun Home(
                 Spacer(modifier = Modifier.height(60.dp))
 
                 RecentActivities(
-                    titulo = "Atividades recentes",
-                    atividadeRealizada = "cadastrou uma propriedade.",
-                    autorAtividade = "Você "
+                    title = "Atividades recentes",
+                    list = logList
                 )
 
                 Spacer(modifier = Modifier.height(60.dp))
@@ -138,7 +177,8 @@ fun Home(
                 Tasks(
                     titulo = "Lista de tarefas",
                     subTitulo = "Seus afazeres da semana!",
-                    navigationController
+                    navigationController = navigationController,
+                    list = taskList
                 )
             }
         } else {
