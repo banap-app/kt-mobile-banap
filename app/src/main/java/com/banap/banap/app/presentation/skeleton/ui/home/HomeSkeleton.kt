@@ -11,33 +11,38 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.banap.banap.core.ui.theme.ShapeCarousel
 import com.banap.banap.core.ui.theme.ShapeProperty
 import com.banap.banap.core.ui.util.shimmerEffect
 
 @Composable
-fun HomeSkeleton() {
+fun HomeSkeleton(
+    padding: Dp = 30.dp
+) {
     val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
+            .verticalScroll(rememberScrollState())
             .fillMaxSize()
             .padding(
                 start = 30.dp,
                 end = 30.dp,
-                top = 40.dp,
+                top = padding + 30.dp,
                 bottom = 60.dp
             ),
         verticalArrangement = Arrangement.spacedBy(
             space = 60.dp
         )
     ) {
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(
@@ -178,6 +183,179 @@ fun HomeSkeleton() {
                     .shimmerEffect(),
                 content = {}
             )
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(
+                space = 20.dp
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .clip(
+                        shape = ShapeCarousel.medium
+                    )
+                    .fillMaxWidth()
+                    .height(30.dp)
+                    .shimmerEffect(),
+                content = {}
+            )
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(
+                    space = 10.dp
+                )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .clip(
+                            shape = ShapeCarousel.medium
+                        )
+                        .fillMaxWidth(0.7f)
+                        .height(15.dp)
+                        .shimmerEffect(),
+                    content = {}
+                )
+
+                Box(
+                    modifier = Modifier
+                        .clip(
+                            shape = ShapeCarousel.medium
+                        )
+                        .fillMaxWidth(0.5f)
+                        .height(15.dp)
+                        .shimmerEffect(),
+                    content = {}
+                )
+
+                Box(
+                    modifier = Modifier
+                        .clip(
+                            shape = ShapeCarousel.medium
+                        )
+                        .fillMaxWidth(0.8f)
+                        .height(15.dp)
+                        .shimmerEffect(),
+                    content = {}
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .clip(
+                        shape = ShapeCarousel.medium
+                    )
+                    .fillMaxWidth(0.4f)
+                    .height(10.dp)
+                    .shimmerEffect(),
+                content = {}
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(
+                space = 40.dp
+            )
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(
+                    space = 5.dp
+                )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .clip(
+                            shape = ShapeCarousel.medium
+                        )
+                        .fillMaxWidth()
+                        .height(30.dp)
+                        .shimmerEffect(),
+                    content = {}
+                )
+
+                Box(
+                    modifier = Modifier
+                        .clip(
+                            shape = ShapeCarousel.medium
+                        )
+                        .fillMaxWidth(0.7f)
+                        .height(20.dp)
+                        .shimmerEffect(),
+                    content = {}
+                )
+            }
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(
+                    space = 60.dp
+                )
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(
+                        space = 10.dp
+                    )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(
+                                shape = ShapeCarousel.medium
+                            )
+                            .fillMaxWidth(0.5f)
+                            .height(15.dp)
+                            .shimmerEffect(),
+                        content = {}
+                    )
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(
+                            space = 5.dp
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .clip(
+                                    shape = ShapeCarousel.medium
+                                )
+                                .fillMaxWidth(0.4f)
+                                .height(10.dp)
+                                .shimmerEffect(),
+                            content = {}
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .clip(
+                                    shape = ShapeProperty.medium
+                                )
+                                .height(50.dp)
+                                .fillMaxWidth()
+                                .shimmerEffect(),
+                            content = {}
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(
+                                shape = ShapeProperty.medium
+                            )
+                            .height(60.dp)
+                            .fillMaxWidth(0.7f)
+                            .shimmerEffect(),
+                        content = {}
+                    )
+                }
+            }
         }
     }
 }
