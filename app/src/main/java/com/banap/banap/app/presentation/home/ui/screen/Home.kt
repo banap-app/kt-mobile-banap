@@ -1,6 +1,6 @@
 package com.banap.banap.app.presentation.home.ui.screen
 
-import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,8 +32,8 @@ import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.skeleton.ui.home.HomeSkeleton
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.domain.viewmodel.TokenVerificationViewModel
+import kotlinx.coroutines.delay
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Home(
     navigationController: NavController,
@@ -48,13 +48,28 @@ fun Home(
         mutableStateOf(false)
     }
 
+    var hasToken: String? by remember {
+        mutableStateOf(null)
+    }
+
     LaunchedEffect(context) {
+        Log.d("TOKEN", tokenViewModel.getToken("token").toString())
+
         tokenViewModel.getToken("token")?.let { token ->
+            hasToken = token
             tokenVerificationViewModel.verifyToken(token)
+        } ?:
+        run {
+            Log.d("NO_TOKEN", "Voce nao possui um token de autenticação e será redirecionado para tela de login")
+            delay(1_000)
+            tokenViewModel.clearAll()
+            navigationController.navigate("Login")
         }
     }
 
     LaunchedEffect(tokenVerificationState.response) {
+        Log.d("RESPONSE", tokenVerificationState.response?.decodedToken ?: "sem resposta")
+
         tokenVerificationState.response?.let {
             tokenViewModel.saveToken("verifiedToken", it.success.toString())
             isTokenValid = it.success
@@ -62,6 +77,8 @@ fun Home(
     }
 
     LaunchedEffect(tokenVerificationState.error) {
+        Log.d("ERROR", tokenVerificationState.error)
+
         if (tokenVerificationState.error.isNotEmpty()) {
             tokenViewModel.clearAll()
             navigationController.navigate("Login")
@@ -72,8 +89,8 @@ fun Home(
         modifier = Modifier
             .fillMaxSize(),
         containerColor = BRANCO
-    ) {
-        if (isTokenValid) {
+    ) { innerPadding ->
+        if (isTokenValid && !hasToken.isNullOrEmpty()) {
             Column (
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
@@ -125,7 +142,9 @@ fun Home(
                 )
             }
         } else {
-            HomeSkeleton()
+            HomeSkeleton(
+                padding = innerPadding.calculateTopPadding()
+            )
         }
     }
 }
