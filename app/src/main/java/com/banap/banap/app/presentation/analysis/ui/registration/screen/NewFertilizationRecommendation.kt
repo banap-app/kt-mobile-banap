@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -17,9 +18,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.app.presentation.analysis.ui.registration.components.AnalysisResult
 import com.banap.banap.app.presentation.analysis.ui.registration.components.ResultCard
-import com.banap.banap.app.presentation.validation.cultivation.event.CultivationTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.cultivation.utils.validationDataCultivation
-import com.banap.banap.app.presentation.validation.cultivation.viewmodel.CultivationTextFieldViewModel
+import com.banap.banap.app.presentation.validation.dropdown.event.DropdownTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.dropdown.utils.validationDataDropdown
+import com.banap.banap.app.presentation.validation.dropdown.viewmodel.DropdownTextFieldViewModel
 import com.banap.banap.app.presentation.validation.phosphorus.event.PhosphorusTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.phosphorus.utils.validationDataPhosphorus
 import com.banap.banap.app.presentation.validation.phosphorus.viewmodel.PhosphorusTextFieldViewModel
@@ -39,8 +40,8 @@ fun NewFertilizationRecommendation(
 ) {
     val context = LocalContext.current
 
-    val viewModelCultivation = viewModel<CultivationTextFieldViewModel>()
-    val stateCultivation = viewModelCultivation.state
+    val viewModelDropdown = viewModel<DropdownTextFieldViewModel>()
+    val stateDropdown = viewModelDropdown.state
 
     val viewModelPhosphorus = viewModel<PhosphorusTextFieldViewModel>()
     val statePhosphorus = viewModelPhosphorus.state
@@ -48,10 +49,10 @@ fun NewFertilizationRecommendation(
     val viewModelPotassium = viewModel<PotassiumTextFieldViewModel>()
     val statePotassium = viewModelPotassium.state
 
-    val validationDataCultivation = validationDataCultivation(
+    val validationDataDropdown = validationDataDropdown(
         context = context,
-        viewModelCultivation = viewModelCultivation,
-        stateCultivation = stateCultivation
+        viewModelDropdown = viewModelDropdown,
+        stateDropdown = stateDropdown
     )
 
     val validationDataPhosphorus = validationDataPhosphorus(
@@ -66,7 +67,8 @@ fun NewFertilizationRecommendation(
         statePotassium = statePotassium
     )
 
-    val isValidationSuccessful = validationDataCultivation && validationDataPhosphorus && validationDataPotassium
+    val isValidationSuccessful =
+        validationDataDropdown && validationDataPhosphorus && validationDataPotassium
 
     var analysisMade by remember {
         mutableStateOf(false)
@@ -80,9 +82,14 @@ fun NewFertilizationRecommendation(
         mutableStateOf(null)
     }
 
+    var page: Int by remember {
+        mutableIntStateOf(1)
+    }
+
     LaunchedEffect(isLoading) {
         if (isLoading) {
-            delay(2_000)
+            delay(1_000)
+            page = 2
             isLoading = false
             analysisMade = true
         }
@@ -169,7 +176,7 @@ fun NewFertilizationRecommendation(
 
                         DropdownTextField(
                             label = "Produtividade Esperada",
-                            value = stateCultivation.cultivation,
+                            value = stateDropdown.option,
                             placeholder = "Qual é a produtividade esperada?",
                             options = listOf(
                                 "Menor que 20%",
@@ -179,38 +186,40 @@ fun NewFertilizationRecommendation(
                                 "Maior que 50%"
                             ),
                             onOptionSelected = {
-                                viewModelCultivation.onEvent(
-                                    CultivationTextFieldFormEvent.CultivationChanged(
+                                viewModelDropdown.onEvent(
+                                    DropdownTextFieldFormEvent.OptionChanged(
                                         it
                                     )
                                 )
-                                viewModelCultivation.onEvent(CultivationTextFieldFormEvent.Submit)
-                            }
+                                viewModelDropdown.onEvent(DropdownTextFieldFormEvent.Submit)
+                            },
+                            errorState = stateDropdown.optionError
                         )
                     }
-
                 }
             }
         },
         onClick = {
-            viewModelPhosphorus.onEvent(PhosphorusTextFieldFormEvent.Submit)
-            viewModelPotassium.onEvent(PotassiumTextFieldFormEvent.Submit)
-            viewModelCultivation.onEvent(CultivationTextFieldFormEvent.Submit)
+            if (page == 1) {
+                viewModelPhosphorus.onEvent(PhosphorusTextFieldFormEvent.Submit)
+                viewModelPotassium.onEvent(PotassiumTextFieldFormEvent.Submit)
+                viewModelDropdown.onEvent(DropdownTextFieldFormEvent.Submit)
 
-            if (isValidationSuccessful && !analysisMade) {
-                npkResult = FertilizerCalculator.calculateNPK(
-                    phosphor = statePhosphorus.phosphorus.toDouble(),
-                    potassium = statePotassium.potassium.toDouble(),
-                    expectedProductivity =
-                    when (stateCultivation.cultivation) {
-                        "Menor que 20%" -> 19
-                        "Entre 20 e 30%" -> 29
-                        "Entre 30 e 40%" -> 39
-                        "Entre 40 e 50%" -> 49
-                        else -> 0
-                    }
-                )
-                isLoading = true
+                if (isValidationSuccessful && !analysisMade) {
+                    npkResult = FertilizerCalculator.calculateNPK(
+                        phosphor = statePhosphorus.phosphorus.toDouble(),
+                        potassium = statePotassium.potassium.toDouble(),
+                        expectedProductivity =
+                        when (stateDropdown.option) {
+                            "Menor que 20%" -> 19
+                            "Entre 20 e 30%" -> 29
+                            "Entre 30 e 40%" -> 39
+                            "Entre 40 e 50%" -> 49
+                            else -> 0
+                        }
+                    )
+                    isLoading = true
+                }
             } else {
                 navigationController.navigate("Information")
             }

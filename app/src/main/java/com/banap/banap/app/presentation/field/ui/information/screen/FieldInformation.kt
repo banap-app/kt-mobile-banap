@@ -28,6 +28,7 @@ import androidx.navigation.NavController
 import com.banap.banap.R
 import com.banap.banap.app.presentation.analysis.ui.information.components.CreateDetails
 import com.banap.banap.app.presentation.field.ui.information.components.FieldActions
+import com.banap.banap.app.presentation.home.ui.components.TaskCard
 import com.banap.banap.core.ui.components.ImageInformation
 import com.banap.banap.core.ui.components.Information
 import com.banap.banap.core.ui.components.Button
@@ -40,6 +41,7 @@ import com.banap.banap.core.ui.theme.ShapeProperty
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
+import com.banap.banap.core.ui.theme.VERMELHO
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -52,6 +54,11 @@ fun FieldInformation(
 
     val analysisList = mutableListOf<String>(
         "Análise 01"
+    )
+
+    val taskList = mutableListOf<String>(
+        "Adubar",
+        "Jambrolhar"
     )
 
     InformationScreenPattern(
@@ -99,40 +106,91 @@ fun FieldInformation(
         )
 
         Information(
-            space = 60.dp,
+            space = if (taskList.isEmpty()) 60.dp else 40.dp,
             icon = R.drawable.fieldicontask,
             title = "Lista de Tarefas",
             child = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(
-                        space = 40.dp,
-                        alignment = Alignment.CenterVertically
-                    )
-                ) {
-                    Text(
-                        text = "Você ainda não tem\numa tarefa á ser feita!",
-                        textAlign = TextAlign.Center,
-                        style = Typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = CINZA_ESCURO
-                    )
+                when {
+                    taskList.isEmpty() -> {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(
+                                space = 40.dp,
+                                alignment = Alignment.CenterVertically
+                            )
+                        ) {
+                            Text(
+                                text = "Você ainda não tem\numa tarefa á ser feita!",
+                                textAlign = TextAlign.Center,
+                                style = Typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = CINZA_ESCURO
+                            )
 
-                    Button(
-                        texto = "Nova Tarefa",
-                        modifier = Modifier
-                            .padding(vertical = 18.dp, horizontal = 15.dp),
-                        hasIcon = true,
-                        shape = ShapeProperty.small,
-                        onClick = {
-                            navigationController.navigate("NewTask")
-                        },
-                        backgroundColor = VERDE_CLARO,
-                        contentColor = BRANCO,
-                        defaultElevetion = 3.dp
-                    )
+                            Button(
+                                texto = "Nova Tarefa",
+                                modifier = Modifier
+                                    .padding(vertical = 18.dp, horizontal = 15.dp),
+                                hasIcon = true,
+                                shape = ShapeProperty.small,
+                                onClick = {
+                                    navigationController.navigate("NewTask")
+                                },
+                                backgroundColor = VERDE_CLARO,
+                                contentColor = BRANCO,
+                                defaultElevetion = 3.dp
+                            )
+                        }
+                    }
+
+                    else -> {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(
+                                space = 60.dp
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(
+                                    space = 10.dp
+                                )
+                            ) {
+                                taskList.forEach { task ->
+                                    TaskCard(
+                                        cardColor = VERMELHO,
+                                        priority = "Alta",
+                                        name = task,
+                                        time = "00:60 ás 08:00"
+                                    )
+                                }
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                Button(
+                                    texto = "Nova Tarefa",
+                                    modifier = Modifier
+                                        .padding(vertical = 18.dp, horizontal = 15.dp),
+                                    hasIcon = true,
+                                    shape = ShapeProperty.small,
+                                    onClick = {
+                                        navigationController.navigate("NewTask")
+                                    },
+                                    backgroundColor = VERDE_CLARO,
+                                    contentColor = BRANCO,
+                                    defaultElevetion = 3.dp
+                                )
+                            }
+                        }
+                    }
                 }
             }
         )

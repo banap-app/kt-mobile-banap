@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,12 +17,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.app.presentation.task.ui.registration.components.Scheduling
-import com.banap.banap.app.presentation.validation.cultivation.event.CultivationTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.cultivation.utils.validationDataCultivation
-import com.banap.banap.app.presentation.validation.cultivation.viewmodel.CultivationTextFieldViewModel
+import com.banap.banap.app.presentation.validation.dropdown.event.DropdownTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.dropdown.utils.validationDataDropdown
+import com.banap.banap.app.presentation.validation.dropdown.utils.validationDataDropdownPriority
+import com.banap.banap.app.presentation.validation.dropdown.viewmodel.DropdownPriorityTextFieldViewModel
+import com.banap.banap.app.presentation.validation.dropdown.viewmodel.DropdownTextFieldViewModel
 import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.name.utils.validationDataName
 import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
+import com.banap.banap.app.presentation.validation.scheduling.utils.validationDataScheduling
 import com.banap.banap.core.ui.components.DropdownTextField
 import com.banap.banap.core.ui.components.RegistrationScreenPattern
 import com.banap.banap.core.ui.components.TextBoxRegistration
@@ -36,15 +40,28 @@ fun NewTask(
     val viewModelName = viewModel<NameTextFieldViewModel>()
     val stateName = viewModelName.state
 
-    val viewModelCultivation = viewModel<CultivationTextFieldViewModel>()
-    val stateCultivation = viewModelCultivation.state
+    val viewModelDropdownField = viewModel<DropdownTextFieldViewModel>()
+    val stateDropdownField = viewModelDropdownField.state
 
-    var isValidationSuccessful by remember {
-        mutableStateOf(false)
-    }
+    val viewModelDropdownPriority = viewModel<DropdownPriorityTextFieldViewModel>()
+    val stateDropdownPriority = viewModelDropdownPriority.state
 
     var isLoading by remember {
         mutableStateOf(false)
+    }
+
+    var startTime = remember {
+        mutableStateOf("")
+    }
+    var endTime = remember {
+        mutableStateOf("")
+    }
+
+    var startError = remember {
+        mutableStateOf("")
+    }
+    var endError = remember {
+        mutableStateOf("")
     }
 
     val validationDataName = validationDataName(
@@ -53,13 +70,24 @@ fun NewTask(
         stateName = stateName
     )
 
-    val validationDataCultivation = validationDataCultivation(
+    val validationDataOptionField = validationDataDropdown(
         context = context,
-        viewModelCultivation = viewModelCultivation,
-        stateCultivation = stateCultivation
+        viewModelDropdown = viewModelDropdownField,
+        stateDropdown = stateDropdownField
     )
 
-    isValidationSuccessful = validationDataName && validationDataCultivation
+    val validationDataDropdownPriority = validationDataDropdownPriority(
+        context = context,
+        viewModelDropdown = viewModelDropdownPriority,
+        stateDropdown = stateDropdownPriority
+    )
+
+    val validationDataScheduling = validationDataScheduling(
+        startTime = startTime.value,
+        endTime = endTime.value
+    )
+
+    val isValidationSuccessful = validationDataName && validationDataOptionField && validationDataDropdownPriority && validationDataScheduling
 
     LaunchedEffect(isLoading) {
         if (isLoading) {
@@ -73,7 +101,7 @@ fun NewTask(
 
     RegistrationScreenPattern(
         navigationController = navigationController,
-        fallbackRoute = "Home",
+        fallbackRoute = "Information",
         texto = "Criando uma ",
         textoASerDestacado = "tarefa...",
         tamanhoTextoDestacado = 36,
@@ -81,12 +109,20 @@ fun NewTask(
         buttonValue = "Cadastrar",
         onClick = {
             viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+            viewModelDropdownField.onEvent(DropdownTextFieldFormEvent.Submit)
 
-            if (validationDataName) {
+            if (!validationDataScheduling) {
+                startError.value = "* Requerido"
+                endError.value = "* Requerido"
+            }
+
+            viewModelDropdownPriority.onEvent(DropdownTextFieldFormEvent.Submit)
+
+            if (isValidationSuccessful) {
                 isLoading = true
             }
         },
-        isValidationSuccessful = validationDataName,
+        isValidationSuccessful = isValidationSuccessful,
         stateError = stateName.nameError,
         isLoading = isLoading,
         children = {
@@ -110,28 +146,33 @@ fun NewTask(
 
                 DropdownTextField(
                     label = "Talhão",
-                    value = stateCultivation.cultivation,
+                    value = stateDropdownField.option,
                     placeholder = "Escolha um talhão para a tarefa",
                     options = listOf(
                         "Talhão 1"
                     ),
                     onOptionSelected = {
-                        viewModelCultivation.onEvent(
-                            CultivationTextFieldFormEvent.CultivationChanged(
+                        viewModelDropdownField.onEvent(
+                            DropdownTextFieldFormEvent.OptionChanged(
                                 it
                             )
                         )
-                        viewModelCultivation.onEvent(CultivationTextFieldFormEvent.Submit)
-                    }
+                        viewModelDropdownField.onEvent(DropdownTextFieldFormEvent.Submit)
+                    },
+                    errorState = stateDropdownField.optionError
                 )
 
                 Scheduling(
-                    label = "Agendamento"
+                    label = "Agendamento",
+                    startTime = startTime,
+                    endTime = endTime,
+                    startError = startError,
+                    endError = endError
                 )
 
                 DropdownTextField(
                     label = "Prioridade",
-                    value = stateCultivation.cultivation,
+                    value = stateDropdownPriority.optionPriority,
                     placeholder = "Defina uma prioridade",
                     options = listOf(
                         "Baixa prioridade",
@@ -139,13 +180,14 @@ fun NewTask(
                         "Alta prioridade"
                     ),
                     onOptionSelected = {
-                        viewModelCultivation.onEvent(
-                            CultivationTextFieldFormEvent.CultivationChanged(
+                        viewModelDropdownPriority.onEvent(
+                            DropdownTextFieldFormEvent.OptionChanged(
                                 it
                             )
                         )
-                        viewModelCultivation.onEvent(CultivationTextFieldFormEvent.Submit)
-                    }
+                        viewModelDropdownPriority.onEvent(DropdownTextFieldFormEvent.Submit)
+                    },
+                    errorState = stateDropdownPriority.optionPriorityError
                 )
             }
 

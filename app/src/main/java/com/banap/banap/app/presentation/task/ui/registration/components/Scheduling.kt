@@ -1,5 +1,6 @@
 package com.banap.banap.app.presentation.task.ui.registration.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,29 +30,27 @@ import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.PRETO
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
+import com.banap.banap.core.ui.theme.VERMELHO
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
+@SuppressLint("NewApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Scheduling(
-    label: String
+    label: String,
+    startTime: MutableState<String>,
+    endTime: MutableState<String>,
+    startError: MutableState<String>,
+    endError: MutableState<String>
 ) {
     var currentPicker by remember {
         mutableStateOf<PickerTarget?>(null)
     }
 
-    var startTime by remember {
-        mutableStateOf("")
-    }
-    var endTime by remember {
-        mutableStateOf("")
-    }
-
     val formatter = remember {
         DateTimeFormatter.ofPattern("HH:mm")
     }
-
 
     currentPicker?.let { target ->
         ShowTimePickerDialog(
@@ -59,11 +59,13 @@ fun Scheduling(
 
                 when (target) {
                     PickerTarget.START -> {
-                        startTime = formatted
+                        startError.value = ""
+                        startTime.value = formatted
                     }
 
                     PickerTarget.END -> {
-                        endTime = formatted
+                        endError.value = ""
+                        endTime.value = formatted
                     }
                 }
 
@@ -95,47 +97,58 @@ fun Scheduling(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    Text(
-                        text = "Começar ás",
-                        style = Typography.bodyLarge,
-                        fontWeight = FontWeight.Normal,
-                        color = PRETO
-                    )
-
-                    Card(
-                        onClick = {
-                            currentPicker = PickerTarget.START
-                        },
-                        modifier = Modifier
-                            .width(
-                                min(
-                                    90.dp,
-                                    90.dp
-                                )
-                            ),
-                        shape = RoundedCornerShape(7.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = VERDE_CLARO,
-                            contentColor = BRANCO
-                        )
+                Column {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         Text(
-                            text = startTime.ifEmpty { "00 : 00" },
-                            style = Typography.bodySmall,
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.SemiBold,
-                            color = BRANCO,
+                            text = "Começar ás",
+                            style = Typography.bodyLarge,
+                            fontWeight = FontWeight.Normal,
+                            color = PRETO
+                        )
+
+                        Card(
+                            onClick = {
+                                currentPicker = PickerTarget.START
+                            },
                             modifier = Modifier
-                                .padding(
-                                    vertical = 13.dp
-                                )
-                                .fillMaxSize()
+                                .width(
+                                    min(
+                                        90.dp,
+                                        90.dp
+                                    )
+                                ),
+                            shape = RoundedCornerShape(7.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (startError.value.isEmpty()) VERDE_CLARO else VERMELHO,
+                                contentColor = BRANCO
+                            )
+                        ) {
+                            Text(
+                                text = startTime.value.ifEmpty { "00 : 00" },
+                                style = Typography.bodySmall,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.SemiBold,
+                                color = BRANCO,
+                                modifier = Modifier
+                                    .padding(
+                                        vertical = 13.dp
+                                    )
+                                    .fillMaxSize()
+                            )
+                        }
+                    }
+
+                    if (startError.value.isNotEmpty()) {
+                        Text(
+                            text = startError.value,
+                            color = VERMELHO,
+                            style = Typography.displaySmall
                         )
                     }
                 }
+
 
                 Text(
                     text = "até as",
@@ -144,47 +157,58 @@ fun Scheduling(
                     color = PRETO
                 )
 
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Text(
-                        text = "Terminar ás",
-                        style = Typography.bodyLarge,
-                        fontWeight = FontWeight.Normal,
-                        color = PRETO
-                    )
-
-                    Card(
-                        onClick = {
-                            currentPicker = PickerTarget.END
-                        },
-                        modifier = Modifier
-                            .width(
-                                min(
-                                    90.dp,
-                                    90.dp
-                                )
-                            ),
-                        shape = RoundedCornerShape(7.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = VERDE_CLARO,
-                            contentColor = BRANCO
-                        )
+                Column {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Text(
-                            text = endTime.ifEmpty { "00 : 00" },
-                            style = Typography.bodySmall,
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.SemiBold,
-                            color = BRANCO,
+                            text = "Terminar ás",
+                            style = Typography.bodyLarge,
+                            fontWeight = FontWeight.Normal,
+                            color = PRETO
+                        )
+
+                        Card(
+                            onClick = {
+                                currentPicker = PickerTarget.END
+                            },
                             modifier = Modifier
-                                .padding(
-                                    vertical = 13.dp
-                                )
-                                .fillMaxSize()
+                                .width(
+                                    min(
+                                        90.dp,
+                                        90.dp
+                                    )
+                                ),
+                            shape = RoundedCornerShape(7.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (endError.value.isEmpty()) VERDE_CLARO else VERMELHO,
+                                contentColor = BRANCO
+                            )
+                        ) {
+                            Text(
+                                text = endTime.value.ifEmpty { "00 : 00" },
+                                style = Typography.bodySmall,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.SemiBold,
+                                color = BRANCO,
+                                modifier = Modifier
+                                    .padding(
+                                        vertical = 13.dp
+                                    )
+                                    .fillMaxSize()
+                            )
+                        }
+                    }
+
+                    if (endError.value.isNotEmpty()) {
+                        Text(
+                            text = endError.value,
+                            color = VERMELHO,
+                            style = Typography.displaySmall
                         )
                     }
                 }
+
             }
         }
     }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +33,7 @@ import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.app.presentation.validation.crea.utils.validationDataCrea
 import com.banap.banap.app.presentation.validation.crea.event.CreaTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.crea.viewmodel.CreaTextFieldViewModel
+import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -52,6 +54,17 @@ fun NewEngineerSecondPage (
         viewModelCrea = viewModelCrea,
         stateCrea = stateCrea
     )
+
+    var isLoading: Boolean by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(isLoading) {
+        if (isLoading) {
+            delay(1_000)
+            navigationController.navigate("Home")
+        }
+    }
 
     var backgroundColorButton by remember {
         mutableStateOf(CINZA_CLARO)
@@ -147,7 +160,7 @@ fun NewEngineerSecondPage (
                         viewModelCrea.onEvent(CreaTextFieldFormEvent.Submit)
 
                         if (isValidationSuccessful) {
-                            navigationController.navigate("Home")
+                            isLoading = true
                         }
                     },
                     buttonValue = "Cadastrar",

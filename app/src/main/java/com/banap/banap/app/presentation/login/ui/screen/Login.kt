@@ -94,6 +94,11 @@ fun Login(
         mutableStateOf(false)
     }
 
+    LaunchedEffect(context) {
+        Log.d("TOKEN", tokenViewModel.getToken("token").toString())
+        Log.d("VERIFIED_TOKEN", tokenViewModel.getToken("verifiedToken").toString())
+    }
+
     ConnectivityAwareContent { isOnline ->
         isApplicationOnline = isOnline
 

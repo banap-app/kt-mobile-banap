@@ -1,12 +1,12 @@
 package com.banap.banap.domain.use_case.validation
 
-class ValidateCultivation {
+class ValidateOption {
 
-    fun execute (cultivation: String) : ValidationResult {
-        if (cultivation.isBlank()) {
+    fun execute (option: String) : ValidationResult {
+        if (option.isBlank()) {
             return ValidationResult(
                 successful = false,
-                errorMessage = "A cultura não pode estar em branco"
+                errorMessage = "Escolha uma das opções disponiveis"
             )
         }
 
