@@ -1,5 +1,6 @@
 package com.banap.banap.app.presentation.home.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,17 +11,25 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.banap.banap.core.ui.theme.AMARELO
+import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.ShapeCarousel
@@ -33,12 +42,18 @@ import java.util.Locale
 fun Carousel(
     temperature: Double,
     description: String,
-    child: @Composable () -> Unit
+    iconUrl: String
 ) {
     val currentTime = Calendar.getInstance()
     val dayOfWeek = currentTime.get(Calendar.DAY_OF_WEEK)
     val hourOfDay = currentTime.get(Calendar.HOUR_OF_DAY)
     val minute = currentTime.get(Calendar.MINUTE)
+
+    val hourString = String.format("%02d", hourOfDay)
+    val minuteString = String.format("%02d", minute)
+
+    val painter = rememberAsyncImagePainter(model = iconUrl)
+    val state by painter.state.collectAsState()
 
     val dayOfWeekString = when (dayOfWeek) {
         Calendar.SUNDAY -> "Domingo"
@@ -81,7 +96,7 @@ fun Carousel(
                         color = VERDE_CLARO
                     )
                     Text(
-                        text = "$dayOfWeekString, $hourOfDay:$minute",
+                        text = "$dayOfWeekString, $hourString:$minuteString",
                         style = Typography.bodyLarge,
                         fontWeight = FontWeight.Normal,
                         color = VERDE_CLARO
@@ -101,7 +116,39 @@ fun Carousel(
                     )
                 }
 
-                child()
+                when (state) {
+                    is AsyncImagePainter.State.Loading -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp
+                        )
+                    }
+
+                    is AsyncImagePainter.State.Success -> {
+                        Image(
+                            painter = painter,
+                            contentDescription = "Ícone do clima",
+                            modifier = Modifier
+                                .size(110.dp)
+                        )
+                    }
+
+                    is AsyncImagePainter.State.Error -> {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = "Erro no carregamento",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
+                    else -> {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = "Erro no carregamento",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
             }
         }
 

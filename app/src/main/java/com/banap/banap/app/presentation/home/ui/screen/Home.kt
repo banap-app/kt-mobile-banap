@@ -182,18 +182,11 @@ fun Home(
                         )
                 )
 
-
                 Carousel(
                     temperature = weather?.main?.temp ?: 0.0,
-                    description = weather?.weather?.get(0)?.description ?: "Sol",
-                ) {
-                    AsyncImage(
-                        model = "https://openweathermap.org/img/wn/${weather?.weather?.get(0)?.icon}@2x.png",
-                        contentDescription = "Icone do Clima",
-                        modifier = Modifier
-                            .size(100.dp)
-                    )
-                }
+                    description = weather?.weather?.get(0)?.description ?: "",
+                    iconUrl = "https://openweathermap.org/img/wn/${weather?.weather?.get(0)?.icon}@2x.png"
+                )
 
                 Spacer(modifier = Modifier.height(60.dp))
 
