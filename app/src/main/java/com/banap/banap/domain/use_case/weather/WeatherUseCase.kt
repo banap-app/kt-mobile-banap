@@ -1,21 +1,21 @@
-package com.banap.banap.domain.use_case.login
+package com.banap.banap.domain.use_case.weather
 
 import com.banap.banap.common.Resource
-import com.banap.banap.data.model.token.TokenVerificationResponse
-import com.banap.banap.data.repository.login.LoginRepositoryImpl
+import com.banap.banap.data.model.weather.WeatherResponse
+import com.banap.banap.data.repository.weather.WeatherRepositoryImpl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
 import javax.inject.Inject
 
-class TokenVerificationUseCase @Inject constructor(
-    private val repository: LoginRepositoryImpl
+class WeatherUseCase @Inject constructor(
+    private val repository: WeatherRepositoryImpl
 ) {
-    operator fun invoke(token: String) : Flow<Resource<TokenVerificationResponse>> = flow {
+    operator fun invoke(city: String, apiKey: String) : Flow<Resource<WeatherResponse>> = flow {
         try {
             emit(Resource.Loading())
-            val tokenVerificationResponse = repository.verifyToken(token)
-            emit(Resource.Success(tokenVerificationResponse))
+            val weatherResponse = repository.getCurrentWeather(city, apiKey)
+            emit(Resource.Success(weatherResponse))
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "Um erro inesperado aconteceu"))
         } catch (e: IOException) {

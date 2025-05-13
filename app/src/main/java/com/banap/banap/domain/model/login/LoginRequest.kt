@@ -1,4 +1,4 @@
-package com.banap.banap.domain.model
+package com.banap.banap.domain.model.login
 
 data class LoginRequest(
     val email: String,

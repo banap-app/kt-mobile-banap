@@ -26,11 +26,31 @@ import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.ShapeCarousel
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
+import java.util.Calendar
+import java.util.Locale
 
 @Composable
 fun Carousel(
-
+    temperature: Double,
+    description: String,
+    child: @Composable () -> Unit
 ) {
+    val currentTime = Calendar.getInstance()
+    val dayOfWeek = currentTime.get(Calendar.DAY_OF_WEEK)
+    val hourOfDay = currentTime.get(Calendar.HOUR_OF_DAY)
+    val minute = currentTime.get(Calendar.MINUTE)
+
+    val dayOfWeekString = when (dayOfWeek) {
+        Calendar.SUNDAY -> "Domingo"
+        Calendar.MONDAY -> "Segunda-feira"
+        Calendar.TUESDAY -> "Terça-feira"
+        Calendar.WEDNESDAY -> "Quarta-feira"
+        Calendar.THURSDAY -> "Quinta-feira"
+        Calendar.FRIDAY -> "Sexta-feira"
+        Calendar.SATURDAY -> "Sábado"
+        else -> ""
+    }
+
     Column (
         modifier = Modifier
             .padding(horizontal = 30.dp)
@@ -49,18 +69,19 @@ fun Carousel(
         ) {
             Row (
                 modifier = Modifier
+                    .padding(horizontal = 35.dp)
                     .fillMaxSize(),
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
                     Text(
-                        text = "27 °C",
+                        text = "${temperature.toInt()} °C",
                         style = Typography.headlineLarge,
                         color = VERDE_CLARO
                     )
                     Text(
-                        text = "quinta-feira, 12:00",
+                        text = "$dayOfWeekString, $hourOfDay:$minute",
                         style = Typography.bodyLarge,
                         fontWeight = FontWeight.Normal,
                         color = VERDE_CLARO
@@ -69,28 +90,18 @@ fun Carousel(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = "Sol",
+                        text = description.replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase(
+                                Locale.ROOT
+                            ) else it.toString()
+                        },
                         style = Typography.bodyLarge,
                         fontWeight = FontWeight.Light,
                         color = VERDE_CLARO
                     )
                 }
 
-                Spacer(modifier = Modifier.width(44.dp))
-
-                Card (
-                    modifier = Modifier
-                        .width(70.dp)
-                        .height(70.dp)
-                        .clip(
-                            shape = ShapeCarousel.large
-                        ),
-                    colors = CardDefaults.cardColors(
-                        containerColor = AMARELO
-                    )
-                ) {
-
-                }
+                child()
             }
         }
 

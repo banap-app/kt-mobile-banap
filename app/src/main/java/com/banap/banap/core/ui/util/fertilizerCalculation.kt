@@ -1,6 +1,6 @@
 package com.banap.banap.core.ui.util
 
-import com.banap.banap.domain.model.NPKResult
+import com.banap.banap.domain.model.analysis.NPKResult
 
 object FertilizerCalculator {
 

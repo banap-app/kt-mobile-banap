@@ -1,11 +1,11 @@
-package com.banap.banap.data.repository
+package com.banap.banap.data.repository.login
 
-import com.banap.banap.domain.model.LoginRequest
-import com.banap.banap.data.model.LoginResponse
-import com.banap.banap.data.model.TokenVerificationResponse
+import com.banap.banap.domain.model.login.LoginRequest
+import com.banap.banap.data.model.login.LoginResponse
+import com.banap.banap.data.model.token.TokenVerificationResponse
 import com.banap.banap.data.remote.login.LoginService
-import com.banap.banap.domain.model.TokenVerificationRequest
-import com.banap.banap.domain.repository.LoginRepository
+import com.banap.banap.domain.model.token.TokenVerificationRequest
+import com.banap.banap.domain.repository.login.LoginRepository
 import javax.inject.Inject
 
 class LoginRepositoryImpl @Inject constructor(

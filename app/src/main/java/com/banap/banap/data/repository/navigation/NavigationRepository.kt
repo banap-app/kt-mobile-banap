@@ -1,4 +1,4 @@
-package com.banap.banap.data.repository
+package com.banap.banap.data.repository.navigation
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit

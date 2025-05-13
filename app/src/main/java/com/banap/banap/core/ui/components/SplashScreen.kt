@@ -31,7 +31,7 @@ import com.banap.banap.app.navigation.viewmodel.NavigationViewModel
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
-import com.banap.banap.domain.viewmodel.TokenVerificationViewModel
+import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
 
 @Composable
 fun SplashScreen(

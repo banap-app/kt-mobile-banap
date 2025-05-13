@@ -39,7 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.R
-import com.banap.banap.domain.viewmodel.LoginViewModel
+import com.banap.banap.domain.viewmodel.login.LoginViewModel
 import com.banap.banap.core.ui.components.Button
 import com.banap.banap.app.presentation.login.ui.components.TextBox
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
@@ -63,7 +63,7 @@ import android.provider.Settings.Panel.ACTION_INTERNET_CONNECTIVITY
 import android.provider.Settings.ACTION_WIFI_SETTINGS
 import android.util.Log
 import com.banap.banap.core.ui.components.LoadingScreen
-import com.banap.banap.domain.viewmodel.TokenVerificationViewModel
+import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

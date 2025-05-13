@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
-import com.banap.banap.data.model.LogList
+import com.banap.banap.data.model.producer.LogList
 
 @Composable
 fun RecentActivities(

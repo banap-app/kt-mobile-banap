@@ -57,7 +57,8 @@ fun TaskCard(
             Row(
                 horizontalArrangement = Arrangement.spacedBy(
                     space = 15.dp
-                )
+                ),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Card(
                     shape = RoundedCornerShape(10.dp),

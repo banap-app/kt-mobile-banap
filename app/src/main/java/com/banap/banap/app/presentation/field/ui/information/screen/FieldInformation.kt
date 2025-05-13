@@ -1,16 +1,13 @@
 package com.banap.banap.app.presentation.field.ui.information.screen
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,9 +26,9 @@ import com.banap.banap.R
 import com.banap.banap.app.presentation.analysis.ui.information.components.CreateDetails
 import com.banap.banap.app.presentation.field.ui.information.components.FieldActions
 import com.banap.banap.app.presentation.home.ui.components.TaskCard
+import com.banap.banap.core.ui.components.Button
 import com.banap.banap.core.ui.components.ImageInformation
 import com.banap.banap.core.ui.components.Information
-import com.banap.banap.core.ui.components.Button
 import com.banap.banap.core.ui.components.InformationScreenPattern
 import com.banap.banap.core.ui.components.ListItemCard
 import com.banap.banap.core.ui.theme.BRANCO
@@ -283,6 +280,9 @@ fun FieldInformation(
                                                     .widthIn(
                                                         max = 290.dp
                                                     ),
+                                                onClick = {
+                                                    navigationController.navigate("AnalysisInformation")
+                                                },
                                                 title = "Análise",
                                                 titleStyle = Typography.labelSmall,
                                                 nameStyle = Typography.titleLarge,

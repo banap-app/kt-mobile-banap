@@ -1,17 +1,12 @@
 package com.banap.banap.app.presentation.home.ui.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,14 +18,12 @@ import androidx.navigation.NavController
 import com.banap.banap.core.ui.components.Button
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
-import com.banap.banap.core.ui.theme.CINZA_INTERMEDIARIO
-import com.banap.banap.core.ui.theme.PRETO
 import com.banap.banap.core.ui.theme.ShapeProperty
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.core.ui.theme.VERMELHO
-import com.banap.banap.data.model.TaskList
+import com.banap.banap.data.model.producer.TaskList
 
 @Composable
 fun Tasks(

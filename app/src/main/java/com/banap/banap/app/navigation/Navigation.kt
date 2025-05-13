@@ -35,7 +35,8 @@ import com.banap.banap.app.presentation.task.ui.registration.screen.NewTask
 import com.banap.banap.app.presentation.tutorial.ui.Tutorial
 import com.banap.banap.app.presentation.userchoice.ui.UserChoice
 import com.banap.banap.core.ui.components.SplashScreen
-import com.banap.banap.domain.viewmodel.TokenVerificationViewModel
+import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
+import com.banap.banap.domain.viewmodel.weather.WeatherViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapNotNull
@@ -45,6 +46,7 @@ fun Navigation() {
     val navigationController = rememberNavController()
     val tokenViewModel: TokenViewModel = hiltViewModel()
     val tokenVerificationViewModel: TokenVerificationViewModel = hiltViewModel()
+    val weatherViewModel: WeatherViewModel = hiltViewModel()
     val navigationViewModel: NavigationViewModel = hiltViewModel()
     val animationDuration: Int = 700
 
@@ -101,7 +103,8 @@ fun Navigation() {
             Home(
                 navigationController,
                 tokenViewModel = tokenViewModel,
-                tokenVerificationViewModel = tokenVerificationViewModel
+                tokenVerificationViewModel = tokenVerificationViewModel,
+                weatherViewModel = weatherViewModel
             )
         }
 

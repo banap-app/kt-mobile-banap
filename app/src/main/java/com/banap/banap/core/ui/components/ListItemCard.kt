@@ -16,12 +16,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.banap.banap.core.ui.theme.BRANCO
-import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 
 @Composable
 fun ListItemCard(
     modifier: Modifier,
+    onClick: () -> Unit = {},
     title: String,
     titleStyle: TextStyle,
     name: String,
@@ -30,6 +30,7 @@ fun ListItemCard(
 ) {
     Card (
         modifier = modifier,
+        onClick = onClick,
         colors = CardDefaults.cardColors(
             containerColor = VERDE_CLARO,
             contentColor = BRANCO

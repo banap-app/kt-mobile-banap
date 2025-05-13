@@ -1,8 +1,8 @@
 package com.banap.banap.domain.use_case.login
 
 import com.banap.banap.common.Resource
-import com.banap.banap.data.model.LoginResponse
-import com.banap.banap.data.repository.LoginRepositoryImpl
+import com.banap.banap.data.model.login.LoginResponse
+import com.banap.banap.data.repository.login.LoginRepositoryImpl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.IOException

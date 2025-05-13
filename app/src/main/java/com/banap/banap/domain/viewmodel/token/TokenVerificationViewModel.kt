@@ -1,11 +1,11 @@
-package com.banap.banap.domain.viewmodel
+package com.banap.banap.domain.viewmodel.token
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.banap.banap.common.Resource
-import com.banap.banap.domain.model.TokenVerificationState
+import com.banap.banap.domain.model.token.TokenVerificationState
 import com.banap.banap.domain.use_case.login.TokenVerificationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn

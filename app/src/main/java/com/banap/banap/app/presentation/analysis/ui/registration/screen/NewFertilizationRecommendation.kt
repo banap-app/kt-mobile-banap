@@ -31,7 +31,7 @@ import com.banap.banap.core.ui.components.DropdownTextField
 import com.banap.banap.core.ui.components.RegistrationScreenPattern
 import com.banap.banap.core.ui.components.TextBoxRegistration
 import com.banap.banap.core.ui.util.FertilizerCalculator
-import com.banap.banap.domain.model.NPKResult
+import com.banap.banap.domain.model.analysis.NPKResult
 import kotlinx.coroutines.delay
 
 @Composable
