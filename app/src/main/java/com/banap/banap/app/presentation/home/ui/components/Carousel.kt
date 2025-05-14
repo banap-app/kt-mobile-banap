@@ -27,7 +27,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import com.banap.banap.core.ui.theme.BRANCO
@@ -119,8 +118,11 @@ fun Carousel(
                 when (state) {
                     is AsyncImagePainter.State.Loading -> {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.dp
+                            modifier = Modifier
+                                .padding(end = 20.dp)
+                                .size(40.dp),
+                            strokeWidth = 4.dp,
+                            color = VERDE_CLARO
                         )
                     }
 
