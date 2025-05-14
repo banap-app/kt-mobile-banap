@@ -1,24 +1,28 @@
 package com.banap.banap.app.presentation.home.ui.screen
 
+import android.Manifest
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -26,7 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil3.compose.AsyncImage
 import com.banap.banap.R
 import com.banap.banap.app.presentation.home.ui.components.Carousel
 import com.banap.banap.app.presentation.home.ui.components.Header
@@ -36,25 +39,34 @@ import com.banap.banap.app.presentation.home.ui.components.Tasks
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.skeleton.ui.home.HomeSkeleton
 import com.banap.banap.core.ui.theme.BRANCO
+import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.Task
 import com.banap.banap.data.model.producer.TaskList
 import com.banap.banap.data.model.weather.WeatherResponse
+import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
 import com.banap.banap.domain.viewmodel.weather.WeatherViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun Home(
     navigationController: NavController,
     tokenViewModel: TokenViewModel,
     tokenVerificationViewModel: TokenVerificationViewModel,
-    weatherViewModel: WeatherViewModel
+    weatherViewModel: WeatherViewModel,
+    locationViewModel: LocationViewModel
 ) {
     val context = LocalContext.current
 
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    val scope = rememberCoroutineScope()
+
     val tokenVerificationState = tokenVerificationViewModel.state.value
     val weatherState = weatherViewModel.state.value
+    val locationState = locationViewModel.state.value
 
     var isTokenValid: Boolean by remember {
         mutableStateOf(false)
@@ -105,6 +117,62 @@ fun Home(
         )
     )
 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            locationViewModel.getCurrentLocation()
+        } else {
+            scope.launch {
+                val autoDismissJob = launch {
+                    delay(5_000L)
+                    snackBarHostState.currentSnackbarData?.dismiss()
+                }
+
+                snackBarHostState.showSnackbar(
+                    message = "Usaremos um valor padrão para mostrar o clima!",
+                    actionLabel = "Entendi",
+                    duration = SnackbarDuration.Indefinite
+                )
+
+                autoDismissJob.cancel()
+            }
+        }
+    }
+
+    LaunchedEffect(true) {
+        delay(1_000)
+        permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    }
+
+    LaunchedEffect(locationState.response) {
+        locationState.response?.let {
+            Log.d("LOCATION", it.toString())
+            weatherViewModel.getCurrentWeather(
+                latitude = it.latitude,
+                longitude = it.longitude
+            )
+        }
+    }
+
+    LaunchedEffect(true) {
+        locationState.response?.let {
+            weatherViewModel.getCurrentWeather(
+                latitude = it.latitude,
+                longitude = it.longitude
+            )
+        } ?: run {
+            weatherViewModel.getCurrentWeather()
+        }
+    }
+
+    LaunchedEffect(weatherState.response) {
+        weatherState.response?.let {
+            Log.d("WEATHER", it.toString())
+            weather = weatherState.response
+        }
+    }
+
     LaunchedEffect(context) {
         Log.d("TOKEN", tokenViewModel.getToken("token").toString())
 
@@ -119,17 +187,6 @@ fun Home(
             delay(1_000)
             tokenViewModel.clearAll()
             navigationController.navigate("Login")
-        }
-    }
-
-    LaunchedEffect(context) {
-        weatherViewModel.getCurrentWeather()
-    }
-
-    LaunchedEffect(weatherState.response) {
-        weatherState.response?.let {
-            Log.d("WEATHER", it.toString())
-            weather = weatherState.response
         }
     }
 
@@ -154,7 +211,19 @@ fun Home(
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
-        containerColor = BRANCO
+        containerColor = BRANCO,
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackBarHostState
+            ) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = VERDE_CLARO,
+                    contentColor = BRANCO,
+                    actionColor = BRANCO
+                )
+            }
+        }
     ) { innerPadding ->
         if (isTokenValid && !hasToken.isNullOrEmpty() && weather != null) {
             Column(

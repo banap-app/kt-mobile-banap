@@ -80,7 +80,7 @@ fun Carousel(
             colors = CardDefaults.cardColors(
                 containerColor = BRANCO
             )
-        ) {
+        ) { // se estiver carregando, trocar por um skeleton
             Row (
                 modifier = Modifier
                     .padding(horizontal = 35.dp)
@@ -131,7 +131,7 @@ fun Carousel(
                             painter = painter,
                             contentDescription = "Ícone do clima",
                             modifier = Modifier
-                                .size(110.dp)
+                                .size(100.dp)
                         )
                     }
 
