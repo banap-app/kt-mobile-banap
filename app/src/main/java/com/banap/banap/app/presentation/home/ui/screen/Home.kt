@@ -80,6 +80,10 @@ fun Home(
         mutableStateOf(null)
     }
 
+    var weatherLoading: Boolean by remember {
+        mutableStateOf(true)
+    }
+
     val taskList: MutableList<TaskList> = mutableListOf(
         TaskList(
             propertyName = "Propriedade 01",
@@ -166,6 +170,10 @@ fun Home(
         }
     }
 
+    LaunchedEffect(weatherState.isLoading) {
+        weatherLoading = weatherState.isLoading
+    }
+
     LaunchedEffect(weatherState.response) {
         weatherState.response?.let {
             Log.d("WEATHER", it.toString())
@@ -225,7 +233,7 @@ fun Home(
             }
         }
     ) { innerPadding ->
-        if (isTokenValid && !hasToken.isNullOrEmpty() && weather != null) {
+        if (isTokenValid && !hasToken.isNullOrEmpty()) {
             Column(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
@@ -252,6 +260,8 @@ fun Home(
                 )
 
                 Carousel(
+                    isLoading = weatherLoading,
+                    weather = weather,
                     temperature = weather?.main?.temp ?: 0.0,
                     description = weather?.weather?.get(0)?.description ?: "",
                     iconUrl = "https://openweathermap.org/img/wn/${weather?.weather?.get(0)?.icon}@2x.png"
