@@ -272,7 +272,10 @@ fun Navigation() {
                 )
             }
         ) {
-            NewFieldSecondPage(navigationController)
+            NewFieldSecondPage(
+                navigationController = navigationController,
+                tokenViewModel = tokenViewModel
+            )
         }
 
         composable (

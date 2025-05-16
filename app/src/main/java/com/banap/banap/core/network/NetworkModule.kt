@@ -1,6 +1,7 @@
 package com.banap.banap.core.network
 
 import com.banap.banap.common.Constants.AUTH_URL
+import com.banap.banap.common.Constants.LOCAL_URL
 import com.banap.banap.common.Constants.WEATHER_URL
 import com.banap.banap.core.data.local.token.TokenManager
 import com.banap.banap.data.remote.login.LoginService
@@ -47,7 +48,7 @@ object NetworkModule {
     @Named("AUTH_RETROFIT")
     fun provideAuthRetrofit(client: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .baseUrl(AUTH_URL)
+            .baseUrl(LOCAL_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

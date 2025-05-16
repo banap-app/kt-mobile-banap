@@ -151,7 +151,13 @@ fun Home(
 
     LaunchedEffect(locationState.response) {
         locationState.response?.let {
-            Log.d("LOCATION", it.toString())
+            tokenViewModel.saveTokens(
+                mapOf(
+                    "latitude" to it.latitude.toString(),
+                    "longitude" to it.longitude.toString()
+                )
+            )
+
             weatherViewModel.getCurrentWeather(
                 latitude = it.latitude,
                 longitude = it.longitude
@@ -160,12 +166,28 @@ fun Home(
     }
 
     LaunchedEffect(true) {
-        locationState.response?.let {
+        if (!tokenViewModel.getToken("latitude").isNullOrEmpty() && !tokenViewModel.getToken("longitude").isNullOrEmpty()) {
+            var latitude = -24.714174
+            var longitude = -47.8870154
+
+            Log.d("LATITUDE", tokenViewModel.getToken("latitude") ?: "")
+            Log.d("LONGITUDE", tokenViewModel.getToken("longitude") ?: "")
+
+            tokenViewModel.getToken("latitude")?.let {
+                Log.d("LATITUDE", "latitude não nula - $it")
+                latitude = it.toDouble()
+            }
+
+            tokenViewModel.getToken("longitude")?.let {
+                Log.d("LONGITUDE", "longitude não nula - $it")
+                longitude = it.toDouble()
+            }
+
             weatherViewModel.getCurrentWeather(
-                latitude = it.latitude,
-                longitude = it.longitude
+                latitude = latitude,
+                longitude = longitude
             )
-        } ?: run {
+        } else {
             weatherViewModel.getCurrentWeather()
         }
     }

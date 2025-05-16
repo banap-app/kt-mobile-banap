@@ -13,6 +13,10 @@ class TokenViewModel @Inject constructor (
         tokenManager.saveToken(key, token)
     }
 
+    fun saveTokens(tokens: Map<String, String>) {
+        tokenManager.saveTokens(tokens)
+    }
+
     fun getToken(key: String) : String? {
         return tokenManager.getToken(key)
     }
