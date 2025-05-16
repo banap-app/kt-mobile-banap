@@ -1,42 +1,39 @@
-package com.banap.banap.domain.viewmodel.login
+package com.banap.banap.domain.viewmodel.producer
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.banap.banap.common.Resource
-import com.banap.banap.domain.model.login.LoginState
-import com.banap.banap.domain.use_case.login.LoginUseCase
+import com.banap.banap.domain.model.producer.CreateProducerState
+import com.banap.banap.domain.use_case.producer.CreateProducerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor (
-    private val loginUseCase: LoginUseCase
+class CreateProducerViewModel @Inject constructor(
+    private val createProducerUseCase: CreateProducerUseCase
 ) : ViewModel() {
-    private val _state = mutableStateOf(LoginState())
-    val state: State<LoginState> = _state
+    private val _state = mutableStateOf((CreateProducerState()))
+    val state: State<CreateProducerState> = _state
 
-    fun authenticateUser (
-        email: String,
-        password: String
-    ) {
-        loginUseCase(email, password).onEach { result ->
+    fun createProducer(name: String, email: String, password: String) {
+        createProducerUseCase(name, email, password).onEach { result ->
             when (result) {
                 is Resource.Success -> {
-                    _state.value = LoginState(response = result.data)
+                    _state.value = CreateProducerState(response = result.data)
                 }
 
                 is Resource.Error -> {
-                    _state.value = LoginState(
+                    _state.value = CreateProducerState(
                         error = result.message ?: "Um erro inesperado aconteceu"
                     )
                 }
 
                 is Resource.Loading -> {
-                    _state.value = LoginState(isLoading = true)
+                    _state.value = CreateProducerState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

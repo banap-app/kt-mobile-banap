@@ -2,9 +2,11 @@ package com.banap.banap.core.network
 
 import com.banap.banap.common.Constants.AUTH_URL
 import com.banap.banap.common.Constants.LOCAL_URL
+import com.banap.banap.common.Constants.PRODUCER_URL
 import com.banap.banap.common.Constants.WEATHER_URL
 import com.banap.banap.core.data.local.token.TokenManager
 import com.banap.banap.data.remote.login.LoginService
+import com.banap.banap.data.remote.producer.ProducerService
 import com.banap.banap.data.remote.weather.WeatherService
 import dagger.Module
 import dagger.Provides
@@ -65,6 +67,16 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    @Named("PRODUCER_RETROFIT")
+    fun provideProducerRetrofit(client: OkHttpClient): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(PRODUCER_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+    @Provides
+    @Singleton
     fun provideLoginService(
         @Named("AUTH_RETROFIT") retrofit: Retrofit
     ): LoginService =
@@ -76,4 +88,11 @@ object NetworkModule {
         @Named("WEATHER_RETROFIT") retrofit: Retrofit
     ): WeatherService =
         retrofit.create(WeatherService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideProducerService(
+        @Named("PRODUCER_RETROFIT") retrofit: Retrofit
+    ): ProducerService =
+        retrofit.create(ProducerService::class.java)
 }
