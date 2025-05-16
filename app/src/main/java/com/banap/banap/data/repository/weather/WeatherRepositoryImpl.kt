@@ -8,9 +8,14 @@ import javax.inject.Inject
 class WeatherRepositoryImpl @Inject constructor(
     private val service: WeatherService
 ) : WeatherRepository {
-    override suspend fun getCurrentWeather(city: String, apiKey: String): WeatherResponse {
+    override suspend fun getCurrentWeather(
+        latitude: Double,
+        longitude: Double,
+        apiKey: String
+    ): WeatherResponse {
         return service.getCurrentWeather(
-            city = city,
+            latitude = latitude,
+            longitude = longitude,
             apiKey = apiKey
         )
     }

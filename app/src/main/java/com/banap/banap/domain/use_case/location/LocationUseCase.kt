@@ -1,20 +1,20 @@
-package com.banap.banap.domain.use_case.weather
+package com.banap.banap.domain.use_case.location
 
 import com.banap.banap.common.Resource
-import com.banap.banap.data.model.weather.WeatherResponse
-import com.banap.banap.data.repository.weather.WeatherRepositoryImpl
+import com.banap.banap.data.model.location.Location
+import com.banap.banap.data.repository.location.LocationRepositoryImpl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
 import javax.inject.Inject
 
-class WeatherUseCase @Inject constructor(
-    private val repository: WeatherRepositoryImpl
+class LocationUseCase @Inject constructor(
+    private val repository: LocationRepositoryImpl
 ) {
-    operator fun invoke(latitude: Double, longitude: Double, apiKey: String) : Flow<Resource<WeatherResponse>> = flow {
+    operator fun invoke() : Flow<Resource<Location>> = flow {
         try {
             emit(Resource.Loading())
-            val weatherResponse = repository.getCurrentWeather(latitude, longitude, apiKey)
+            val weatherResponse = repository.getCurrentLocation()
             emit(Resource.Success(weatherResponse))
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "Um erro inesperado aconteceu"))

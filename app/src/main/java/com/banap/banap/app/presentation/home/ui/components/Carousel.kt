@@ -2,6 +2,7 @@ package com.banap.banap.app.presentation.home.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,8 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Warning
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,21 +25,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
+import com.banap.banap.R
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.ShapeCarousel
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
+import com.banap.banap.core.ui.util.shimmerEffect
+import com.banap.banap.data.model.weather.WeatherResponse
 import java.util.Calendar
 import java.util.Locale
 
 @Composable
 fun Carousel(
+    isLoading: Boolean,
+    weather: WeatherResponse?,
     temperature: Double,
     description: String,
     iconUrl: String
@@ -66,11 +72,11 @@ fun Carousel(
         else -> ""
     }
 
-    Column (
+    Column(
         modifier = Modifier
             .padding(horizontal = 30.dp)
     ) {
-        Card (
+        Card(
             modifier = Modifier
                 .shadow(elevation = 3.dp, shape = ShapeCarousel.medium)
                 .clip(
@@ -82,85 +88,149 @@ fun Carousel(
                 containerColor = BRANCO
             )
         ) {
-            Row (
+            Row(
                 modifier = Modifier
                     .padding(horizontal = 35.dp)
                     .fillMaxSize(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
-                    Text(
-                        text = "${temperature.toInt()} °C",
-                        style = Typography.headlineLarge,
-                        color = VERDE_CLARO
-                    )
-                    Text(
-                        text = "$dayOfWeekString, $hourString:$minuteString",
-                        style = Typography.bodyLarge,
-                        fontWeight = FontWeight.Normal,
-                        color = VERDE_CLARO
-                    )
+                if (!isLoading) {
+                    Column {
+                        Text(
+                            text = if (weather != null) "${temperature.toInt()} °C" else "Erro",
+                            style = Typography.headlineLarge,
+                            color = VERDE_CLARO
+                        )
+                        Text(
+                            text = "$dayOfWeekString, $hourString:$minuteString",
+                            style = Typography.bodyLarge,
+                            fontWeight = FontWeight.Normal,
+                            color = VERDE_CLARO
+                        )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                    Text(
-                        text = description.replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase(
-                                Locale.ROOT
-                            ) else it.toString()
-                        },
-                        style = Typography.bodyLarge,
-                        fontWeight = FontWeight.Light,
-                        color = VERDE_CLARO
-                    )
-                }
-
-                when (state) {
-                    is AsyncImagePainter.State.Loading -> {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.dp
+                        Text(
+                            text =
+                            if (description.isEmpty())
+                                "Tente novamente"
+                            else
+                                description.replaceFirstChar {
+                                    if (it.isLowerCase())
+                                        it.titlecase(Locale.ROOT)
+                                    else
+                                        it.toString()
+                                },
+                            style = Typography.bodyLarge,
+                            fontWeight = FontWeight.Light,
+                            color = VERDE_CLARO
                         )
                     }
 
-                    is AsyncImagePainter.State.Success -> {
-                        Image(
-                            painter = painter,
-                            contentDescription = "Ícone do clima",
+                    when (state) {
+                        is AsyncImagePainter.State.Loading -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .padding(end = 20.dp)
+                                    .size(40.dp),
+                                strokeWidth = 4.dp,
+                                color = VERDE_CLARO
+                            )
+                        }
+
+                        is AsyncImagePainter.State.Success -> {
+                            Image(
+                                painter = painter,
+                                contentDescription = "Ícone do clima",
+                                modifier = Modifier
+                                    .size(100.dp)
+                            )
+                        }
+
+                        is AsyncImagePainter.State.Error -> {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.homeiconretry),
+                                contentDescription = "Erro no carregamento",
+                                modifier = Modifier.size(80.dp),
+                                tint = VERDE_CLARO
+                            )
+                        }
+
+                        else -> {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.homeiconretry),
+                                contentDescription = "Erro no carregamento",
+                                modifier = Modifier.size(60.dp),
+                                tint = VERDE_CLARO
+                            )
+                        }
+                    }
+                } else {
+                    Column (
+                        verticalArrangement = Arrangement.spacedBy(
+                            space = 12.dp
+                        )
+                    ) {
+                        Box(
                             modifier = Modifier
-                                .size(110.dp)
+                                .clip(
+                                    shape = ShapeCarousel.medium
+                                )
+                                .width(80.dp)
+                                .height(25.dp)
+                                .shimmerEffect(),
+                            content = {}
                         )
+
+                        Box(
+                            modifier = Modifier
+                                .clip(
+                                    shape = ShapeCarousel.medium
+                                )
+                                .width(140.dp)
+                                .height(15.dp)
+                                .shimmerEffect(),
+                            content = {}
+                        )
+
+                        Column {
+                            Box(
+                                modifier = Modifier
+                                    .clip(
+                                        shape = ShapeCarousel.medium
+                                    )
+                                    .width(80.dp)
+                                    .height(10.dp)
+                                    .shimmerEffect(),
+                                content = {}
+                            )
+                        }
                     }
 
-                    is AsyncImagePainter.State.Error -> {
-                        Icon(
-                            imageVector = Icons.Default.Warning,
-                            contentDescription = "Erro no carregamento",
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-
-                    else -> {
-                        Icon(
-                            imageVector = Icons.Default.Warning,
-                            contentDescription = "Erro no carregamento",
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+                    Box(
+                        modifier = Modifier
+                            .clip(
+                                shape = CircleShape
+                            )
+                            .width(80.dp)
+                            .height(80.dp)
+                            .shimmerEffect(),
+                        content = {}
+                    )
                 }
             }
         }
 
-        Row (
+        Row(
             modifier = Modifier
                 .padding(top = 20.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
 
-        ) {
-            Card (
+            ) {
+            Card(
                 modifier = Modifier
                     .clip(
                         shape = ShapeCarousel.small
@@ -177,7 +247,7 @@ fun Carousel(
                 modifier = Modifier.width(8.dp)
             )
 
-            Card (
+            Card(
                 modifier = Modifier
                     .clip(
                         shape = ShapeCarousel.large
@@ -193,7 +263,7 @@ fun Carousel(
                 modifier = Modifier.width(8.dp)
             )
 
-            Card (
+            Card(
                 modifier = Modifier
                     .clip(
                         shape = ShapeCarousel.large
@@ -209,7 +279,7 @@ fun Carousel(
                 modifier = Modifier.width(8.dp)
             )
 
-            Card (
+            Card(
                 modifier = Modifier
                     .clip(
                         shape = ShapeCarousel.large

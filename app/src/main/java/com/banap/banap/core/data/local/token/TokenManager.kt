@@ -14,6 +14,14 @@ class TokenManager @Inject constructor (
             .apply()
     }
 
+    fun saveTokens(tokens: Map<String, String>) {
+        prefs.edit().apply {
+            tokens.forEach { (key, value) ->
+                putString(key, value)
+            }
+        }.apply()
+    }
+
     fun getToken(key: String) : String? {
         return prefs.getString(key, null)
     }

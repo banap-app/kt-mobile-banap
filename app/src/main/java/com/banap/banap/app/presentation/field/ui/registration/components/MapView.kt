@@ -1,9 +1,6 @@
 package com.banap.banap.app.presentation.field.ui.registration.components
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.pm.PackageManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,91 +9,51 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.runtime.*
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.banap.banap.R
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.GoogleMapOptions
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PinConfig
 import com.google.android.gms.maps.model.PinConfig.Glyph
 import com.google.maps.android.compose.AdvancedMarker
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polygon
 import com.google.maps.android.compose.Polyline
-import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun MapView(
     isExpanded: Boolean,
     mapModifier: Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    marcadores: SnapshotStateList<LatLng>,
+    cameraPositionState: CameraPositionState,
+    maxMarkers: Int = 6,
+    scope: CoroutineScope,
+    snackBarHostState: SnackbarHostState
 ) {
-    val context = LocalContext.current
-
-    val fusedLocationClient = remember {
-        LocationServices.getFusedLocationProviderClient(context)
-    }
-
-    var marcadores = remember {
-        mutableStateListOf<LatLng>()
-    }
-
-    var defaultValue by remember {
-        mutableStateOf(LatLng(-23.537761, -46.631072))
-    }
-
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(defaultValue, 10f)
-    }
-
-    LaunchedEffect(
-        Unit
-    ) {
-        if (ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                location?.let {
-                    defaultValue = LatLng(it.latitude, it.longitude)
-
-                    val currentLatLng = LatLng(it.latitude, it.longitude)
-                    cameraPositionState.position = CameraPosition.fromLatLngZoom(currentLatLng, 10f)
-                }
-            }
-        } else {
-            ActivityCompat.requestPermissions(
-                context as Activity,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                1001
-            )
-        }
-    }
-
     Box(
         modifier = mapModifier
             .clip(
@@ -112,7 +69,24 @@ fun MapView(
             properties = MapProperties(isMyLocationEnabled = true),
             uiSettings = MapUiSettings(myLocationButtonEnabled = true),
             onMapClick = { latLng ->
-                marcadores.add(latLng)
+                if (marcadores.size < maxMarkers) {
+                    marcadores.add(latLng)
+                } else {
+                    scope.launch {
+                        val autoDismissJob = launch {
+                            delay(5_000L)
+                            snackBarHostState.currentSnackbarData?.dismiss()
+                        }
+
+                        snackBarHostState.showSnackbar(
+                            message = "Você atingiu o limite de pontos!",
+                            actionLabel = "Entendi",
+                            duration = SnackbarDuration.Indefinite
+                        )
+
+                        autoDismissJob.cancel()
+                    }
+                }
             }
         ) {
             marcadores.forEach { posicao ->
@@ -132,6 +106,17 @@ fun MapView(
             if (marcadores.size >= 2) {
                 Polyline(
                     points = marcadores.toList(),
+                    color = VERDE_ESCURO,
+                    width = 5f
+                )
+            }
+
+            if (marcadores.size >= 3) {
+                Polyline(
+                    points = listOf(
+                        marcadores.first(),
+                        marcadores.last()
+                    ),
                     color = VERDE_ESCURO,
                     width = 5f
                 )
