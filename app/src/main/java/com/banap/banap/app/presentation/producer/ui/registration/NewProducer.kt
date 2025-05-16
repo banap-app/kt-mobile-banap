@@ -1,6 +1,12 @@
 package com.banap.banap.app.presentation.producer.ui.registration
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.os.Build
+import android.os.Build.VERSION_CODES
+import android.provider.Settings.ACTION_WIFI_SETTINGS
+import android.provider.Settings.Panel.ACTION_INTERNET_CONNECTIVITY
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -9,6 +15,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,13 +27,26 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
+import com.banap.banap.app.presentation.validation.email.event.EmailTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.email.utils.validationDataEmail
+import com.banap.banap.app.presentation.validation.email.viewmodel.EmailTextFieldViewModel
+import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.name.utils.validationDataName
+import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
+import com.banap.banap.app.presentation.validation.password.event.PasswordTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.password.utils.validationDataPassword
+import com.banap.banap.app.presentation.validation.password.viewmodel.PasswordTextFieldViewModel
 import com.banap.banap.core.ui.components.ButtonRegistration
+import com.banap.banap.core.ui.components.LoadingScreen
 import com.banap.banap.core.ui.components.RegistrationHeader
 import com.banap.banap.core.ui.components.TextBoxRegistration
 import com.banap.banap.core.ui.components.TitleRegistration
@@ -30,24 +54,26 @@ import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
-import com.banap.banap.app.presentation.validation.email.utils.validationDataEmail
-import com.banap.banap.app.presentation.validation.email.event.EmailTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.email.viewmodel.EmailTextFieldViewModel
-import com.banap.banap.app.presentation.validation.name.utils.validationDataName
-import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
-import com.banap.banap.app.presentation.validation.password.utils.validationDataPassword
-import com.banap.banap.app.presentation.validation.password.event.PasswordTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.password.viewmodel.PasswordTextFieldViewModel
-import com.banap.banap.core.ui.components.LoadingScreen
+import com.banap.banap.core.ui.util.ConnectivityAwareContent
+import com.banap.banap.domain.viewmodel.login.LoginViewModel
+import com.banap.banap.domain.viewmodel.producer.CreateProducerViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NewProducer(
-    navigationController: NavController
+    navigationController: NavController,
+    createProducerViewModel: CreateProducerViewModel = hiltViewModel(),
+    loginViewModel: LoginViewModel = hiltViewModel(),
+    tokenViewModel: TokenViewModel
 ) {
     val context = LocalContext.current
+
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    val createProducerState = createProducerViewModel.state.value
+    val loginState = loginViewModel.state.value
 
     val viewModelName = viewModel<NameTextFieldViewModel>()
     val stateName = viewModelName.state
@@ -82,11 +108,12 @@ fun NewProducer(
         mutableStateOf(false)
     }
 
-    LaunchedEffect(isLoading) {
-        if (isLoading) {
-            delay(1_000)
-            navigationController.navigate("Home")
-        }
+    var isApplicationOnline: Boolean? by remember {
+        mutableStateOf(null)
+    }
+
+    var userExists: Boolean? by remember {
+        mutableStateOf(null)
     }
 
     var backgroundColorButton by remember {
@@ -135,10 +162,150 @@ fun NewProducer(
         }
     }
 
+    ConnectivityAwareContent { isOnline ->
+        isApplicationOnline = isOnline
+
+        LaunchedEffect(isOnline) {
+            if (!isOnline) {
+                val result = snackBarHostState.showSnackbar(
+                    message = "Sem conexão de internet",
+                    actionLabel = "RECONECTAR",
+                    duration = SnackbarDuration.Indefinite
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    val intent = if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
+                        Intent(ACTION_INTERNET_CONNECTIVITY)
+                    } else {
+                        Intent(ACTION_WIFI_SETTINGS)
+                    }
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
+                }
+            } else {
+                snackBarHostState.currentSnackbarData?.dismiss()
+            }
+        }
+    }
+
+    LaunchedEffect(createProducerState.response) {
+        createProducerState.response?.let {
+            if (it.id.isNotEmpty()) {
+                navigationController.navigate("login")
+//                loginViewModel.authenticateUser(
+//                    stateEmail.email,
+//                    statePassword.password
+//                )
+            }
+        }
+    }
+
+    LaunchedEffect(createProducerState.error) {
+        if (createProducerState.error.isNotEmpty()) {
+            isLoading = false
+
+            var message = ""
+            var showSnackBar = false
+
+            when {
+                createProducerState.error.contains("500") -> {
+                    userExists = true
+                    Log.d("CREATE PRODUCER Error", createProducerState.error)
+                }
+
+                else -> {
+                    showSnackBar = true
+                    message = "[PRODUCER] Não foi possível se conectar ao servidor!"
+                }
+            }
+
+            Log.d("CREATE PRODUCER Error", createProducerState.error)
+
+            val autoDismissJob = launch {
+                delay(5_000L)
+                createProducerViewModel.clearError()
+                snackBarHostState.currentSnackbarData?.dismiss()
+            }
+
+            if (showSnackBar) {
+                snackBarHostState.showSnackbar(
+                    message = message,
+                    actionLabel = "Entendi",
+                    duration = SnackbarDuration.Indefinite
+                )
+            }
+
+            autoDismissJob.cancel()
+
+            createProducerViewModel.clearError()
+        }
+    }
+
+//    LaunchedEffect(loginState.response) {
+//        loginState.response?.token?.let { token ->
+//            tokenViewModel.saveToken("token", token)
+//
+//            if (tokenViewModel.getToken("token") != null) {
+//                navigationController.navigate("home")
+//            }
+//        }
+//    }
+
+//    LaunchedEffect(loginState.error) {
+//        if (loginState.error.isNotEmpty()) {
+//            isLoading = false
+//
+//            var message: String = ""
+//            var showSnackBar: Boolean = false
+//
+//            when {
+//                loginState.error.contains("422") -> {
+//                    Log.d("LOGIN Error", loginState.error)
+//                }
+//
+//                else -> {
+//                    showSnackBar = true
+//                    message = "[LOGIN] Não foi possível se conectar ao servidor"
+//                }
+//            }
+//
+//            Log.d("LOGIN Error", loginState.error)
+//
+//            val autoDismissJob = launch {
+//                delay(5_000L)
+//                loginViewModel.clearError()
+//                snackBarHostState.currentSnackbarData?.dismiss()
+//            }
+//
+//            if (showSnackBar) {
+//                snackBarHostState.showSnackbar(
+//                    message = message,
+//                    actionLabel = "Entendi",
+//                    duration = SnackbarDuration.Indefinite
+//                )
+//            }
+//
+//            autoDismissJob.cancel()
+//
+//            loginViewModel.clearError()
+//        }
+//    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
-        containerColor = BRANCO
+        containerColor = BRANCO,
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackBarHostState
+            ) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = BRANCO,
+                    contentColor = VERDE_CLARO,
+                    actionColor = VERDE_CLARO
+                )
+            }
+        }
     ) {
         if (!isLoading) {
             Column {
@@ -187,12 +354,17 @@ fun NewProducer(
                                 viewModelEmail.onEvent(EmailTextFieldFormEvent.EmailChanged(it))
                                 viewModelEmail.onEvent(EmailTextFieldFormEvent.Submit)
                             },
-                            isError = stateEmail.emailError != null,
-                            errorState = stateEmail.emailError,
+                            isError = stateEmail.emailError != null || userExists == true,
+                            errorState = if (userExists == true) "O email já está cadastrado" else stateEmail.emailError,
                             label = "Email",
                             placeholder = "exemplo@gmail.com",
                             tipoTeclado = KeyboardType.Email,
                             modifier = Modifier
+                                .onFocusChanged {
+                                    if (it.isFocused) {
+                                        userExists = null
+                                    }
+                                }
                                 .fillMaxWidth()
                         )
 
@@ -210,7 +382,7 @@ fun NewProducer(
                             errorState = statePassword.passwordError,
                             isPassword = true,
                             label = "Senha",
-                            placeholder = "12345678",
+                            placeholder = "Senha123#",
                             tipoTeclado = KeyboardType.Password,
                             modifier = Modifier
                                 .fillMaxWidth(),
@@ -224,7 +396,13 @@ fun NewProducer(
                             viewModelEmail.onEvent(EmailTextFieldFormEvent.Submit)
                             viewModelPassword.onEvent(PasswordTextFieldFormEvent.Submit)
 
-                            if (isValidationSuccessful) {
+                            if (isValidationSuccessful && isApplicationOnline == true) {
+                                createProducerViewModel.createProducer(
+                                    name = stateName.name,
+                                    email = stateEmail.email,
+                                    password = statePassword.password
+                                )
+
                                 isLoading = true
                             }
                         },

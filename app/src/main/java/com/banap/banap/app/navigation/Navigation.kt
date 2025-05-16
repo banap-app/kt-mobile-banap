@@ -160,7 +160,10 @@ fun Navigation() {
                 )
             }
         ) {
-            NewProducer(navigationController)
+            NewProducer(
+                navigationController = navigationController,
+                tokenViewModel = tokenViewModel
+            )
         }
 
         composable (

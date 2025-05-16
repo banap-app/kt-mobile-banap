@@ -323,7 +323,7 @@ fun Login(
                         keyboardType = KeyboardType.Password,
                         icon = R.drawable.lock,
                         iconColor = PRETO,
-                        placeholder = "Senha123",
+                        placeholder = "Senha123#",
                         passwordTextBox = true,
                         label = "Senha",
                         labelTextStyle = Typography.labelSmall,

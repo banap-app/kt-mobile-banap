@@ -17,14 +17,21 @@ class ValidatePassword {
             )
         }
 
-        val containsLetterAndDigits = password.any { it.isDigit() }
-                &&
+        val specialRegex = Regex("[!@#\$%^&*]")
+
+        val containsLetterAndDigits =
+                password.any { it.isUpperCase() }
+                    &&
+                password.any { it.isDigit() }
+                    &&
                 password.any { it.isLetter() }
+                    &&
+                password.any { specialRegex.matches(it.toString()) }
 
         if (!containsLetterAndDigits) {
             return ValidationResult(
                 successful = false,
-                errorMessage = "A senha precisa ter pelo menos uma letra e um digito"
+                errorMessage = "A senha precisa ter: letra maiuscula, digito e caractere especial"
             )
         }
 
