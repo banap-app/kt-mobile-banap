@@ -20,9 +20,11 @@ import com.banap.banap.core.ui.theme.VERMELHO
 
 @Composable
 fun FieldActions(
-    navigationController: NavController
+    navigationController: NavController,
+    onClickDelete: () -> Unit,
+    onClickEdit: () -> Unit
 ) {
-    Row (
+    Row(
         modifier = Modifier
             .padding(horizontal = 30.dp)
             .fillMaxWidth(),
@@ -36,7 +38,7 @@ fun FieldActions(
             hasIcon = true,
             icon = ImageVector.vectorResource(id = R.drawable.fieldiconedit),
             shape = RoundedCornerShape(10.dp),
-            onClick = {},
+            onClick = onClickEdit,
             backgroundColor = VERDE_CLARO,
             contentColor = BRANCO,
             defaultElevetion = 3.dp
@@ -49,7 +51,7 @@ fun FieldActions(
             hasIcon = true,
             icon = ImageVector.vectorResource(id = R.drawable.fieldicondelete),
             shape = RoundedCornerShape(10.dp),
-            onClick = {},
+            onClick = onClickDelete,
             backgroundColor = VERMELHO,
             contentColor = BRANCO,
             defaultElevetion = 3.dp

@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -31,6 +32,7 @@ import com.banap.banap.core.ui.components.ImageInformation
 import com.banap.banap.core.ui.components.Information
 import com.banap.banap.core.ui.components.InformationScreenPattern
 import com.banap.banap.core.ui.components.ListItemCard
+import com.banap.banap.core.ui.components.Modal
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.PRETO
@@ -46,6 +48,10 @@ fun FieldInformation(
     navigationController: NavController
 ) {
     val isLoading by remember {
+        mutableStateOf(false)
+    }
+
+    var modalVisible: Boolean by remember {
         mutableStateOf(false)
     }
 
@@ -84,8 +90,26 @@ fun FieldInformation(
             )
 
             FieldActions(
-                navigationController
+                navigationController,
+                onClickDelete = {
+                    modalVisible = true
+                },
+                onClickEdit = {}
             )
+
+            if (modalVisible) {
+                Modal(
+                    onConfirm = {},
+                    onDismiss = {
+                        modalVisible = false
+                    },
+                    icon = R.drawable.fieldicondelete,
+                    title = "Tem certeza que deseja\n apagar o talhão?",
+                    description = "Apagando o talhão, todas as informações relacionadas a ele tambem serão apagadas!",
+                    onConfirmText = "Excluir",
+                    onDismissText = "Cancelar"
+                )
+            }
         }
 
         Information(

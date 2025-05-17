@@ -7,6 +7,7 @@ import com.banap.banap.common.Constants.WEATHER_URL
 import com.banap.banap.core.data.local.token.TokenManager
 import com.banap.banap.data.remote.login.LoginService
 import com.banap.banap.data.remote.producer.ProducerService
+import com.banap.banap.data.remote.property.PropertyService
 import com.banap.banap.data.remote.weather.WeatherService
 import dagger.Module
 import dagger.Provides
@@ -100,6 +101,6 @@ object NetworkModule {
     @Singleton
     fun providePropertyService(
         @Named("PRODUCER_RETROFIT") retrofit: Retrofit
-    ): ProducerService =
-        retrofit.create(ProducerService::class.java)
+    ): PropertyService =
+        retrofit.create(PropertyService::class.java)
 }

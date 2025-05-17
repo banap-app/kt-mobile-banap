@@ -38,4 +38,8 @@ class CreatePropertyViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
+
+    fun clearError() {
+        _state.value = _state.value.copy(error = "")
+    }
 }

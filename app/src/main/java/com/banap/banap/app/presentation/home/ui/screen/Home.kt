@@ -5,10 +5,11 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -17,6 +18,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,10 +26,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.banap.banap.R
@@ -38,7 +43,12 @@ import com.banap.banap.app.presentation.home.ui.components.RecentActivities
 import com.banap.banap.app.presentation.home.ui.components.Tasks
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.skeleton.ui.home.HomeSkeleton
+import com.banap.banap.core.ui.components.Button
+import com.banap.banap.core.ui.components.Modal
 import com.banap.banap.core.ui.theme.BRANCO
+import com.banap.banap.core.ui.theme.CINZA_ESCURO
+import com.banap.banap.core.ui.theme.ShapeProperty
+import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.Task
@@ -83,6 +93,19 @@ fun Home(
     var weatherLoading: Boolean by remember {
         mutableStateOf(true)
     }
+
+    var modalVisible: Boolean by remember {
+        mutableStateOf(false)
+    }
+
+    val propertyList: MutableList<String> = mutableListOf(
+        "Propriedade 01"
+    )
+
+    val fieldList: MutableList<String> = mutableListOf(
+        "Talhão 01",
+        "Talhão 02"
+    )
 
     val taskList: MutableList<TaskList> = mutableListOf(
         TaskList(
@@ -166,7 +189,9 @@ fun Home(
     }
 
     LaunchedEffect(true) {
-        if (!tokenViewModel.getToken("latitude").isNullOrEmpty() && !tokenViewModel.getToken("longitude").isNullOrEmpty()) {
+        if (!tokenViewModel.getToken("latitude")
+                .isNullOrEmpty() && !tokenViewModel.getToken("longitude").isNullOrEmpty()
+        ) {
             var latitude = -24.714174
             var longitude = -47.8870154
 
@@ -257,19 +282,43 @@ fun Home(
     ) { innerPadding ->
         if (isTokenValid && !hasToken.isNullOrEmpty()) {
             Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .fillMaxSize()
-                    .padding(top = 40.dp, bottom = 60.dp),
+                modifier =
+                if (propertyList.isNotEmpty()) {
+                    Modifier
+                        .verticalScroll(rememberScrollState())
+                        .fillMaxSize()
+                        .padding(top = 40.dp, bottom = 60.dp)
+                } else {
+                    Modifier
+                        .fillMaxSize()
+                        .padding(top = 40.dp, bottom = 60.dp)
+                }
             ) {
                 Header(
                     nome = "Gilmar",
                     navigationController = navigationController,
                     onItemClick = {
-                        tokenViewModel.clearAll()
-                        navigationController.navigate("Login")
+                        modalVisible = true
                     }
                 )
+
+                if (modalVisible) {
+                    Modal(
+                        onConfirm = {
+                            tokenViewModel.clearAll()
+                            navigationController.navigate("Login")
+                        },
+                        onDismiss = {
+                            modalVisible = false
+                        },
+                        icon = R.drawable.baseline_logout_24,
+                        title = "Tem certeza que\n deseja sair?",
+                        description = "",
+                        onConfirmText = "Sair",
+                        onDismissText = "Cancelar",
+                        space = 0.dp
+                    )
+                }
 
                 Image(
                     imageVector = ImageVector.vectorResource(id = R.drawable.linhas),
@@ -281,36 +330,114 @@ fun Home(
                         )
                 )
 
-                Carousel(
-                    isLoading = weatherLoading,
-                    weather = weather,
-                    temperature = weather?.main?.temp ?: 0.0,
-                    description = weather?.weather?.get(0)?.description ?: "",
-                    iconUrl = "https://openweathermap.org/img/wn/${weather?.weather?.get(0)?.icon}@2x.png"
-                )
+                when {
+                    propertyList.isNotEmpty() -> {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(
+                                space = 60.dp
+                            )
+                        ) {
+                            Carousel(
+                                isLoading = weatherLoading,
+                                weather = weather,
+                                temperature = weather?.main?.temp ?: 0.0,
+                                description = weather?.weather?.get(0)?.description ?: "",
+                                iconUrl = "https://openweathermap.org/img/wn/${
+                                    weather?.weather?.get(
+                                        0
+                                    )?.icon
+                                }@2x.png"
+                            )
 
-                Spacer(modifier = Modifier.height(60.dp))
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(
+                                    space = 60.dp
+                                )
+                            ) {
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(
+                                        space = 40.dp
+                                    )
+                                ) {
+                                    propertyList.forEach {
+                                        Property(
+                                            titulo = it,
+                                            navigationController = navigationController,
+                                            fieldList = fieldList
+                                        )
+                                    }
+                                }
 
-                Property(
-                    titulo = "Propriedade 01",
-                    navigationController = navigationController
-                )
+                                Row(
+                                    modifier = Modifier
+                                        .padding(horizontal = 30.dp)
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.End
+                                ) {
+                                    Button(
+                                        texto = "Nova Propriedade",
+                                        modifier = Modifier
+                                            .padding(vertical = 18.dp, horizontal = 15.dp),
+                                        hasIcon = true,
+                                        shape = ShapeProperty.small,
+                                        onClick = {
+                                            navigationController.navigate("NewProperty")
+                                        },
+                                        backgroundColor = VERDE_CLARO,
+                                        contentColor = BRANCO,
+                                        defaultElevetion = 3.dp
+                                    )
+                                }
+                            }
 
-                Spacer(modifier = Modifier.height(60.dp))
+                            RecentActivities(
+                                title = "Atividades recentes",
+                                list = logList
+                            )
 
-                RecentActivities(
-                    title = "Atividades recentes",
-                    list = logList
-                )
+                            Tasks(
+                                titulo = "Lista de tarefas",
+                                subTitulo = "Seus afazeres da semana!",
+                                navigationController = navigationController,
+                                list = taskList
+                            )
+                        }
+                    }
 
-                Spacer(modifier = Modifier.height(60.dp))
+                    else -> {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(
+                                space = 40.dp,
+                                alignment = Alignment.CenterVertically
+                            )
+                        ) {
+                            Text(
+                                text = "Ainda não há uma\npropriedade cadastrada!",
+                                textAlign = TextAlign.Center,
+                                style = Typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = CINZA_ESCURO
+                            )
 
-                Tasks(
-                    titulo = "Lista de tarefas",
-                    subTitulo = "Seus afazeres da semana!",
-                    navigationController = navigationController,
-                    list = taskList
-                )
+                            Button(
+                                texto = "Nova Propriedade",
+                                modifier = Modifier
+                                    .padding(vertical = 18.dp, horizontal = 15.dp),
+                                hasIcon = true,
+                                shape = ShapeProperty.small,
+                                onClick = {
+                                    propertyList.add("Propriedade 03")
+                                },
+                                backgroundColor = VERDE_CLARO,
+                                contentColor = BRANCO,
+                                defaultElevetion = 3.dp
+                            )
+                        }
+                    }
+                }
             }
         } else {
             HomeSkeleton(

@@ -4,11 +4,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
@@ -22,18 +19,15 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.banap.banap.core.ui.components.Button
-import com.banap.banap.core.ui.theme.BRANCO
-import com.banap.banap.core.ui.theme.ShapeProperty
 import com.banap.banap.core.ui.theme.Typography
-import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.core.ui.util.clickableText
 
 @Composable
 fun Property(
     titulo: String,
-    navigationController: NavController
+    navigationController: NavController,
+    fieldList: MutableList<String>
 ) {
     Column(
         modifier = Modifier
@@ -82,35 +76,19 @@ fun Property(
                 space = 25.dp
             )
         ) {
-            FieldCard(
-                nomeTalhao = "Talhão 01",
-                navigationController
-            )
+            when {
+                fieldList.isNotEmpty() -> {
+                    fieldList.forEach {
+                        FieldCard(
+                            nomeTalhao = it,
+                            navigationController
+                        )
+                    }
+                }
+            }
 
             NewFieldCard(
                 navigationController
-            )
-        }
-
-        Spacer(modifier = Modifier.height(60.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Button(
-                texto = "Nova Propriedade",
-                modifier = Modifier
-                    .padding(vertical = 18.dp, horizontal = 15.dp),
-                hasIcon = true,
-                shape = ShapeProperty.small,
-                onClick = {
-                    navigationController.navigate("NewProperty")
-                },
-                backgroundColor = VERDE_CLARO,
-                contentColor = BRANCO,
-                defaultElevetion = 3.dp
             )
         }
     }

@@ -1,6 +1,7 @@
 package com.banap.banap.app.presentation.property.ui.registration
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -9,7 +10,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.core.ui.components.ButtonRegistration
@@ -32,19 +39,36 @@ import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.app.presentation.validation.name.utils.validationDataName
 import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
+import com.banap.banap.core.ui.components.LoadingScreen
+import com.banap.banap.domain.viewmodel.property.CreatePropertyViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NewProperty(
-    navigationController: NavController
+    navigationController: NavController,
+    createPropertyViewModel: CreatePropertyViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+
+    val createPropertyState = createPropertyViewModel.state.value
+
+    val snackBarHostState = remember { SnackbarHostState() }
 
     val viewModelName = viewModel<NameTextFieldViewModel>()
     val stateName = viewModelName.state
 
     var isValidationSuccessful by remember {
         mutableStateOf(false)
+    }
+
+    var isLoading: Boolean by remember {
+        mutableStateOf(false)
+    }
+
+    var propertyExists: Boolean? by remember {
+        mutableStateOf(null)
     }
 
     isValidationSuccessful = validationDataName(
@@ -99,62 +123,124 @@ fun NewProperty(
         }
     }
 
-    Scaffold (
-        modifier = Modifier
-            .fillMaxSize(),
-        containerColor = BRANCO
-    ) {
-        Column {
-            RegistrationHeader(
-                navigationController = navigationController,
-                fallbackRoute = "Home"
-            )
+    LaunchedEffect(createPropertyState.error) {
+        if (createPropertyState.error.isNotEmpty()) {
+            isLoading = false
 
-            TitleRegistration(
-                texto = "Cadastrando sua ",
-                textoASerDestacado = "propriedade...",
-                corEmDestaque = VERDE_ESCURO,
-                subTexto = "",
-                tamanhoTextoDestacado = 36.sp,
-                paginaUsuario = false,
-                subtituloDestacado = "",
-                subtitulo = "O primeiro passo a ser feito é cadastrar sua propriedade..."
-            )
+            var message = ""
+            var showSnackBar = false
 
-            Column (
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                TextBoxRegistration(
-                    value = stateName.name,
-                    onValueChange = {
-                        viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
-                        viewModelName.onEvent(NameTextFieldFormEvent.Submit)
-                    },
-                    isError = stateName.nameError != null,
-                    errorState = stateName.nameError,
-                    label = "Nome da Propriedade",
-                    placeholder = "Propriedade 01",
-                    tipoTeclado = KeyboardType.Text,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    lastOne = true
-                )
+            when {
+                createPropertyState.error.contains("500") -> {
+                    propertyExists = true
+                    Log.d("Error", createPropertyState.error)
+                }
 
-                ButtonRegistration(
-                    onClick = {
-                        viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+                else -> {
+                    showSnackBar = true
+                    message = "Não foi possível se conectar ao servidor!"
+                }
+            }
 
-                        if (isValidationSuccessful) {
-                            navigationController.navigate("Home")
-                        }
-                    },
-                    buttonValue = "Cadastrar",
-                    backgroundColor = backgroundColor,
-                    contentColor = contentColor
+            Log.d("Error", createPropertyState.error)
+
+            val autoDismissJob = launch {
+                delay(5_000L)
+                createPropertyViewModel.clearError()
+                snackBarHostState.currentSnackbarData?.dismiss()
+            }
+
+            if (showSnackBar) {
+                snackBarHostState.showSnackbar(
+                    message = message,
+                    actionLabel = "Entendi",
+                    duration = SnackbarDuration.Indefinite
                 )
             }
+
+            autoDismissJob.cancel()
+
+            createPropertyViewModel.clearError()
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize(),
+        containerColor = BRANCO,
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackBarHostState
+            ) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = BRANCO,
+                    contentColor = VERDE_CLARO,
+                    actionColor = VERDE_CLARO
+                )
+            }
+        }
+    ) {
+        if (!isLoading) {
+            Column {
+                RegistrationHeader(
+                    navigationController = navigationController,
+                    fallbackRoute = "Home"
+                )
+
+                TitleRegistration(
+                    texto = "Cadastrando sua ",
+                    textoASerDestacado = "propriedade...",
+                    corEmDestaque = VERDE_ESCURO,
+                    subTexto = "",
+                    tamanhoTextoDestacado = 36.sp,
+                    paginaUsuario = false,
+                    subtituloDestacado = "",
+                    subtitulo = "O primeiro passo a ser feito é cadastrar sua propriedade..."
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    TextBoxRegistration(
+                        value = stateName.name,
+                        onValueChange = {
+                            viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
+                            viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+                        },
+                        isError = stateName.nameError != null || propertyExists == true,
+                        errorState = if (propertyExists == true) "A propriedade já existe" else stateName.nameError,
+                        label = "Nome da Propriedade",
+                        placeholder = "Propriedade 01",
+                        tipoTeclado = KeyboardType.Text,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        lastOne = true
+                    )
+
+                    ButtonRegistration(
+                        onClick = {
+                            viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+
+                            if (isValidationSuccessful) {
+                                createPropertyViewModel.createProperty(
+                                    producerId = "",
+                                    name = stateName.name
+                                )
+
+                                isLoading = true
+                            }
+                        },
+                        buttonValue = "Cadastrar",
+                        backgroundColor = backgroundColor,
+                        contentColor = contentColor
+                    )
+                }
+            }
+        } else {
+            LoadingScreen()
         }
     }
 }

@@ -3,7 +3,9 @@ package com.banap.banap.app.presentation.home.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
@@ -24,15 +26,11 @@ import com.banap.banap.R
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.PRETO
 import com.banap.banap.core.ui.theme.Typography
-
-data class DropDownItem (
-    val text: String
-)
+import com.banap.banap.data.model.menu.DropDownItem
 
 @Composable
 fun Menu(
-    dropDownItems: List<DropDownItem>,
-    onItemClick: (DropDownItem) -> Unit
+    dropDownItems: List<DropDownItem>
 ) {
     var isContextMenuVisible by rememberSaveable {
         mutableStateOf(false)
@@ -63,28 +61,30 @@ fun Menu(
             isContextMenuVisible = false
         },
         modifier = Modifier
-            .background(BRANCO)
+            .background(BRANCO),
+        shape = RoundedCornerShape(10.dp)
     ) {
         dropDownItems.forEach {
             item ->
             DropdownMenuItem(
                 onClick = {
-                    onItemClick(item)
+                    item.optionSelected(item)
                     isContextMenuVisible = false
                 },
                 text = {
                     Text(
-                        text = item.text,
+                        text = item.option.text,
                         style = Typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold,
                         color = PRETO
                     )
                 },
                 modifier = Modifier
+                    .padding(horizontal = 10.dp)
                     .background(BRANCO),
                 leadingIcon = {
                     Image(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.baseline_logout_24),
+                        imageVector = ImageVector.vectorResource(id = item.option.icon),
                         contentDescription = "Icone de logout",
                         colorFilter = ColorFilter.tint(PRETO)
                     )

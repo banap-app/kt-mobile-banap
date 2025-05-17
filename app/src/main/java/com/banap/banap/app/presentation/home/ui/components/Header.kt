@@ -4,30 +4,29 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.banap.banap.core.ui.util.setColorInText
+import com.banap.banap.R
 import com.banap.banap.core.ui.theme.PRETO
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
+import com.banap.banap.core.ui.util.setColorInText
+import com.banap.banap.data.model.menu.DropDownItem
+import com.banap.banap.data.model.menu.MenuOption
 
 @Composable
 fun Header(
     nome: String,
-    navigationController: NavController,
-    onItemClick: (DropDownItem) -> Unit
+    onItemClick: (DropDownItem) -> Unit,
+    navigationController: NavController
 ) {
-    Row (
+    Row(
         modifier = Modifier
             .padding(horizontal = 30.dp)
             .fillMaxWidth(),
@@ -47,22 +46,30 @@ fun Header(
             color = PRETO
         )
 
-        Row (
+        Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                Icons.Outlined.Notifications,
-                contentDescription = "Icone de notificação",
-                modifier = Modifier
-                    .scale(1.2F)
-                    .padding(end = 20.dp)
-            )
+            Notifications()
 
             Menu(
                 dropDownItems = listOf(
-                    DropDownItem("Sair")
-                ),
-                onItemClick = onItemClick
+                    DropDownItem(
+                        option = MenuOption(
+                            icon = R.drawable.baseline_logout_24,
+                            text = "Sair"
+                        ),
+                        optionSelected = onItemClick
+                    ),
+                    DropDownItem(
+                        option = MenuOption(
+                            icon = R.drawable.fieldiconedit,
+                            text = "Editar"
+                        ),
+                        optionSelected = {
+                            navigationController.navigate("EditProfile")
+                        }
+                    )
+                )
             )
         }
     }
