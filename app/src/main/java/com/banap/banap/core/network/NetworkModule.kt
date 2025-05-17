@@ -95,4 +95,11 @@ object NetworkModule {
         @Named("PRODUCER_RETROFIT") retrofit: Retrofit
     ): ProducerService =
         retrofit.create(ProducerService::class.java)
+
+    @Provides
+    @Singleton
+    fun providePropertyService(
+        @Named("PRODUCER_RETROFIT") retrofit: Retrofit
+    ): ProducerService =
+        retrofit.create(ProducerService::class.java)
 }
