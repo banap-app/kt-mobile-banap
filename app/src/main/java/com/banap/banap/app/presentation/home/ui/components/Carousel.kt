@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import com.banap.banap.R
+import com.banap.banap.app.presentation.skeleton.ui.home.components.WeatherDataHomeSkeleton
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.ShapeCarousel
@@ -180,54 +181,7 @@ fun Carousel(
                             }
                         }
                     } else {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(
-                                space = 12.dp
-                            )
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .clip(
-                                        shape = ShapeCarousel.medium
-                                    )
-                                    .width(80.dp)
-                                    .height(25.dp)
-                                    .shimmerEffect(),
-                                content = {}
-                            )
-
-                            Box(
-                                modifier = Modifier
-                                    .clip(
-                                        shape = ShapeCarousel.medium
-                                    )
-                                    .width(140.dp)
-                                    .height(15.dp)
-                                    .shimmerEffect(),
-                                content = {}
-                            )
-
-                            Column {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(
-                                            shape = ShapeCarousel.medium
-                                        )
-                                        .width(80.dp)
-                                        .height(10.dp)
-                                        .shimmerEffect(),
-                                    content = {}
-                                )
-                            }
-                        }
-
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.baseline_cloud_24),
-                            contentDescription = "Erro no carregamento",
-                            modifier = Modifier
-                                .size(70.dp),
-                            tint = Color(0xFFB8B5B5)
-                        )
+                        WeatherDataHomeSkeleton()
                     }
                 }
             }

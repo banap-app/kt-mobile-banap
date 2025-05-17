@@ -74,51 +74,54 @@ fun Container(
 
         }
     ) {
-        if (!isLoading) {
-            Column(
-                modifier = Modifier
+        Column(
+            modifier =
+            if (isLoading) {
+                Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(bottom = 60.dp)
                     .fillMaxSize()
+            } else {
+                Modifier
+                    .fillMaxSize()
+            }
+        ) {
+            RegistrationHeader(
+                navigationController = navigationController,
+                fallbackRoute = "Home"
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(
+                    space = 10.dp,
+                    alignment = Alignment.CenterHorizontally
+                ),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                RegistrationHeader(
-                    navigationController = navigationController,
-                    fallbackRoute = "Home"
+                Icon(
+                    imageVector = Icons.Outlined.Home,
+                    contentDescription = "Icone de propriedade",
+                    tint = VERDE_ESCURO,
+                    modifier = Modifier
+                        .scale(1.2f)
                 )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(
-                        space = 10.dp,
-                        alignment = Alignment.CenterHorizontally
-                    ),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Home,
-                        contentDescription = "Icone de propriedade",
-                        tint = VERDE_ESCURO,
-                        modifier = Modifier
-                            .scale(1.2f)
-                    )
-
-                    Text(
-                        text = titulo,
-                        style = Typography.titleLarge,
-                        color = VERDE_ESCURO
-                    )
-                }
-
-                if (propertyList.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(60.dp))
-                }
-
-
-                Column() {
-                    children()
-                }
+                Text(
+                    text = titulo,
+                    style = Typography.titleLarge,
+                    color = VERDE_ESCURO
+                )
             }
-        } else {
-            LoadingScreen()
+
+            if (propertyList.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(60.dp))
+            }
+
+            Column {
+                children()
+            }
         }
     }
 }

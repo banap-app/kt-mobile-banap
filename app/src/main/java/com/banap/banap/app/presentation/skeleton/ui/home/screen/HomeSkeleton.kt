@@ -1,4 +1,4 @@
-package com.banap.banap.app.presentation.skeleton.ui.home
+package com.banap.banap.app.presentation.skeleton.ui.home.screen
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
