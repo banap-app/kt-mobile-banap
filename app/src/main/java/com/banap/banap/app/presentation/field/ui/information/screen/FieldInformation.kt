@@ -27,6 +27,7 @@ import com.banap.banap.R
 import com.banap.banap.app.presentation.analysis.ui.information.components.CreateDetails
 import com.banap.banap.app.presentation.field.ui.information.components.FieldActions
 import com.banap.banap.app.presentation.home.ui.components.TaskCard
+import com.banap.banap.app.presentation.skeleton.ui.field.screen.FieldInformationSkeleton
 import com.banap.banap.core.ui.components.Button
 import com.banap.banap.core.ui.components.ImageInformation
 import com.banap.banap.core.ui.components.Information
@@ -68,314 +69,103 @@ fun FieldInformation(
         navigationController = navigationController,
         fixedRoute = "Home",
         title = "Talhão 01",
-        titleIcon = R.drawable.field
+        titleIcon = R.drawable.field,
+        isLoading = isLoading
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(
-                space = 20.dp
-            )
-        ) {
-            ImageInformation(
-                image = R.drawable.fieldimage,
-                icon = R.drawable.fieldiconplant,
-                text = "Banana Nanica",
-                child = {
-                    Text(
-                        text = "10",
-                        style = Typography.bodyLarge,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = VERDE_CLARO
-                    )
-                }
-            )
-
-            FieldActions(
-                navigationController,
-                onClickDelete = {
-                    modalVisible = true
-                },
-                onClickEdit = {}
-            )
-
-            if (modalVisible) {
-                Modal(
-                    onConfirm = {},
-                    onDismiss = {
-                        modalVisible = false
-                    },
-                    icon = R.drawable.fieldicondelete,
-                    title = "Tem certeza que deseja\n apagar o talhão?",
-                    description = "Apagando o talhão, todas as informações relacionadas a ele tambem serão apagadas!",
-                    onConfirmText = "Excluir",
-                    onDismissText = "Cancelar"
-                )
+        when {
+            isLoading -> {
+                FieldInformationSkeleton()
             }
-        }
 
-        Information(
-            icon = R.drawable.fieldicondescription,
-            title = "Descrição",
-            child = {
-                Text(
-                    text = "Esse talhão fica perto da cerca ao leste da fazenda, ao lado de outros talhões de banana prata.",
-                    style = Typography.bodyLarge,
-                    color = PRETO,
-                    fontWeight = FontWeight.Normal,
-                    textAlign = TextAlign.Justify
-                )
-            }
-        )
-
-        Information(
-            space = if (taskList.isEmpty()) 60.dp else 40.dp,
-            icon = R.drawable.fieldicontask,
-            title = "Lista de Tarefas",
-            child = {
-                when {
-                    taskList.isEmpty() -> {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(
-                                space = 40.dp,
-                                alignment = Alignment.CenterVertically
-                            )
-                        ) {
-                            Text(
-                                text = "Você ainda não tem\numa tarefa á ser feita!",
-                                textAlign = TextAlign.Center,
-                                style = Typography.bodyLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = CINZA_ESCURO
-                            )
-
-                            Button(
-                                texto = "Nova Tarefa",
-                                modifier = Modifier
-                                    .padding(vertical = 18.dp, horizontal = 15.dp),
-                                hasIcon = true,
-                                shape = ShapeProperty.small,
-                                onClick = {
-                                    navigationController.navigate("NewTask")
-                                },
-                                backgroundColor = VERDE_CLARO,
-                                contentColor = BRANCO,
-                                defaultElevetion = 3.dp
-                            )
-                        }
-                    }
-
-                    else -> {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(
-                                space = 60.dp
-                            )
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(
-                                    space = 10.dp
-                                )
-                            ) {
-                                taskList.forEach { task ->
-                                    TaskCard(
-                                        cardColor = VERMELHO,
-                                        priority = "Alta",
-                                        name = task,
-                                        time = "00:60 ás 08:00"
-                                    )
-                                }
-                            }
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                Button(
-                                    texto = "Nova Tarefa",
-                                    modifier = Modifier
-                                        .padding(vertical = 18.dp, horizontal = 15.dp),
-                                    hasIcon = true,
-                                    shape = ShapeProperty.small,
-                                    onClick = {
-                                        navigationController.navigate("NewTask")
-                                    },
-                                    backgroundColor = VERDE_CLARO,
-                                    contentColor = BRANCO,
-                                    defaultElevetion = 3.dp
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        )
-
-        Information(
-            space = 5.dp,
-            icon = R.drawable.fieldicontroubleshoot,
-            title = "Ultimas Análises",
-            child = {
+            else -> {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(
-                        space = if (analysisList.isEmpty()) 60.dp else 40.dp,
+                        space = 20.dp
                     )
                 ) {
-                    Text(
-                        text = "Listadas abaixo estão as ultímas 5 análises feitas nesse talhão!",
-                        style = Typography.bodyLarge,
-                        color = VERDE_ESCURO,
-                        fontWeight = FontWeight.Light,
-                        textAlign = TextAlign.Justify
+                    ImageInformation(
+                        image = R.drawable.fieldimage,
+                        icon = R.drawable.fieldiconplant,
+                        text = "Banana Nanica",
+                        child = {
+                            Text(
+                                text = "10",
+                                style = Typography.bodyLarge,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = VERDE_CLARO
+                            )
+                        }
                     )
 
-                    when {
-                        analysisList.isEmpty() -> {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(
-                                    space = 40.dp,
-                                    alignment = Alignment.CenterVertically
-                                )
-                            ) {
-                                Text(
-                                    text = "Você ainda não\nrealizou nenhuma análise!",
-                                    textAlign = TextAlign.Center,
-                                    style = Typography.bodyLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    color = CINZA_ESCURO
-                                )
+                    FieldActions(
+                        navigationController,
+                        onClickDelete = {
+                            modalVisible = true
+                        },
+                        onClickEdit = {}
+                    )
 
-                                Button(
-                                    texto = "Nova Análise",
-                                    modifier = Modifier
-                                        .padding(vertical = 18.dp, horizontal = 15.dp),
-                                    hasIcon = true,
-                                    shape = ShapeProperty.small,
-                                    onClick = {
-                                        navigationController.navigate("NewLimingCalculation")
-                                    },
-                                    backgroundColor = VERDE_CLARO,
-                                    contentColor = BRANCO,
-                                    defaultElevetion = 3.dp
-                                )
-                            }
-                        }
+                    if (modalVisible) {
+                        Modal(
+                            onConfirm = {},
+                            onDismiss = {
+                                modalVisible = false
+                            },
+                            icon = R.drawable.fieldicondelete,
+                            title = "Tem certeza que deseja\n apagar o talhão?",
+                            description = "Apagando o talhão, todas as informações relacionadas a ele tambem serão apagadas!",
+                            onConfirmText = "Excluir",
+                            onDismissText = "Cancelar"
+                        )
+                    }
+                }
 
-                        else -> {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(
-                                    space = 10.dp
-                                )
-                            ) {
-                                CreateDetails(
-                                    username = "Gilmar",
-                                    createdAt = "10 Maio 2024 ás 17:54"
-                                )
+                Information(
+                    icon = R.drawable.fieldicondescription,
+                    title = "Descrição",
+                    child = {
+                        Text(
+                            text = "Esse talhão fica perto da cerca ao leste da fazenda, ao lado de outros talhões de banana prata.",
+                            style = Typography.bodyLarge,
+                            color = PRETO,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Justify
+                        )
+                    }
+                )
 
+                Information(
+                    space = if (taskList.isEmpty()) 60.dp else 40.dp,
+                    icon = R.drawable.fieldicontask,
+                    title = "Lista de Tarefas",
+                    child = {
+                        when {
+                            taskList.isEmpty() -> {
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.spacedBy(
-                                        space = 60.dp
-                                    ),
-                                    horizontalAlignment = Alignment.End
+                                        space = 40.dp,
+                                        alignment = Alignment.CenterVertically
+                                    )
                                 ) {
-                                    Column(
-                                        verticalArrangement = Arrangement.spacedBy(
-                                            space = 20.dp
-                                        ),
-                                    ) {
-                                        analysisList.forEach { analysis ->
-                                            ListItemCard(
-                                                modifier = Modifier
-                                                    .height(120.dp)
-                                                    .widthIn(
-                                                        max = 290.dp
-                                                    ),
-                                                onClick = {
-                                                    navigationController.navigate("AnalysisInformation")
-                                                },
-                                                title = "Análise",
-                                                titleStyle = Typography.labelSmall,
-                                                nameStyle = Typography.titleLarge,
-                                                name = analysis
-                                            ) {
-                                                Row(
-                                                    modifier = Modifier
-                                                        .padding(end = 30.dp),
-                                                    horizontalArrangement = Arrangement.spacedBy(
-                                                        space = 10.dp,
-                                                        alignment = Alignment.CenterHorizontally
-                                                    )
-                                                ) {
-                                                    Column(
-                                                        verticalArrangement = Arrangement.spacedBy(
-                                                            space = 5.dp
-                                                        ),
-                                                        horizontalAlignment = Alignment.CenterHorizontally
-                                                    ) {
-                                                        Text(
-                                                            text = "1+",
-                                                            style = Typography.displaySmall,
-                                                            fontWeight = FontWeight.ExtraBold,
-                                                            color = BRANCO
-                                                        )
-
-                                                        Icon(
-                                                            imageVector = ImageVector.vectorResource(
-                                                                id = R.drawable.analysisiconliming
-                                                            ),
-                                                            contentDescription = "Icone de Calagem"
-                                                        )
-                                                    }
-
-                                                    Column(
-                                                        verticalArrangement = Arrangement.spacedBy(
-                                                            space = 5.dp
-                                                        ),
-                                                        horizontalAlignment = Alignment.CenterHorizontally
-                                                    ) {
-                                                        Text(
-                                                            text = "1+",
-                                                            style = Typography.displaySmall,
-
-                                                            fontWeight = FontWeight.ExtraBold,
-                                                            color = BRANCO
-                                                        )
-
-                                                        Icon(
-                                                            imageVector = ImageVector.vectorResource(
-                                                                id = R.drawable.analysisiconnpk
-                                                            ),
-                                                            contentDescription = "Icone de Npk"
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
+                                    Text(
+                                        text = "Você ainda não tem\numa tarefa á ser feita!",
+                                        textAlign = TextAlign.Center,
+                                        style = Typography.bodyLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = CINZA_ESCURO
+                                    )
 
                                     Button(
-                                        texto = "Nova Análise",
+                                        texto = "Nova Tarefa",
                                         modifier = Modifier
                                             .padding(vertical = 18.dp, horizontal = 15.dp),
                                         hasIcon = true,
                                         shape = ShapeProperty.small,
                                         onClick = {
-                                            navigationController.navigate("NewLimingCalculation")
+                                            navigationController.navigate("NewTask")
                                         },
                                         backgroundColor = VERDE_CLARO,
                                         contentColor = BRANCO,
@@ -383,11 +173,231 @@ fun FieldInformation(
                                     )
                                 }
                             }
+
+                            else -> {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    verticalArrangement = Arrangement.spacedBy(
+                                        space = 60.dp
+                                    )
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        verticalArrangement = Arrangement.spacedBy(
+                                            space = 10.dp
+                                        )
+                                    ) {
+                                        taskList.forEach { task ->
+                                            TaskCard(
+                                                cardColor = VERMELHO,
+                                                priority = "Alta",
+                                                name = task,
+                                                time = "00:60 ás 08:00"
+                                            )
+                                        }
+                                    }
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.End
+                                    ) {
+                                        Button(
+                                            texto = "Nova Tarefa",
+                                            modifier = Modifier
+                                                .padding(vertical = 18.dp, horizontal = 15.dp),
+                                            hasIcon = true,
+                                            shape = ShapeProperty.small,
+                                            onClick = {
+                                                navigationController.navigate("NewTask")
+                                            },
+                                            backgroundColor = VERDE_CLARO,
+                                            contentColor = BRANCO,
+                                            defaultElevetion = 3.dp
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
+                )
 
-                }
+                Information(
+                    space = 5.dp,
+                    icon = R.drawable.fieldicontroubleshoot,
+                    title = "Ultimas Análises",
+                    child = {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(
+                                space = if (analysisList.isEmpty()) 60.dp else 40.dp,
+                            )
+                        ) {
+                            Text(
+                                text = "Listadas abaixo estão as ultímas 5 análises feitas nesse talhão!",
+                                style = Typography.bodyLarge,
+                                color = VERDE_ESCURO,
+                                fontWeight = FontWeight.Light,
+                                textAlign = TextAlign.Justify
+                            )
+
+                            when {
+                                analysisList.isEmpty() -> {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.spacedBy(
+                                            space = 40.dp,
+                                            alignment = Alignment.CenterVertically
+                                        )
+                                    ) {
+                                        Text(
+                                            text = "Você ainda não\nrealizou nenhuma análise!",
+                                            textAlign = TextAlign.Center,
+                                            style = Typography.bodyLarge,
+                                            fontWeight = FontWeight.Bold,
+                                            color = CINZA_ESCURO
+                                        )
+
+                                        Button(
+                                            texto = "Nova Análise",
+                                            modifier = Modifier
+                                                .padding(vertical = 18.dp, horizontal = 15.dp),
+                                            hasIcon = true,
+                                            shape = ShapeProperty.small,
+                                            onClick = {
+                                                navigationController.navigate("NewLimingCalculation")
+                                            },
+                                            backgroundColor = VERDE_CLARO,
+                                            contentColor = BRANCO,
+                                            defaultElevetion = 3.dp
+                                        )
+                                    }
+                                }
+
+                                else -> {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        verticalArrangement = Arrangement.spacedBy(
+                                            space = 10.dp
+                                        )
+                                    ) {
+                                        CreateDetails(
+                                            username = "Gilmar",
+                                            createdAt = "10 Maio 2024 ás 17:54"
+                                        )
+
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth(),
+                                            verticalArrangement = Arrangement.spacedBy(
+                                                space = 60.dp
+                                            ),
+                                            horizontalAlignment = Alignment.End
+                                        ) {
+                                            Column(
+                                                verticalArrangement = Arrangement.spacedBy(
+                                                    space = 20.dp
+                                                ),
+                                            ) {
+                                                analysisList.forEach { analysis ->
+                                                    ListItemCard(
+                                                        modifier = Modifier
+                                                            .height(120.dp)
+                                                            .widthIn(
+                                                                max = 290.dp
+                                                            ),
+                                                        onClick = {
+                                                            navigationController.navigate("AnalysisInformation")
+                                                        },
+                                                        title = "Análise",
+                                                        titleStyle = Typography.labelSmall,
+                                                        nameStyle = Typography.titleLarge,
+                                                        name = analysis
+                                                    ) {
+                                                        Row(
+                                                            modifier = Modifier
+                                                                .padding(end = 30.dp),
+                                                            horizontalArrangement = Arrangement.spacedBy(
+                                                                space = 10.dp,
+                                                                alignment = Alignment.CenterHorizontally
+                                                            )
+                                                        ) {
+                                                            Column(
+                                                                verticalArrangement = Arrangement.spacedBy(
+                                                                    space = 5.dp
+                                                                ),
+                                                                horizontalAlignment = Alignment.CenterHorizontally
+                                                            ) {
+                                                                Text(
+                                                                    text = "1+",
+                                                                    style = Typography.displaySmall,
+                                                                    fontWeight = FontWeight.ExtraBold,
+                                                                    color = BRANCO
+                                                                )
+
+                                                                Icon(
+                                                                    imageVector = ImageVector.vectorResource(
+                                                                        id = R.drawable.analysisiconliming
+                                                                    ),
+                                                                    contentDescription = "Icone de Calagem"
+                                                                )
+                                                            }
+
+                                                            Column(
+                                                                verticalArrangement = Arrangement.spacedBy(
+                                                                    space = 5.dp
+                                                                ),
+                                                                horizontalAlignment = Alignment.CenterHorizontally
+                                                            ) {
+                                                                Text(
+                                                                    text = "1+",
+                                                                    style = Typography.displaySmall,
+
+                                                                    fontWeight = FontWeight.ExtraBold,
+                                                                    color = BRANCO
+                                                                )
+
+                                                                Icon(
+                                                                    imageVector = ImageVector.vectorResource(
+                                                                        id = R.drawable.analysisiconnpk
+                                                                    ),
+                                                                    contentDescription = "Icone de Npk"
+                                                                )
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+
+                                            Button(
+                                                texto = "Nova Análise",
+                                                modifier = Modifier
+                                                    .padding(vertical = 18.dp, horizontal = 15.dp),
+                                                hasIcon = true,
+                                                shape = ShapeProperty.small,
+                                                onClick = {
+                                                    navigationController.navigate("NewLimingCalculation")
+                                                },
+                                                backgroundColor = VERDE_CLARO,
+                                                contentColor = BRANCO,
+                                                defaultElevetion = 3.dp
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                )
             }
-        )
+        }
     }
 }
