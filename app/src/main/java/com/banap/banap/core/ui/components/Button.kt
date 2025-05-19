@@ -17,6 +17,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.banap.banap.core.ui.theme.Typography
@@ -31,7 +33,9 @@ fun Button(
     onClick: () -> Unit,
     backgroundColor: Color,
     contentColor: Color,
-    defaultElevetion: Dp
+    defaultElevetion: Dp,
+    style: TextStyle = Typography.bodyMedium,
+    fontWeight: FontWeight = FontWeight.ExtraBold
 ) {
     Card (
         shape = shape,
@@ -64,7 +68,8 @@ fun Button(
 
             Text(
                 text = texto,
-                style = Typography.bodyMedium
+                style = style,
+                fontWeight = fontWeight
             )
         }
     }

@@ -1,6 +1,6 @@
 package com.banap.banap.data.model.producer
 
-data class ProducerResponse(
+data class CreateProducerResponse(
     val id: String,
     val name: String,
     val email: String,
