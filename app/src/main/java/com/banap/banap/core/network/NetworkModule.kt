@@ -51,7 +51,7 @@ object NetworkModule {
     @Named("AUTH_RETROFIT")
     fun provideAuthRetrofit(client: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .baseUrl(LOCAL_URL)
+            .baseUrl(AUTH_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

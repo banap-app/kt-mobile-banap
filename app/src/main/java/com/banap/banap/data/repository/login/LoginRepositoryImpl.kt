@@ -13,7 +13,7 @@ class LoginRepositoryImpl @Inject constructor(
 ) : LoginRepository {
     override suspend fun authenticationUser(email: String, password: String): LoginResponse {
         return service.authenticationUser(
-            LoginRequest(email, password, 1)
+            LoginRequest(email, password, 2)
         )
     }
 
