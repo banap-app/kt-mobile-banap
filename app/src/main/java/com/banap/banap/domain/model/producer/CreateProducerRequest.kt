@@ -4,5 +4,6 @@ data class CreateProducerRequest(
     val name: String,
     val email: String,
     val password: String,
-    val isActive: Boolean = true
+    val isActive: Boolean = true,
+    val typeUser: Int = 2
 )
