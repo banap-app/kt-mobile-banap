@@ -48,7 +48,6 @@ fun RecentActivities(
 
         }
 
-
         Text(
             text = "10 de Maio 2025 ás 17:54",
             style = Typography.bodySmall,

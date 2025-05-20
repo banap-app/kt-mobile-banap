@@ -31,12 +31,15 @@ import com.banap.banap.core.ui.components.DropdownTextField
 import com.banap.banap.core.ui.components.RegistrationScreenPattern
 import com.banap.banap.core.ui.components.TextBoxRegistration
 import com.banap.banap.core.ui.util.FertilizerCalculator
+import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.domain.model.analysis.NPKResult
 import kotlinx.coroutines.delay
 
 @Composable
 fun NewFertilizationRecommendation(
-    navigationController: NavController
+    navigationController: NavController,
+    analysisList: MutableList<String>,
+    logList: MutableList<LogList>
 ) {
     val context = LocalContext.current
 
@@ -116,17 +119,17 @@ fun NewFertilizationRecommendation(
                         children = {
                             ResultCard(
                                 nutrient = "Potássio",
-                                result = npkResult?.potassium.toString()
+                                result = "${npkResult?.potassium} Kg/ha"
                             )
 
                             ResultCard(
                                 nutrient = "Fosfóro",
-                                result = npkResult?.phosphor.toString()
+                                result = "${npkResult?.phosphor} Kg/ha"
                             )
 
                             ResultCard(
                                 nutrient = "Nitrogênio",
-                                result = npkResult?.nitrogen.toString()
+                                result = "${npkResult?.nitrogen} Kg/ha"
                             )
                         }
                     )
@@ -221,6 +224,14 @@ fun NewFertilizationRecommendation(
                     isLoading = true
                 }
             } else {
+                analysisList.add("Análise 01")
+                logList.add(
+                    LogList(
+                        author = "Gilmar",
+                        activity = "cadastrou uma análise."
+                    )
+                )
+
                 navigationController.navigate("Information")
             }
         },

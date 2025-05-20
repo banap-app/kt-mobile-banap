@@ -46,7 +46,9 @@ import com.banap.banap.core.ui.theme.VERMELHO
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun FieldInformation(
-    navigationController: NavController
+    navigationController: NavController,
+    analysisList: MutableList<String>,
+    taskList: MutableList<String>
 ) {
     val isLoading by remember {
         mutableStateOf(false)
@@ -55,15 +57,6 @@ fun FieldInformation(
     var modalVisible: Boolean by remember {
         mutableStateOf(false)
     }
-
-    val analysisList = mutableListOf<String>(
-        "Análise 01"
-    )
-
-    val taskList = mutableListOf<String>(
-        "Adubar",
-        "Jambrolhar"
-    )
 
     InformationScreenPattern(
         navigationController = navigationController,

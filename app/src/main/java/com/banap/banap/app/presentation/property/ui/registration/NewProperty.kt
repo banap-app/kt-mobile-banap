@@ -17,6 +17,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,6 +41,10 @@ import com.banap.banap.app.presentation.validation.name.utils.validationDataName
 import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
 import com.banap.banap.core.ui.components.LoadingScreen
+import com.banap.banap.data.model.producer.LogList
+import com.banap.banap.data.model.producer.TaskList
+import com.banap.banap.data.model.property.ListPropertiesResponse
+import com.banap.banap.data.model.property.ProducerId
 import com.banap.banap.domain.viewmodel.property.CreatePropertyViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -48,8 +53,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun NewProperty(
     navigationController: NavController,
-    createPropertyViewModel: CreatePropertyViewModel = hiltViewModel()
+    createPropertyViewModel: CreatePropertyViewModel = hiltViewModel(),
+    listProperties: MutableList<ListPropertiesResponse>,
+    logList: MutableList<LogList>
 ) {
+    var count by remember {
+        mutableIntStateOf(1)
+    }
+
     val context = LocalContext.current
 
     val createPropertyState = createPropertyViewModel.state.value
@@ -62,6 +73,7 @@ fun NewProperty(
     var isValidationSuccessful by remember {
         mutableStateOf(false)
     }
+
 
     var isLoading: Boolean by remember {
         mutableStateOf(false)
@@ -164,6 +176,13 @@ fun NewProperty(
         }
     }
 
+    LaunchedEffect(isLoading) {
+        if (isLoading) {
+            delay(1_000)
+            navigationController.navigate("Home")
+        }
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -225,11 +244,28 @@ fun NewProperty(
                             viewModelName.onEvent(NameTextFieldFormEvent.Submit)
 
                             if (isValidationSuccessful) {
-                                createPropertyViewModel.createProperty(
-                                    producerId = "",
-                                    name = stateName.name
+//                                createPropertyViewModel.createProperty(
+//                                    producerId = "",
+//                                    name = stateName.name
+//                                )
+                                listProperties.add(
+                                    ListPropertiesResponse(
+                                        id = "${count++}",
+                                        producerId = ProducerId(
+                                            id = "${count++}"
+                                        ),
+                                        name = stateName.name,
+                                        isActive = true
+                                    )
                                 )
 
+                                logList.add(
+                                    LogList(
+                                        author = "Gilmar",
+                                        activity = "cadastrou uma propriedade."
+                                    )
+                                )
+//
                                 isLoading = true
                             }
                         },

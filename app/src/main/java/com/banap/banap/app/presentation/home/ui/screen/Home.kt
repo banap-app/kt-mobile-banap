@@ -52,10 +52,8 @@ import com.banap.banap.core.ui.theme.ShapeProperty
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.data.model.producer.LogList
-import com.banap.banap.data.model.producer.Task
 import com.banap.banap.data.model.producer.TaskList
 import com.banap.banap.data.model.property.ListPropertiesResponse
-import com.banap.banap.data.model.property.ProducerId
 import com.banap.banap.data.model.weather.WeatherResponse
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.property.ListPropertiesViewModel
@@ -71,7 +69,11 @@ fun Home(
     tokenVerificationViewModel: TokenVerificationViewModel,
     weatherViewModel: WeatherViewModel,
     locationViewModel: LocationViewModel,
-    listPropertiesViewModel: ListPropertiesViewModel
+    listPropertiesViewModel: ListPropertiesViewModel,
+    fieldList: MutableList<String>,
+    listProperties: MutableList<ListPropertiesResponse>,
+    taskList: MutableList<TaskList>,
+    logList: MutableList<LogList>
 ) {
     val context = LocalContext.current
 
@@ -107,66 +109,6 @@ fun Home(
     var modalVisible: Boolean by remember {
         mutableStateOf(false)
     }
-
-    val listProperties: MutableList<ListPropertiesResponse> = mutableListOf(
-        ListPropertiesResponse(
-            id = "1",
-            producerId = ProducerId(
-                id = "1"
-            ),
-            name = "Propriedade 01",
-            isActive = true
-        ),
-        ListPropertiesResponse(
-            id = "1",
-            producerId = ProducerId(
-                id = "1"
-            ),
-            name = "Propriedade 02",
-            isActive = true
-        )
-    )
-
-    val fieldList: MutableList<String> = mutableListOf(
-        "Talhão 01" 
-    )
-
-    val taskList: MutableList<TaskList> = mutableListOf(
-        TaskList(
-            propertyName = "Propriedade 01",
-            tasks = listOf(
-                Task(
-                    fieldName = "Talhão 01",
-                    taskName = listOf(
-                        "Semear",
-                        "Cultivar"
-                    )
-                )
-            )
-        ),
-        TaskList(
-            propertyName = "Propriedade 02",
-            tasks = listOf(
-                Task(
-                    fieldName = "Talhão 01",
-                    taskName = listOf(
-                        "Semear"
-                    )
-                )
-            )
-        )
-    )
-
-    val logList: MutableList<LogList> = mutableListOf(
-        LogList(
-            author = "Gilmar",
-            activity = "cadastrou uma propriedade."
-        ),
-        LogList(
-            author = "Gilmar",
-            activity = "criou um talhão."
-        )
-    )
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -437,7 +379,8 @@ fun Home(
                                 titulo = "Lista de tarefas",
                                 subTitulo = "Seus afazeres da semana!",
                                 navigationController = navigationController,
-                                list = taskList
+                                fieldList = fieldList,
+                                taskList = taskList
                             )
                         }
                     }
