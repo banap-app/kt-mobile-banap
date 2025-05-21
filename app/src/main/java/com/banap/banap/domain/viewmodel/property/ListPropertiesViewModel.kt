@@ -1,5 +1,6 @@
 package com.banap.banap.domain.viewmodel.property
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -19,11 +20,12 @@ class ListPropertiesViewModel @Inject constructor(
     private val _state = mutableStateOf(ListPropertiesState())
     val state: State<ListPropertiesState> = _state
 
-    fun listProperties(producerId: String) {
-        listPropertiesUseCase(producerId).onEach { result ->
+    fun listProperties() {
+        listPropertiesUseCase().onEach { result ->
             when (result) {
                 is Resource.Success -> {
                     _state.value = ListPropertiesState(response = result.data)
+                    Log.d("LISTING PROPERTIES", result.data.toString())
                 }
 
                 is Resource.Error -> {

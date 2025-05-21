@@ -38,7 +38,6 @@ import com.banap.banap.core.ui.components.SplashScreen
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
 import com.banap.banap.data.model.property.ListPropertiesResponse
-import com.banap.banap.data.model.property.ProducerId
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.property.ListPropertiesViewModel
 import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
@@ -63,24 +62,8 @@ fun Navigation() {
     val taskListHome: MutableList<TaskList> = mutableListOf()
     val taskListFieldInformation: MutableList<String> = mutableListOf()
 
-    val listProperties: MutableList<ListPropertiesResponse> = mutableListOf(
-        ListPropertiesResponse(
-            id = "1",
-            producerId = ProducerId(
-                id = "1"
-            ),
-            name = "Propriedade 01",
-            isActive = true
-        )
-    )
-
-    val logList: MutableList<LogList> = mutableListOf(
-        LogList(
-            author = "Gilmar",
-            activity = "cadastrou uma propriedade."
-        )
-    )
-
+    val listProperties: MutableList<ListPropertiesResponse> = mutableListOf()
+    val logList: MutableList<LogList> = mutableListOf()
 
     LaunchedEffect(navigationController) {
         navigationController
@@ -140,7 +123,6 @@ fun Navigation() {
                 locationViewModel = locationViewModel,
                 listPropertiesViewModel = listPropertiesViewModel,
                 fieldList = fieldList,
-                listProperties = listProperties,
                 taskList = taskListHome,
                 logList = logList
             )
@@ -181,7 +163,6 @@ fun Navigation() {
         ) {
             NewProperty(
                 navigationController,
-                listProperties = listProperties,
                 logList = logList
             )
         }

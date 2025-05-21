@@ -55,6 +55,7 @@ import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
 import com.banap.banap.data.model.property.ListPropertiesResponse
 import com.banap.banap.data.model.weather.WeatherResponse
+import com.banap.banap.domain.model.property.ListPropertiesState
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.property.ListPropertiesViewModel
 import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
@@ -70,10 +71,9 @@ fun Home(
     weatherViewModel: WeatherViewModel,
     locationViewModel: LocationViewModel,
     listPropertiesViewModel: ListPropertiesViewModel,
-    fieldList: MutableList<String>,
-    listProperties: MutableList<ListPropertiesResponse>,
     taskList: MutableList<TaskList>,
-    logList: MutableList<LogList>
+    logList: MutableList<LogList>,
+    fieldList: MutableList<String>
 ) {
     val context = LocalContext.current
 
@@ -95,6 +95,10 @@ fun Home(
     }
 
     var weather: WeatherResponse? by remember {
+        mutableStateOf(null)
+    }
+
+    var properties: List<ListPropertiesResponse>? by remember {
         mutableStateOf(null)
     }
 
@@ -138,22 +142,6 @@ fun Home(
         permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
-    LaunchedEffect(locationState.response) {
-        locationState.response?.let {
-            tokenViewModel.saveTokens(
-                mapOf(
-                    "latitude" to it.latitude.toString(),
-                    "longitude" to it.longitude.toString()
-                )
-            )
-
-            weatherViewModel.getCurrentWeather(
-                latitude = it.latitude,
-                longitude = it.longitude
-            )
-        }
-    }
-
     LaunchedEffect(true) {
         if (!tokenViewModel.getToken("latitude")
                 .isNullOrEmpty() && !tokenViewModel.getToken("longitude").isNullOrEmpty()
@@ -183,21 +171,6 @@ fun Home(
         }
     }
 
-    LaunchedEffect(weatherState.isLoading) {
-        weatherLoading = weatherState.isLoading
-    }
-
-    LaunchedEffect(listPropertiesState.isLoading) {
-        propertiesLoading = listPropertiesState.isLoading
-    }
-
-    LaunchedEffect(weatherState.response) {
-        weatherState.response?.let {
-            Log.d("WEATHER", it.toString())
-            weather = weatherState.response
-        }
-    }
-
     LaunchedEffect(context) {
         Log.d("TOKEN", tokenViewModel.getToken("token").toString())
 
@@ -215,6 +188,33 @@ fun Home(
         }
     }
 
+    LaunchedEffect(locationState.response) {
+        locationState.response?.let {
+            tokenViewModel.saveTokens(
+                mapOf(
+                    "latitude" to it.latitude.toString(),
+                    "longitude" to it.longitude.toString()
+                )
+            )
+
+            weatherViewModel.getCurrentWeather(
+                latitude = it.latitude,
+                longitude = it.longitude
+            )
+        }
+    }
+
+    LaunchedEffect(weatherState.isLoading) {
+        weatherLoading = weatherState.isLoading
+    }
+
+    LaunchedEffect(weatherState.response) {
+        weatherState.response?.let {
+            Log.d("WEATHER", it.toString())
+            weather = weatherState.response
+        }
+    }
+
     LaunchedEffect(tokenVerificationState.response) {
         Log.d("RESPONSE", tokenVerificationState.response?.decodedToken ?: "sem resposta")
 
@@ -222,7 +222,9 @@ fun Home(
             tokenViewModel.saveToken("verifiedToken", it.success.toString())
             isTokenValid = it.success
 
-//            listPropertiesViewModel.listProperties()
+            if (it.success) {
+                listPropertiesViewModel.listProperties()
+            }
         }
     }
 
@@ -233,6 +235,21 @@ fun Home(
             tokenViewModel.clearAll()
             navigationController.navigate("Login")
         }
+    }
+
+    LaunchedEffect(listPropertiesState.isLoading) {
+        propertiesLoading = listPropertiesState.isLoading
+    }
+
+    LaunchedEffect(listPropertiesState.response) {
+        listPropertiesState.response?.let {
+            Log.d("PROPERTIES", it.toString())
+            properties = listPropertiesState.response
+        }
+    }
+
+    LaunchedEffect(listPropertiesState.error) {
+        Log.d("ERROR", listPropertiesState.error)
     }
 
     Scaffold(
@@ -255,7 +272,7 @@ fun Home(
         if (isTokenValid && !hasToken.isNullOrEmpty()) {
             Column(
                 modifier =
-                if (listProperties.isNotEmpty()) {
+                if (properties?.isNotEmpty() == true) {
                     Modifier
                         .verticalScroll(rememberScrollState())
                         .fillMaxSize()
@@ -303,7 +320,7 @@ fun Home(
                 )
 
                 when {
-                    listProperties.isNotEmpty() -> {
+                    properties?.isNotEmpty() == true -> {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(
                                 space = 60.dp
@@ -337,7 +354,7 @@ fun Home(
                                         }
 
                                         else -> {
-                                            listProperties.forEach {
+                                            properties?.forEach {
                                                 Property(
                                                     titulo = it.name,
                                                     navigationController = navigationController,

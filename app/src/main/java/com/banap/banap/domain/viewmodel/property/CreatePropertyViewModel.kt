@@ -1,5 +1,6 @@
 package com.banap.banap.domain.viewmodel.property
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -19,11 +20,12 @@ class CreatePropertyViewModel @Inject constructor(
     private val _state = mutableStateOf(CreatePropertyState())
     val state: State<CreatePropertyState> = _state
 
-    fun createProperty(producerId: String, name: String) {
-        createPropertyUseCase(producerId, name).onEach { result ->
+    fun createProperty(name: String) {
+        createPropertyUseCase(name).onEach { result ->
             when (result) {
                 is Resource.Success -> {
                     _state.value = CreatePropertyState(response = result.data)
+                    Log.d("CREATE PROPERTY", result.data.toString())
                 }
 
                 is Resource.Error -> {

@@ -13,7 +13,7 @@ interface PropertyService {
     suspend fun createProperty(@Body property: CreatePropertyRequest): CreatePropertyResponse
     
     @GET("/property")
-    suspend fun listProperties(@Query("producerId") producerId: String): List<ListPropertiesResponse>
+    suspend fun listProperties(): List<ListPropertiesResponse>
 
     @GET("/property")
     suspend fun getPropertyById(@Query("id") id: String): ListPropertiesResponse

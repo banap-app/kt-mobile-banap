@@ -11,10 +11,10 @@ import javax.inject.Inject
 class ListPropertiesUseCase @Inject constructor(
     private val repository: PropertyRepositoryImpl
 ) {
-    operator fun invoke(producerId: String) : Flow<Resource<List<ListPropertiesResponse>>> = flow {
+    operator fun invoke() : Flow<Resource<List<ListPropertiesResponse>>> = flow {
         try {
             emit(Resource.Loading())
-            val properties = repository.listProperties(producerId)
+            val properties = repository.listProperties()
             emit(Resource.Success(properties))
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "Um erro inesperado aconteceu"))

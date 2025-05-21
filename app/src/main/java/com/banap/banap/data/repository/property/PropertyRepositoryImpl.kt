@@ -14,8 +14,8 @@ class PropertyRepositoryImpl @Inject constructor(
         return service.createProperty(property)
     }
 
-    override suspend fun listProperties(producerId: String): List<ListPropertiesResponse> {
-        return service.listProperties(producerId)
+    override suspend fun listProperties(): List<ListPropertiesResponse> {
+        return service.listProperties()
     }
 
     override suspend fun getPropertyById(id: String): ListPropertiesResponse {

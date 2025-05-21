@@ -17,7 +17,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,7 +27,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.name.utils.validationDataName
+import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
 import com.banap.banap.core.ui.components.ButtonRegistration
+import com.banap.banap.core.ui.components.LoadingScreen
 import com.banap.banap.core.ui.components.RegistrationHeader
 import com.banap.banap.core.ui.components.TextBoxRegistration
 import com.banap.banap.core.ui.components.TitleRegistration
@@ -37,14 +40,7 @@ import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
-import com.banap.banap.app.presentation.validation.name.utils.validationDataName
-import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
-import com.banap.banap.core.ui.components.LoadingScreen
 import com.banap.banap.data.model.producer.LogList
-import com.banap.banap.data.model.producer.TaskList
-import com.banap.banap.data.model.property.ListPropertiesResponse
-import com.banap.banap.data.model.property.ProducerId
 import com.banap.banap.domain.viewmodel.property.CreatePropertyViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -54,13 +50,8 @@ import kotlinx.coroutines.launch
 fun NewProperty(
     navigationController: NavController,
     createPropertyViewModel: CreatePropertyViewModel = hiltViewModel(),
-    listProperties: MutableList<ListPropertiesResponse>,
     logList: MutableList<LogList>
 ) {
-    var count by remember {
-        mutableIntStateOf(1)
-    }
-
     val context = LocalContext.current
 
     val createPropertyState = createPropertyViewModel.state.value
@@ -73,7 +64,6 @@ fun NewProperty(
     var isValidationSuccessful by remember {
         mutableStateOf(false)
     }
-
 
     var isLoading: Boolean by remember {
         mutableStateOf(false)
@@ -176,9 +166,9 @@ fun NewProperty(
         }
     }
 
-    LaunchedEffect(isLoading) {
-        if (isLoading) {
-            delay(1_000)
+    LaunchedEffect(createPropertyState.response) {
+        createPropertyState.response?.let {
+            isLoading = false
             navigationController.navigate("Home")
         }
     }
@@ -244,20 +234,20 @@ fun NewProperty(
                             viewModelName.onEvent(NameTextFieldFormEvent.Submit)
 
                             if (isValidationSuccessful) {
-//                                createPropertyViewModel.createProperty(
-//                                    producerId = "",
-//                                    name = stateName.name
-//                                )
-                                listProperties.add(
-                                    ListPropertiesResponse(
-                                        id = "${count++}",
-                                        producerId = ProducerId(
-                                            id = "${count++}"
-                                        ),
-                                        name = stateName.name,
-                                        isActive = true
-                                    )
+                                createPropertyViewModel.createProperty(
+                                    name = stateName.name
                                 )
+
+//                                listProperties.add(
+//                                    ListPropertiesResponse(
+//                                        id = "",
+//                                        producerId = ProducerId(
+//                                            id = ""
+//                                        ),
+//                                        name = stateName.name,
+//                                        isActive = true
+//                                    )
+//                                )
 
                                 logList.add(
                                     LogList(
@@ -265,7 +255,7 @@ fun NewProperty(
                                         activity = "cadastrou uma propriedade."
                                     )
                                 )
-//
+
                                 isLoading = true
                             }
                         },

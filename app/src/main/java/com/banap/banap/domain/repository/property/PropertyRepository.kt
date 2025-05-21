@@ -6,6 +6,6 @@ import com.banap.banap.domain.model.property.CreatePropertyRequest
 
 interface PropertyRepository {
     suspend fun createProperty(property: CreatePropertyRequest): CreatePropertyResponse
-    suspend fun listProperties(producerId: String): List<ListPropertiesResponse>
+    suspend fun listProperties(): List<ListPropertiesResponse>
     suspend fun getPropertyById(id: String): ListPropertiesResponse
 }
