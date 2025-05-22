@@ -12,12 +12,11 @@ import javax.inject.Inject
 class CreatePropertyUseCase @Inject constructor(
     private val repository: PropertyRepositoryImpl
 ) {
-    operator fun invoke(producerId: String, name: String) : Flow<Resource<CreatePropertyResponse>> = flow {
+    operator fun invoke(name: String) : Flow<Resource<CreatePropertyResponse>> = flow {
         try {
             emit(Resource.Loading())
             val propertyResponse = repository.createProperty(
                 CreatePropertyRequest(
-                    producerId = producerId,
                     name = name
                 )
             )

@@ -38,26 +38,19 @@ import com.banap.banap.core.ui.util.shimmerEffect
 
 @Composable
 fun Property(
-    navigationController: NavController
+    navigationController: NavController,
+    fieldList: MutableList<String>
 ) {
     var fieldsLoading: Boolean by remember {
         mutableStateOf(false)
     }
-
-    val propertyList = mutableListOf<String>(
-        "Talhão 01",
-        "Talhão 02",
-        "Talhão 03",
-        "Talhão 04",
-        "Talhão 05"
-    )
 
     Container(
         navigationController = navigationController,
         titulo = "Propriedade 01",
         children = {
             when {
-                propertyList.isEmpty() -> {
+                fieldList.isEmpty() -> {
                     Column(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -82,7 +75,7 @@ fun Property(
                             hasIcon = true,
                             shape = ShapeProperty.small,
                             onClick = {
-                                propertyList.add("Talhao 01")
+                                navigationController.navigate("NewFieldFirstPage")
                             },
                             backgroundColor = VERDE_CLARO,
                             contentColor = BRANCO,
@@ -103,7 +96,7 @@ fun Property(
                                 .fillMaxSize(),
                             verticalArrangement = Arrangement.spacedBy(20.dp)
                         ) {
-                            items(propertyList.size) {
+                            items(fieldList.size) {
                                 ListItemCard(
                                     modifier = Modifier
                                         .height(150.dp)
@@ -111,7 +104,7 @@ fun Property(
                                     title = "Talhão",
                                     titleStyle = Typography.titleMedium,
                                     nameStyle = Typography.displayLarge,
-                                    name = propertyList[it]
+                                    name = fieldList[it]
                                 ) {
                                     Image(
                                         imageVector = ImageVector.vectorResource(id = R.drawable.propertyimagefield),
@@ -187,6 +180,6 @@ fun Property(
         },
         buttonValue = "Novo Talhão",
         isLoading = fieldsLoading,
-        propertyList = propertyList
+        propertyList = fieldList
     )
 }

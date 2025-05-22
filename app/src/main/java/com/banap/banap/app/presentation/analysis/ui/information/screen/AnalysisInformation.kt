@@ -38,7 +38,7 @@ fun AnalysisInformation(
     navigationController: NavController
 ) {
     val isLoading by remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
     }
 
     InformationScreenPattern(

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,11 +28,17 @@ import com.banap.banap.app.presentation.validation.scheduling.utils.validationDa
 import com.banap.banap.core.ui.components.DropdownTextField
 import com.banap.banap.core.ui.components.RegistrationScreenPattern
 import com.banap.banap.core.ui.components.TextBoxRegistration
+import com.banap.banap.data.model.producer.LogList
+import com.banap.banap.data.model.producer.Task
+import com.banap.banap.data.model.producer.TaskList
 import kotlinx.coroutines.delay
 
 @Composable
 fun NewTask(
-    navigationController: NavController
+    navigationController: NavController,
+    taskListHome: MutableList<TaskList>,
+    taskListFieldInformation: MutableList<String>,
+    logList: MutableList<LogList>
 ) {
     val context = LocalContext.current
 
@@ -119,6 +124,31 @@ fun NewTask(
             viewModelDropdownPriority.onEvent(DropdownTextFieldFormEvent.Submit)
 
             if (isValidationSuccessful) {
+                taskListHome.add(
+                    TaskList(
+                        propertyName = "Propriedade 01",
+                        tasks = listOf(
+                            Task(
+                                fieldName = "Talhão 01",
+                                taskName = listOf(
+                                    stateName.name
+                                )
+                            )
+                        )
+                    )
+                )
+
+                taskListFieldInformation.add(
+                    stateName.name
+                )
+
+                logList.add(
+                    LogList(
+                        author = "Gilmar",
+                        activity = "criou uma tarefa."
+                    )
+                )
+
                 isLoading = true
             }
         },

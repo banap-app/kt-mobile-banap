@@ -27,7 +27,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.name.utils.validationDataName
+import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
 import com.banap.banap.core.ui.components.ButtonRegistration
+import com.banap.banap.core.ui.components.LoadingScreen
 import com.banap.banap.core.ui.components.RegistrationHeader
 import com.banap.banap.core.ui.components.TextBoxRegistration
 import com.banap.banap.core.ui.components.TitleRegistration
@@ -36,10 +40,7 @@ import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
-import com.banap.banap.app.presentation.validation.name.utils.validationDataName
-import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
-import com.banap.banap.core.ui.components.LoadingScreen
+import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.domain.viewmodel.property.CreatePropertyViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -48,7 +49,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun NewProperty(
     navigationController: NavController,
-    createPropertyViewModel: CreatePropertyViewModel = hiltViewModel()
+    createPropertyViewModel: CreatePropertyViewModel = hiltViewModel(),
+    logList: MutableList<LogList>
 ) {
     val context = LocalContext.current
 
@@ -164,6 +166,13 @@ fun NewProperty(
         }
     }
 
+    LaunchedEffect(createPropertyState.response) {
+        createPropertyState.response?.let {
+            isLoading = false
+            navigationController.navigate("Home")
+        }
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -226,8 +235,25 @@ fun NewProperty(
 
                             if (isValidationSuccessful) {
                                 createPropertyViewModel.createProperty(
-                                    producerId = "",
                                     name = stateName.name
+                                )
+
+//                                listProperties.add(
+//                                    ListPropertiesResponse(
+//                                        id = "",
+//                                        producerId = ProducerId(
+//                                            id = ""
+//                                        ),
+//                                        name = stateName.name,
+//                                        isActive = true
+//                                    )
+//                                )
+
+                                logList.add(
+                                    LogList(
+                                        author = "Gilmar",
+                                        activity = "cadastrou uma propriedade."
+                                    )
                                 )
 
                                 isLoading = true

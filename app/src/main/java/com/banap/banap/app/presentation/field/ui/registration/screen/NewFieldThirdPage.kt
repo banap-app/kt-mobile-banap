@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,11 +39,14 @@ import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.app.presentation.validation.description.utils.validationDataDescription
 import com.banap.banap.app.presentation.validation.description.event.DescriptionTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.description.viewmodel.DescriptionTextFieldViewModel
+import com.banap.banap.data.model.producer.LogList
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NewFieldThirdPage (
-    navigationController: NavController
+    navigationController: NavController,
+    fieldList: MutableList<String>,
+    logList: MutableList<LogList>
 ) {
     val context = LocalContext.current
 
@@ -185,6 +189,14 @@ fun NewFieldThirdPage (
                 ButtonRegistration(
                     onClick = {
                         if (isValidationSuccessful) {
+                            fieldList.add("Talhão 01")
+                            logList.add(
+                                LogList(
+                                    author = "Gilmar",
+                                    activity = "cadastrou um talhão."
+                                )
+                            )
+
                             navigationController.navigate("Home")
                         }
                     },

@@ -35,6 +35,9 @@ import com.banap.banap.app.presentation.task.ui.registration.screen.NewTask
 import com.banap.banap.app.presentation.tutorial.ui.Tutorial
 import com.banap.banap.app.presentation.userchoice.ui.UserChoice
 import com.banap.banap.core.ui.components.SplashScreen
+import com.banap.banap.data.model.producer.LogList
+import com.banap.banap.data.model.producer.TaskList
+import com.banap.banap.data.model.property.ListPropertiesResponse
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.property.ListPropertiesViewModel
 import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
@@ -53,6 +56,14 @@ fun Navigation() {
     val navigationViewModel: NavigationViewModel = hiltViewModel()
     val listPropertiesViewModel: ListPropertiesViewModel = hiltViewModel()
     val animationDuration: Int = 700
+
+    val fieldList: MutableList<String> = mutableListOf()
+    val analysisList: MutableList<String> = mutableListOf()
+    val taskListHome: MutableList<TaskList> = mutableListOf()
+    val taskListFieldInformation: MutableList<String> = mutableListOf()
+
+    val listProperties: MutableList<ListPropertiesResponse> = mutableListOf()
+    val logList: MutableList<LogList> = mutableListOf()
 
     LaunchedEffect(navigationController) {
         navigationController
@@ -110,7 +121,10 @@ fun Navigation() {
                 tokenVerificationViewModel = tokenVerificationViewModel,
                 weatherViewModel = weatherViewModel,
                 locationViewModel = locationViewModel,
-                listPropertiesViewModel = listPropertiesViewModel
+                listPropertiesViewModel = listPropertiesViewModel,
+                fieldList = fieldList,
+                taskList = taskListHome,
+                logList = logList
             )
         }
 
@@ -147,7 +161,10 @@ fun Navigation() {
                 )
             }
         ) {
-            NewProperty(navigationController)
+            NewProperty(
+                navigationController,
+                logList = logList
+            )
         }
 
         composable (
@@ -297,7 +314,11 @@ fun Navigation() {
                 )
             }
         ) {
-            NewFieldThirdPage(navigationController)
+            NewFieldThirdPage(
+                navigationController,
+                fieldList = fieldList,
+                logList = logList
+            )
         }
 
         composable(
@@ -313,7 +334,11 @@ fun Navigation() {
                 )
             }
         ) {
-            FieldInformation(navigationController)
+            FieldInformation(
+                navigationController,
+                analysisList = analysisList,
+                taskList = taskListFieldInformation
+            )
         }
 
         composable(
@@ -345,7 +370,11 @@ fun Navigation() {
                 )
             }
         ) {
-            NewFertilizationRecommendation(navigationController)
+            NewFertilizationRecommendation(
+                navigationController,
+                analysisList = analysisList,
+                logList = logList
+            )
         }
 
         composable(
@@ -383,7 +412,10 @@ fun Navigation() {
                 )
             }
         ) {
-            Property(navigationController)
+            Property(
+                navigationController,
+                fieldList = fieldList
+            )
         }
 
         composable(
@@ -399,7 +431,12 @@ fun Navigation() {
                 )
             }
         ) {
-            NewTask(navigationController)
+            NewTask(
+                navigationController,
+                taskListHome = taskListHome,
+                taskListFieldInformation = taskListFieldInformation,
+                logList = logList
+            )
         }
 
         composable(
