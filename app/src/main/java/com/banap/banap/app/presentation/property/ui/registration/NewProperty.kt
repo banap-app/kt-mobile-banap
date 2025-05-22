@@ -168,7 +168,6 @@ fun NewProperty(
 
     LaunchedEffect(createPropertyState.response) {
         createPropertyState.response?.let {
-            isLoading = false
             navigationController.navigate("Home")
         }
     }

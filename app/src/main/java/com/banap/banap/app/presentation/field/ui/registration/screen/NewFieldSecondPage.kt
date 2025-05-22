@@ -55,7 +55,7 @@ fun NewFieldSecondPage(
     val snackBarHostState = remember { SnackbarHostState() }
 
     var isValidationSuccessful by remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
     }
 
     var backgroundColorButton by remember {
@@ -106,6 +106,8 @@ fun NewFieldSecondPage(
             durationMs = 1_000
         )
     }
+
+    isValidationSuccessful = marcadores.size >= 3
 
     val backgroundColor by animateColorAsState(
         targetValue = backgroundColorButton,

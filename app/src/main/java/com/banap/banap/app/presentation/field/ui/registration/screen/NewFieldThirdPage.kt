@@ -1,6 +1,7 @@
 package com.banap.banap.app.presentation.field.ui.registration.screen
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -10,7 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -40,18 +46,23 @@ import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.app.presentation.validation.description.utils.validationDataDescription
 import com.banap.banap.app.presentation.validation.description.event.DescriptionTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.description.viewmodel.DescriptionTextFieldViewModel
+import com.banap.banap.core.ui.components.LoadingScreen
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.domain.model.field.FieldBoundary
 import com.banap.banap.domain.viewmodel.field.CreateFieldViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun NewFieldThirdPage (
+fun NewFieldThirdPage(
     navigationController: NavController,
     createFieldViewModel: CreateFieldViewModel = hiltViewModel(),
     logList: MutableList<LogList>
 ) {
     val context = LocalContext.current
+
+    val snackBarHostState = remember { SnackbarHostState() }
 
     val createFieldState = createFieldViewModel.state.value
 
@@ -74,6 +85,10 @@ fun NewFieldThirdPage (
     )
 
     val isValidationSuccessful = validationDataDescription && validationDataDropdown
+
+    var isLoading: Boolean by remember {
+        mutableStateOf(false)
+    }
 
     var backgroundColorButton by remember {
         mutableStateOf(CINZA_CLARO)
@@ -121,120 +136,187 @@ fun NewFieldThirdPage (
         }
     }
 
-    Scaffold (
-        modifier = Modifier
-            .fillMaxSize(),
-        containerColor = BRANCO
-    ) {
-        Column {
-            RegistrationHeader(
-                navigationController = navigationController,
-                fallbackRoute = "NewFieldSecondPage"
-            )
+    LaunchedEffect(createFieldState.error) {
+        if (createFieldState.error.isNotEmpty()) {
+            isLoading = false
 
-            TitleRegistration(
-                texto = "Cadastrando seu ",
-                textoASerDestacado = "Talhão...",
-                corEmDestaque = VERDE_ESCURO,
-                subTexto = "",
-                tamanhoTextoDestacado = 36.sp,
-                paginaUsuario = false,
-                subtituloDestacado = "",
-                subtitulo = ""
-            )
+            var message = ""
+            var showSnackBar = false
 
-            Column (
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column (
-                    verticalArrangement = Arrangement.spacedBy(40.dp)
-                ) {
-                    TextBoxRegistration(
-                        value = stateDescription.description,
-                        onValueChange = {
-                            viewModelDescription.onEvent(DescriptionTextFieldFormEvent.DescriptionChanged(it))
-                            viewModelDescription.onEvent(DescriptionTextFieldFormEvent.Submit)
-                        },
-                        isError = stateDescription.descriptionError != null,
-                        errorState = stateDescription.descriptionError,
-                        label = "Descrição",
-                        placeholder = "Descreva seu talhão",
-                        tipoTeclado = KeyboardType.Text,
-                        modifier = Modifier
-                            .heightIn(
-                                min = 70.dp,
-                                max = 100.dp
-                            )
-                            .fillMaxWidth(),
-                        lastOne = true,
-                        maxLines = 10
-                    )
-
-                    DropdownTextField(
-                        label = "Cultura",
-                        value = stateDropdown.option,
-                        placeholder = "Escolha uma cultura",
-                        options = listOf(
-                            "Banana Nanica",
-                            "Banana Prata",
-                            "Banana da Terra",
-                            "Banana Maçã",
-                            "Banana Ouro"
-                        ),
-                        onOptionSelected = {
-                            viewModelDropdown.onEvent(DropdownTextFieldFormEvent.OptionChanged(it))
-                            viewModelDropdown.onEvent(DropdownTextFieldFormEvent.Submit)
-                        },
-                        errorState = stateDropdown.optionError
-                    )
+            when {
+                createFieldState.error.contains("500") -> {
+                    Log.d("Error", createFieldState.error)
                 }
 
-                ButtonRegistration(
-                    onClick = {
-                        if (isValidationSuccessful) {
-                            createFieldViewModel.createField(
-                                producerId = "850cd26e-dcaa-47e2-b1c1-24f5bf709984",
-                                propertyId = "8e5d9388-9a27-42c0-a762-790c753eea9b",
-                                name = "Talhão 01",
-                                description = stateDescription.description,
-                                crop = stateDropdown.option,
-                                fieldBoundary = listOf(
-                                    FieldBoundary(
-                                        lat = -24.692057,
-                                        lng = -47.886843
-                                    ),
-                                    FieldBoundary(
-                                        lat = -24.692369,
-                                        lng = -47.883753
-                                    ),
-                                    FieldBoundary(
-                                        lat = -24.695450,
-                                        lng = -47.887143
-                                    ),
-                                    FieldBoundary(
-                                        lat = -24.695800,
-                                        lng = -47.883753
-                                    )
-                                )
-                            )
+                else -> {
+                    showSnackBar = true
+                    message = "Não foi possível se conectar ao servidor!"
+                }
+            }
 
-                            logList.add(
-                                LogList(
-                                    author = "Gilmar",
-                                    activity = "cadastrou um talhão."
-                                )
-                            )
+            Log.d("Error", createFieldState.error)
 
-                            navigationController.navigate("Home")
-                        }
-                    },
-                    buttonValue = "Continuar",
-                    backgroundColor = backgroundColor,
-                    contentColor = contentColor
+            val autoDismissJob = launch {
+                delay(5_000L)
+                snackBarHostState.currentSnackbarData?.dismiss()
+            }
+
+            if (showSnackBar) {
+                snackBarHostState.showSnackbar(
+                    message = message,
+                    actionLabel = "Entendi",
+                    duration = SnackbarDuration.Indefinite
                 )
             }
+
+            autoDismissJob.cancel()
+        }
+    }
+
+    LaunchedEffect(createFieldState.response) {
+        createFieldState.response?.let {
+            navigationController.navigate("Home")
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize(),
+        containerColor = BRANCO,
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackBarHostState
+            ) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = BRANCO,
+                    contentColor = VERDE_CLARO,
+                    actionColor = VERDE_CLARO
+                )
+            }
+        }
+    ) {
+        if (!isLoading) {
+            Column {
+                RegistrationHeader(
+                    navigationController = navigationController,
+                    fallbackRoute = "NewFieldSecondPage"
+                )
+
+                TitleRegistration(
+                    texto = "Cadastrando seu ",
+                    textoASerDestacado = "Talhão...",
+                    corEmDestaque = VERDE_ESCURO,
+                    subTexto = "",
+                    tamanhoTextoDestacado = 36.sp,
+                    paginaUsuario = false,
+                    subtituloDestacado = "",
+                    subtitulo = ""
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(40.dp)
+                    ) {
+                        TextBoxRegistration(
+                            value = stateDescription.description,
+                            onValueChange = {
+                                viewModelDescription.onEvent(
+                                    DescriptionTextFieldFormEvent.DescriptionChanged(
+                                        it
+                                    )
+                                )
+                                viewModelDescription.onEvent(DescriptionTextFieldFormEvent.Submit)
+                            },
+                            isError = stateDescription.descriptionError != null,
+                            errorState = stateDescription.descriptionError,
+                            label = "Descrição",
+                            placeholder = "Descreva seu talhão",
+                            tipoTeclado = KeyboardType.Text,
+                            modifier = Modifier
+                                .heightIn(
+                                    min = 70.dp,
+                                    max = 100.dp
+                                )
+                                .fillMaxWidth(),
+                            lastOne = true,
+                            maxLines = 10
+                        )
+
+                        DropdownTextField(
+                            label = "Cultura",
+                            value = stateDropdown.option,
+                            placeholder = "Escolha uma cultura",
+                            options = listOf(
+                                "Banana Nanica",
+                                "Banana Prata",
+                                "Banana da Terra",
+                                "Banana Maçã",
+                                "Banana Ouro"
+                            ),
+                            onOptionSelected = {
+                                viewModelDropdown.onEvent(
+                                    DropdownTextFieldFormEvent.OptionChanged(
+                                        it
+                                    )
+                                )
+                                viewModelDropdown.onEvent(DropdownTextFieldFormEvent.Submit)
+                            },
+                            errorState = stateDropdown.optionError
+                        )
+                    }
+
+                    ButtonRegistration(
+                        onClick = {
+                            if (isValidationSuccessful) {
+                                createFieldViewModel.createField(
+                                    producerId = "850cd26e-dcaa-47e2-b1c1-24f5bf709984",
+                                    propertyId = "8e5d9388-9a27-42c0-a762-790c753eea9b",
+                                    name = "Talhão 01",
+                                    description = stateDescription.description,
+                                    crop = stateDropdown.option,
+                                    fieldBoundary = listOf(
+                                        FieldBoundary(
+                                            lat = -24.692057,
+                                            lng = -47.886843
+                                        ),
+                                        FieldBoundary(
+                                            lat = -24.692369,
+                                            lng = -47.883753
+                                        ),
+                                        FieldBoundary(
+                                            lat = -24.695450,
+                                            lng = -47.887143
+                                        ),
+                                        FieldBoundary(
+                                            lat = -24.695800,
+                                            lng = -47.883753
+                                        )
+                                    )
+                                )
+
+                                logList.add(
+                                    LogList(
+                                        author = "Gilmar",
+                                        activity = "cadastrou um talhão."
+                                    )
+                                )
+
+                                isLoading = true
+                            }
+                        },
+                        buttonValue = "Continuar",
+                        backgroundColor = backgroundColor,
+                        contentColor = contentColor
+                    )
+                }
+            }
+        } else {
+            LoadingScreen()
         }
     }
 }
