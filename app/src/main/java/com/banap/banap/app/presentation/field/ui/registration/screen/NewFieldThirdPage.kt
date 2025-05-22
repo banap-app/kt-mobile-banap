@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.core.ui.components.DropdownTextField
@@ -40,15 +41,19 @@ import com.banap.banap.app.presentation.validation.description.utils.validationD
 import com.banap.banap.app.presentation.validation.description.event.DescriptionTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.description.viewmodel.DescriptionTextFieldViewModel
 import com.banap.banap.data.model.producer.LogList
+import com.banap.banap.domain.model.field.FieldBoundary
+import com.banap.banap.domain.viewmodel.field.CreateFieldViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NewFieldThirdPage (
     navigationController: NavController,
-    fieldList: MutableList<String>,
+    createFieldViewModel: CreateFieldViewModel = hiltViewModel(),
     logList: MutableList<LogList>
 ) {
     val context = LocalContext.current
+
+    val createFieldState = createFieldViewModel.state.value
 
     val viewModelDescription = viewModel<DescriptionTextFieldViewModel>()
     val stateDescription = viewModelDescription.state
@@ -189,7 +194,32 @@ fun NewFieldThirdPage (
                 ButtonRegistration(
                     onClick = {
                         if (isValidationSuccessful) {
-                            fieldList.add("Talhão 01")
+                            createFieldViewModel.createField(
+                                producerId = "850cd26e-dcaa-47e2-b1c1-24f5bf709984",
+                                propertyId = "8e5d9388-9a27-42c0-a762-790c753eea9b",
+                                name = "Talhão 01",
+                                description = stateDescription.description,
+                                crop = stateDropdown.option,
+                                fieldBoundary = listOf(
+                                    FieldBoundary(
+                                        lat = -24.692057,
+                                        lng = -47.886843
+                                    ),
+                                    FieldBoundary(
+                                        lat = -24.692369,
+                                        lng = -47.883753
+                                    ),
+                                    FieldBoundary(
+                                        lat = -24.695450,
+                                        lng = -47.887143
+                                    ),
+                                    FieldBoundary(
+                                        lat = -24.695800,
+                                        lng = -47.883753
+                                    )
+                                )
+                            )
+
                             logList.add(
                                 LogList(
                                     author = "Gilmar",

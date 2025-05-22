@@ -316,7 +316,6 @@ fun Navigation() {
         ) {
             NewFieldThirdPage(
                 navigationController,
-                fieldList = fieldList,
                 logList = logList
             )
         }
