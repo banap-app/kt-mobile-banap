@@ -49,8 +49,6 @@ fun NewFieldSecondPage(
     navigationController: NavController,
     tokenViewModel: TokenViewModel
 ) {
-    val context = LocalContext.current
-
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 

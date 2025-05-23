@@ -53,11 +53,8 @@ fun Modal(
             modifier = modifier
                 .padding(horizontal = 50.dp)
                 .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-                .background(
-                    shape = MaterialTheme.shapes.extraLarge,
-                    color = BRANCO
-                )
+                .height(IntrinsicSize.Min),
+            color = BRANCO
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(

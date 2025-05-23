@@ -88,4 +88,5 @@ object FertilizerCalculator {
             potassium = potassiumValue
         )
     }
+
 }
