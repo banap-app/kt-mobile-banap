@@ -17,19 +17,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.CINZA_INTERMEDIARIO
 import com.banap.banap.core.ui.theme.ShapeProperty
 
 @Composable
 fun NewFieldCard (
-    navigationController: NavController
+    onClick: () -> Unit
 ) {
     Card (
-        onClick = {
-            navigationController.navigate("NewFieldFirstPage")
-        },
+        onClick = onClick,
         modifier = Modifier
             .clip(
                 shape = ShapeProperty.medium

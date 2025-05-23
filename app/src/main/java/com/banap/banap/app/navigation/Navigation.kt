@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.navigation.viewmodel.NavigationViewModel
 import com.banap.banap.app.presentation.analysis.ui.information.screen.AnalysisInformation
 import com.banap.banap.app.presentation.analysis.ui.readmore.screen.ReadMore
@@ -21,9 +22,7 @@ import com.banap.banap.app.presentation.analysis.ui.registration.screen.NewLimin
 import com.banap.banap.app.presentation.engineer.ui.registration.NewEngineerFirstPage
 import com.banap.banap.app.presentation.engineer.ui.registration.NewEngineerSecondPage
 import com.banap.banap.app.presentation.field.ui.information.screen.FieldInformation
-import com.banap.banap.app.presentation.field.ui.registration.screen.NewFieldFirstPage
-import com.banap.banap.app.presentation.field.ui.registration.screen.NewFieldSecondPage
-import com.banap.banap.app.presentation.field.ui.registration.screen.NewFieldThirdPage
+import com.banap.banap.app.presentation.field.ui.registration.screen.NewField
 import com.banap.banap.app.presentation.home.ui.screen.Home
 import com.banap.banap.app.presentation.login.ui.screen.Login
 import com.banap.banap.app.presentation.producer.ui.registration.NewProducer
@@ -268,8 +267,9 @@ fun Navigation() {
             UserChoice(navigationController)
         }
 
-        composable (
-            route = "NewFieldFirstPage",
+        composable(
+            route = Screen.NewField.routeWithArgument,
+            arguments = Screen.NewField.arguments,
             enterTransition = {
                 fadeIn(
                     animationSpec = tween(animationDuration)
@@ -280,47 +280,72 @@ fun Navigation() {
                     animationSpec = tween(animationDuration)
                 )
             }
-        ) {
-            NewFieldFirstPage(navigationController)
-        }
+        ) { backStackEntry ->
+            val producerId = backStackEntry.arguments?.getString(Screen.NewField.PRODUCER_ARGUMENT)
+            val propertyId = backStackEntry.arguments?.getString(Screen.NewField.PROPERTY_ARGUMENT)
 
-        composable (
-            route = "NewFieldSecondPage",
-            enterTransition = {
-                fadeIn(
-                    animationSpec = tween(animationDuration)
-                )
-            },
-            exitTransition = {
-                fadeOut(
-                    animationSpec = tween(animationDuration)
-                )
-            }
-        ) {
-            NewFieldSecondPage(
+            NewField(
                 navigationController = navigationController,
-                tokenViewModel = tokenViewModel
-            )
-        }
-
-        composable (
-            route = "NewFieldThirdPage",
-            enterTransition = {
-                fadeIn(
-                    animationSpec = tween(animationDuration)
-                )
-            },
-            exitTransition = {
-                fadeOut(
-                    animationSpec = tween(animationDuration)
-                )
-            }
-        ) {
-            NewFieldThirdPage(
-                navigationController,
+                producerId = producerId ?: "",
+                propertyId = propertyId ?: "",
+                tokenViewModel = tokenViewModel,
                 logList = logList
             )
         }
+
+//        composable (
+//            route = "FirstPage",
+//            enterTransition = {
+//                fadeIn(
+//                    animationSpec = tween(animationDuration)
+//                )
+//            },
+//            exitTransition = {
+//                fadeOut(
+//                    animationSpec = tween(animationDuration)
+//                )
+//            }
+//        ) {
+//            FirstPage(navigationController)
+//        }
+//
+//        composable (
+//            route = "SecondPage",
+//            enterTransition = {
+//                fadeIn(
+//                    animationSpec = tween(animationDuration)
+//                )
+//            },
+//            exitTransition = {
+//                fadeOut(
+//                    animationSpec = tween(animationDuration)
+//                )
+//            }
+//        ) {
+//            SecondPage(
+//                navigationController = navigationController,
+//                tokenViewModel = tokenViewModel
+//            )
+//        }
+//
+//        composable (
+//            route = "ThirdPage",
+//            enterTransition = {
+//                fadeIn(
+//                    animationSpec = tween(animationDuration)
+//                )
+//            },
+//            exitTransition = {
+//                fadeOut(
+//                    animationSpec = tween(animationDuration)
+//                )
+//            }
+//        ) {
+//            ThirdPage(
+//                navigationController,
+//                logList = logList
+//            )
+//        }
 
         composable(
             route = "Information",

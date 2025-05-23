@@ -1,7 +1,6 @@
 package com.banap.banap.core.network
 
 import com.banap.banap.common.Constants.AUTH_URL
-import com.banap.banap.common.Constants.LOCAL_URL
 import com.banap.banap.common.Constants.PRODUCER_URL
 import com.banap.banap.common.Constants.WEATHER_URL
 import com.banap.banap.core.data.local.token.TokenManager
