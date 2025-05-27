@@ -8,6 +8,10 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -63,7 +67,8 @@ fun Navigation() {
     val taskListHome: MutableList<TaskList> = mutableListOf()
     val taskListFieldInformation: MutableList<String> = mutableListOf()
 
-    val listProperties: MutableList<ListPropertiesResponse> = mutableListOf()
+    val listPropertiesState = listPropertiesViewModel.state.value
+
     val logList: MutableList<LogList> = mutableListOf()
 
     LaunchedEffect(navigationController) {
@@ -123,9 +128,10 @@ fun Navigation() {
                 weatherViewModel = weatherViewModel,
                 locationViewModel = locationViewModel,
                 listPropertiesViewModel = listPropertiesViewModel,
-                fieldList = fieldList,
+                listPropertiesState = listPropertiesState,
                 taskList = taskListHome,
-                logList = logList
+                logList = logList,
+                fieldList = fieldList
             )
         }
 

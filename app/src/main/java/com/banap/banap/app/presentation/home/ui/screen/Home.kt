@@ -5,18 +5,13 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
@@ -25,6 +20,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,7 +28,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
@@ -53,15 +48,14 @@ import com.banap.banap.core.ui.components.Button
 import com.banap.banap.core.ui.components.Modal
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
-import com.banap.banap.core.ui.theme.ShapeCarousel
 import com.banap.banap.core.ui.theme.ShapeProperty
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
-import com.banap.banap.core.ui.util.shimmerEffect
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
 import com.banap.banap.data.model.property.ListPropertiesResponse
 import com.banap.banap.data.model.weather.WeatherResponse
+import com.banap.banap.domain.model.property.ListPropertiesState
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.property.ListPropertiesViewModel
 import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
@@ -77,6 +71,7 @@ fun Home(
     weatherViewModel: WeatherViewModel,
     locationViewModel: LocationViewModel,
     listPropertiesViewModel: ListPropertiesViewModel,
+    listPropertiesState: ListPropertiesState,
     taskList: MutableList<TaskList>,
     logList: MutableList<LogList>,
     fieldList: MutableList<String>
@@ -87,12 +82,9 @@ fun Home(
 
     val scope = rememberCoroutineScope()
 
-    val scrollState = rememberScrollState()
-
     val tokenVerificationState = tokenVerificationViewModel.state.value
     val weatherState = weatherViewModel.state.value
     val locationState = locationViewModel.state.value
-    val listPropertiesState = listPropertiesViewModel.state.value
 
     var isTokenValid: Boolean by remember {
         mutableStateOf(false)
@@ -106,8 +98,8 @@ fun Home(
         mutableStateOf(null)
     }
 
-    var properties: List<ListPropertiesResponse>? by remember {
-        mutableStateOf(null)
+    var properties: List<ListPropertiesResponse> by remember {
+        mutableStateOf(listOf())
     }
 
     var weatherLoading: Boolean by remember {
@@ -230,7 +222,7 @@ fun Home(
             tokenViewModel.saveToken("verifiedToken", it.success.toString())
             isTokenValid = it.success
 
-            if (it.success) {
+            if (listPropertiesState.response == null) {
                 listPropertiesViewModel.listProperties()
             }
         }
@@ -280,9 +272,8 @@ fun Home(
         if (isTokenValid && !hasToken.isNullOrEmpty()) {
             Column(
                 modifier =
-                if (properties?.isNotEmpty() == true) {
+                if (properties.isNotEmpty()) {
                     Modifier
-                        .verticalScroll(rememberScrollState())
                         .fillMaxSize()
                         .padding(top = 40.dp, bottom = 60.dp)
                 } else {
@@ -328,303 +319,7 @@ fun Home(
                 )
 
                 when {
-                    propertiesLoading -> {
-                        Column(
-                            modifier = Modifier
-                                .padding(horizontal = 30.dp),
-                            verticalArrangement = Arrangement.spacedBy(
-                                space = 60.dp
-                            )
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(
-                                    space = 20.dp
-                                ),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(
-                                            shape = ShapeCarousel.medium
-                                        )
-                                        .fillMaxWidth()
-                                        .height(156.dp)
-                                        .shimmerEffect(),
-                                    content = {}
-                                )
-
-                                Box(
-                                    modifier = Modifier
-                                        .clip(
-                                            shape = ShapeCarousel.medium
-                                        )
-                                        .width(64.dp)
-                                        .height(8.dp)
-                                        .shimmerEffect(),
-                                    content = {}
-                                )
-                            }
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(
-                                    space = 35.dp
-                                )
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(
-                                            shape = ShapeCarousel.medium
-                                        )
-                                        .fillMaxWidth()
-                                        .height(30.dp)
-                                        .shimmerEffect(),
-                                    content = {}
-                                )
-
-                                Row(
-                                    modifier = Modifier
-                                        .horizontalScroll(
-                                            state = scrollState,
-                                            enabled = false
-                                        )
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(
-                                        space = 25.dp
-                                    )
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeProperty.medium
-                                            )
-                                            .height(178.dp)
-                                            .width(124.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeProperty.medium
-                                            )
-                                            .height(178.dp)
-                                            .width(124.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeProperty.medium
-                                            )
-                                            .height(178.dp)
-                                            .width(124.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-                                }
-                            }
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(
-                                            shape = ShapeProperty.medium
-                                        )
-                                        .height(60.dp)
-                                        .fillMaxWidth(0.7f)
-                                        .shimmerEffect(),
-                                    content = {}
-                                )
-                            }
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(
-                                    space = 20.dp
-                                )
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(
-                                            shape = ShapeCarousel.medium
-                                        )
-                                        .fillMaxWidth()
-                                        .height(30.dp)
-                                        .shimmerEffect(),
-                                    content = {}
-                                )
-
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(
-                                        space = 10.dp
-                                    )
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeCarousel.medium
-                                            )
-                                            .fillMaxWidth(0.7f)
-                                            .height(15.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeCarousel.medium
-                                            )
-                                            .fillMaxWidth(0.5f)
-                                            .height(15.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeCarousel.medium
-                                            )
-                                            .fillMaxWidth(0.8f)
-                                            .height(15.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-                                }
-
-                                Box(
-                                    modifier = Modifier
-                                        .clip(
-                                            shape = ShapeCarousel.medium
-                                        )
-                                        .fillMaxWidth(0.4f)
-                                        .height(10.dp)
-                                        .shimmerEffect(),
-                                    content = {}
-                                )
-                            }
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(
-                                    space = 40.dp
-                                )
-                            ) {
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(
-                                        space = 5.dp
-                                    )
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeCarousel.medium
-                                            )
-                                            .fillMaxWidth()
-                                            .height(30.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeCarousel.medium
-                                            )
-                                            .fillMaxWidth(0.7f)
-                                            .height(20.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-                                }
-
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(
-                                        space = 60.dp
-                                    )
-                                ) {
-                                    Column(
-                                        verticalArrangement = Arrangement.spacedBy(
-                                            space = 10.dp
-                                        )
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .clip(
-                                                    shape = ShapeCarousel.medium
-                                                )
-                                                .fillMaxWidth(0.5f)
-                                                .height(15.dp)
-                                                .shimmerEffect(),
-                                            content = {}
-                                        )
-
-                                        Column(
-                                            verticalArrangement = Arrangement.spacedBy(
-                                                space = 5.dp
-                                            )
-                                        ) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .clip(
-                                                        shape = ShapeCarousel.medium
-                                                    )
-                                                    .fillMaxWidth(0.4f)
-                                                    .height(10.dp)
-                                                    .shimmerEffect(),
-                                                content = {}
-                                            )
-
-                                            Box(
-                                                modifier = Modifier
-                                                    .clip(
-                                                        shape = ShapeProperty.medium
-                                                    )
-                                                    .height(50.dp)
-                                                    .fillMaxWidth()
-                                                    .shimmerEffect(),
-                                                content = {}
-                                            )
-                                        }
-                                    }
-
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.End
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .clip(
-                                                    shape = ShapeProperty.medium
-                                                )
-                                                .height(60.dp)
-                                                .fillMaxWidth(0.7f)
-                                                .shimmerEffect(),
-                                            content = {}
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    properties?.isNotEmpty() == true -> {
+                    properties.isNotEmpty() -> {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(
                                 space = 60.dp
@@ -647,27 +342,21 @@ fun Home(
                                     space = 60.dp
                                 )
                             ) {
-                                Column(
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxSize(),
                                     verticalArrangement = Arrangement.spacedBy(
                                         space = 40.dp
                                     )
                                 ) {
-                                    when {
-                                        propertiesLoading -> {
-                                            ListPropertiesHomeSkeleton()
-                                        }
-
-                                        else -> {
-                                            properties?.forEach {
-                                                Property(
-                                                    titulo = it.name,
-                                                    navigationController = navigationController,
-                                                    propertyId = it.id,
-                                                    producerId = it.producerId,
-                                                    fieldList = fieldList
-                                                )
-                                            }
-                                        }
+                                    items(properties.size) {
+                                        Property(
+                                            titulo = properties[it].name,
+                                            navigationController = navigationController,
+                                            propertyId = properties[it].id,
+                                            producerId = properties[it].producerId,
+                                            fieldList = fieldList
+                                        )
                                     }
                                 }
 
@@ -706,6 +395,10 @@ fun Home(
                                 taskList = taskList
                             )
                         }
+                    }
+
+                    propertiesLoading -> {
+                        ListPropertiesHomeSkeleton()
                     }
 
                     else -> {
