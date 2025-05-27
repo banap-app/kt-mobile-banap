@@ -8,10 +8,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,7 +36,6 @@ import com.banap.banap.app.presentation.userchoice.ui.UserChoice
 import com.banap.banap.core.ui.components.SplashScreen
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
-import com.banap.banap.data.model.property.ListPropertiesResponse
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.property.ListPropertiesViewModel
 import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
@@ -68,6 +63,7 @@ fun Navigation() {
     val taskListFieldInformation: MutableList<String> = mutableListOf()
 
     val listPropertiesState = listPropertiesViewModel.state.value
+    val weatherState = weatherViewModel.state.value
 
     val logList: MutableList<LogList> = mutableListOf()
 
@@ -126,6 +122,7 @@ fun Navigation() {
                 tokenViewModel = tokenViewModel,
                 tokenVerificationViewModel = tokenVerificationViewModel,
                 weatherViewModel = weatherViewModel,
+                weatherState = weatherState,
                 locationViewModel = locationViewModel,
                 listPropertiesViewModel = listPropertiesViewModel,
                 listPropertiesState = listPropertiesState,

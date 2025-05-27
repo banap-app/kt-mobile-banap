@@ -8,10 +8,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
@@ -20,7 +24,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
@@ -38,6 +42,7 @@ import androidx.navigation.NavController
 import com.banap.banap.R
 import com.banap.banap.app.presentation.home.ui.components.Carousel
 import com.banap.banap.app.presentation.home.ui.components.Header
+import com.banap.banap.app.presentation.home.ui.components.NoData
 import com.banap.banap.app.presentation.home.ui.components.Property
 import com.banap.banap.app.presentation.home.ui.components.RecentActivities
 import com.banap.banap.app.presentation.home.ui.components.Tasks
@@ -56,6 +61,7 @@ import com.banap.banap.data.model.producer.TaskList
 import com.banap.banap.data.model.property.ListPropertiesResponse
 import com.banap.banap.data.model.weather.WeatherResponse
 import com.banap.banap.domain.model.property.ListPropertiesState
+import com.banap.banap.domain.model.weather.WeatherState
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.property.ListPropertiesViewModel
 import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
@@ -69,6 +75,7 @@ fun Home(
     tokenViewModel: TokenViewModel,
     tokenVerificationViewModel: TokenVerificationViewModel,
     weatherViewModel: WeatherViewModel,
+    weatherState: WeatherState,
     locationViewModel: LocationViewModel,
     listPropertiesViewModel: ListPropertiesViewModel,
     listPropertiesState: ListPropertiesState,
@@ -83,7 +90,6 @@ fun Home(
     val scope = rememberCoroutineScope()
 
     val tokenVerificationState = tokenVerificationViewModel.state.value
-    val weatherState = weatherViewModel.state.value
     val locationState = locationViewModel.state.value
 
     var isTokenValid: Boolean by remember {
@@ -92,6 +98,10 @@ fun Home(
 
     var hasToken: String? by remember {
         mutableStateOf(null)
+    }
+
+    var listPropertiesError: String by remember {
+        mutableStateOf("")
     }
 
     var weather: WeatherResponse? by remember {
@@ -222,9 +232,7 @@ fun Home(
             tokenViewModel.saveToken("verifiedToken", it.success.toString())
             isTokenValid = it.success
 
-            if (listPropertiesState.response == null) {
-                listPropertiesViewModel.listProperties()
-            }
+            listPropertiesViewModel.listProperties()
         }
     }
 
@@ -249,7 +257,7 @@ fun Home(
     }
 
     LaunchedEffect(listPropertiesState.error) {
-        Log.d("ERROR", listPropertiesState.error)
+        listPropertiesError = ""
     }
 
     Scaffold(
@@ -270,61 +278,62 @@ fun Home(
         }
     ) { innerPadding ->
         if (isTokenValid && !hasToken.isNullOrEmpty()) {
-            Column(
-                modifier =
-                if (properties.isNotEmpty()) {
-                    Modifier
-                        .fillMaxSize()
-                        .padding(top = 40.dp, bottom = 60.dp)
-                } else {
-                    Modifier
-                        .fillMaxSize()
-                        .padding(top = 40.dp, bottom = 60.dp)
-                }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 30.dp)
             ) {
-                Header(
-                    nome = "Gilmar",
-                    navigationController = navigationController,
-                    onItemClick = {
-                        modalVisible = true
-                    }
-                )
+                item {
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                if (modalVisible) {
-                    Modal(
-                        onConfirm = {
-                            tokenViewModel.clearAll()
-                            navigationController.navigate("Login")
-                        },
-                        onDismiss = {
-                            modalVisible = false
-                        },
-                        icon = R.drawable.baseline_logout_24,
-                        title = "Tem certeza que\n deseja sair?",
-                        description = "",
-                        onConfirmText = "Sair",
-                        onDismissText = "Cancelar",
-                        space = 0.dp
+                    Header(
+                        nome = "Gilmar",
+                        navigationController = navigationController,
+                        onItemClick = {
+                            modalVisible = true
+                        }
+                    )
+
+                    if (modalVisible) {
+                        Modal(
+                            onConfirm = {
+                                tokenViewModel.clearAll()
+                                navigationController.navigate("Login")
+                            },
+                            onDismiss = {
+                                modalVisible = false
+                            },
+                            icon = R.drawable.baseline_logout_24,
+                            title = "Tem certeza que\n deseja sair?",
+                            description = "",
+                            onConfirmText = "Sair",
+                            onDismissText = "Cancelar",
+                            space = 0.dp
+                        )
+                    }
+                }
+
+                item {
+                    Image(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.linhas),
+                        contentDescription = "Linhas que separam o conteúdo",
+                        modifier = Modifier
+                            .padding(
+                                top = 20.dp,
+                                bottom = 40.dp
+                            )
                     )
                 }
 
-                Image(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.linhas),
-                    contentDescription = "Linhas que separam o conteúdo",
-                    modifier = Modifier
-                        .padding(
-                            top = 20.dp,
-                            bottom = 40.dp
-                        )
-                )
-
                 when {
+                    propertiesLoading -> {
+                        item {
+                            ListPropertiesHomeSkeleton()
+                        }
+                    }
+
                     properties.isNotEmpty() -> {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(
-                                space = 60.dp
-                            )
-                        ) {
+                        item {
                             Carousel(
                                 isLoading = weatherLoading,
                                 weather = weather,
@@ -334,59 +343,63 @@ fun Home(
                                     weather?.weather?.get(
                                         0
                                     )?.icon
-                                }@2x.png"
+                                }@2x.png",
+                                onClick = {
+                                    weatherViewModel.getCurrentWeather()
+                                }
                             )
+                        }
 
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(
-                                    space = 60.dp
-                                )
-                            ) {
-                                LazyColumn(
-                                    modifier = Modifier
-                                        .fillMaxSize(),
-                                    verticalArrangement = Arrangement.spacedBy(
-                                        space = 40.dp
-                                    )
-                                ) {
-                                    items(properties.size) {
-                                        Property(
-                                            titulo = properties[it].name,
-                                            navigationController = navigationController,
-                                            propertyId = properties[it].id,
-                                            producerId = properties[it].producerId,
-                                            fieldList = fieldList
-                                        )
-                                    }
-                                }
-
-                                Row(
-                                    modifier = Modifier
-                                        .padding(horizontal = 30.dp)
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.End
-                                ) {
-                                    Button(
-                                        texto = "Nova Propriedade",
-                                        modifier = Modifier
-                                            .padding(vertical = 18.dp, horizontal = 15.dp),
-                                        hasIcon = true,
-                                        shape = ShapeProperty.small,
-                                        onClick = {
-                                            navigationController.navigate("NewProperty")
-                                        },
-                                        backgroundColor = VERDE_CLARO,
-                                        contentColor = BRANCO,
-                                        defaultElevetion = 3.dp
-                                    )
-                                }
+                        items(
+                            count = properties.size,
+                            key = {
+                                properties[it].id
                             }
+                        ) { index ->
+                            Property(
+                                titulo = properties[index].name,
+                                navigationController = navigationController,
+                                propertyId = properties[index].id,
+                                producerId = properties[index].producerId,
+                                fieldList = fieldList,
+                                withSpacing = index != properties.size - 1
+                            )
+                        }
 
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .padding(
+                                        horizontal = 30.dp,
+                                        vertical = 60.dp
+                                    )
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                Button(
+                                    texto = "Nova Propriedade",
+                                    modifier = Modifier
+                                        .padding(vertical = 18.dp, horizontal = 15.dp),
+                                    hasIcon = true,
+                                    shape = ShapeProperty.small,
+                                    onClick = {
+                                        navigationController.navigate("NewProperty")
+                                    },
+                                    backgroundColor = VERDE_CLARO,
+                                    contentColor = BRANCO,
+                                    defaultElevetion = 3.dp
+                                )
+                            }
+                        }
+
+                        item {
                             RecentActivities(
                                 title = "Atividades recentes",
                                 list = logList
                             )
+                        }
 
+                        item {
                             Tasks(
                                 titulo = "Lista de tarefas",
                                 subTitulo = "Seus afazeres da semana!",
@@ -395,42 +408,49 @@ fun Home(
                                 taskList = taskList
                             )
                         }
+
                     }
 
-                    propertiesLoading -> {
-                        ListPropertiesHomeSkeleton()
+                    listPropertiesError.isNotEmpty() -> {
+                        item {
+                            Column (
+                                modifier = Modifier
+                                    .padding(top = 60.dp)
+                                    .fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(
+                                    space = 30.dp,
+                                    alignment = Alignment.CenterVertically
+                                )
+                            ) {
+                                Image(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.listpropertieserroricon),
+                                    contentDescription = "Imagem representativa de um produtor"
+                                )
+
+                                NoData(
+                                    text = "Não foi possivel carregar\nsuas propriedades...",
+                                    buttonValue = "Tentar Novamente",
+                                    icon = ImageVector.vectorResource(id = R.drawable.homeiconretry),
+                                    onClick = {
+                                        listPropertiesViewModel.listProperties()
+                                    }
+                                )
+                            }
+
+                        }
                     }
 
                     else -> {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(
-                                space = 40.dp,
-                                alignment = Alignment.CenterVertically
-                            )
-                        ) {
-                            Text(
-                                text = "Ainda não há uma\npropriedade cadastrada!",
-                                textAlign = TextAlign.Center,
-                                style = Typography.bodyLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = CINZA_ESCURO
-                            )
+                        item {
+                            Spacer(modifier = Modifier.height(60.dp))
 
-                            Button(
-                                texto = "Nova Propriedade",
-                                modifier = Modifier
-                                    .padding(vertical = 18.dp, horizontal = 15.dp),
-                                hasIcon = true,
-                                shape = ShapeProperty.small,
+                            NoData(
+                                text = "Ainda não há uma\npropriedade cadastrada!",
+                                buttonValue = "Nova Propriedade",
                                 onClick = {
                                     navigationController.navigate("NewProperty")
-                                },
-                                backgroundColor = VERDE_CLARO,
-                                contentColor = BRANCO,
-                                defaultElevetion = 3.dp
+                                }
                             )
                         }
                     }

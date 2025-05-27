@@ -34,7 +34,6 @@ fun RecentActivities(
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(
             space = 20.dp
-
         )
     ) {
         Text(

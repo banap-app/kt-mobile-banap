@@ -35,7 +35,10 @@ fun Tasks(
 ) {
     Column(
         modifier = Modifier
-            .padding(horizontal = 30.dp)
+            .padding(
+                horizontal = 30.dp,
+                vertical = 60.dp
+            )
             .fillMaxWidth()
     ) {
         Text(
