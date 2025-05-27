@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.core.ui.util.clickableText
@@ -27,6 +28,8 @@ import com.banap.banap.core.ui.util.clickableText
 fun Property(
     titulo: String,
     navigationController: NavController,
+    propertyId: String,
+    producerId: String,
     fieldList: MutableList<String>
 ) {
     Column(
@@ -88,7 +91,12 @@ fun Property(
             }
 
             NewFieldCard(
-                navigationController
+                onClick = {
+                    navigationController.navigate(Screen.NewField.createRoute(
+                        producerId = producerId,
+                        propertyId = propertyId
+                    ))
+                }
             )
         }
     }

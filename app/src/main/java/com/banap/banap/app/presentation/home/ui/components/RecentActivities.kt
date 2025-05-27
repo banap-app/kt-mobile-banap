@@ -2,16 +2,25 @@ package com.banap.banap.app.presentation.home.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.Typography
+import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
+import com.banap.banap.core.ui.util.setColorInText
 import com.banap.banap.data.model.producer.LogList
 
 @Composable
@@ -34,25 +43,36 @@ fun RecentActivities(
             color = VERDE_ESCURO
         )
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(
-                space = 10.dp
-            )
-        ) {
-            list.forEach { activity ->
+        when {
+            list.isEmpty() -> {
                 Activities(
-                    activity.author,
-                    activity.activity
+                    icone = Icons.Outlined.Info,
+                    autor = "Você",
+                    atividade = "não realizou nenhuma atividade recentemente."
                 )
             }
 
-        }
+            else -> {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(
+                        space = 10.dp
+                    )
+                ) {
+                    list.forEach { activity ->
+                        Activities(
+                            autor = activity.author,
+                            atividade = activity.activity
+                        )
+                    }
+                }
 
-        Text(
-            text = "10 de Maio 2025 ás 17:54",
-            style = Typography.bodySmall,
-            fontWeight = FontWeight.Bold,
-            color = CINZA_ESCURO
-        )
+                Text(
+                    text = "10 de Maio 2025 ás 17:54",
+                    style = Typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = CINZA_ESCURO
+                )
+            }
+        }
     }
 }

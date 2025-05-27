@@ -63,7 +63,7 @@ fun Container(
                         hasIcon = true,
                         shape = ShapeProperty.small,
                         onClick = {
-                            navigationController.navigate("NewFieldFirstPage")
+                            navigationController.navigate("NewField")
                         },
                         backgroundColor = BRANCO,
                         contentColor = VERDE_CLARO,

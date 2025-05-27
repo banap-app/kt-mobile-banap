@@ -40,6 +40,7 @@ import com.banap.banap.R
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
+import com.banap.banap.core.ui.theme.VERMELHO
 
 @Composable
 fun TextBox(
@@ -114,7 +115,10 @@ fun TextBox(
                         unfocusedTextColor = VERDE_ESCURO,
                         focusedTextColor = VERDE_ESCURO,
                         unfocusedPlaceholderColor = VERDE_ESCURO,
-                        focusedPlaceholderColor = VERDE_ESCURO
+                        focusedPlaceholderColor = VERDE_ESCURO,
+                        errorTextColor = VERMELHO,
+                        errorPlaceholderColor = VERMELHO,
+                        errorCursorColor = VERMELHO
                     ),
                     shape = RoundedCornerShape(0.dp),
                     keyboardOptions = KeyboardOptions(
@@ -173,7 +177,10 @@ fun TextBox(
                         unfocusedTextColor = VERDE_ESCURO,
                         focusedTextColor = VERDE_ESCURO,
                         unfocusedPlaceholderColor = VERDE_ESCURO,
-                        focusedPlaceholderColor = VERDE_ESCURO
+                        focusedPlaceholderColor = VERDE_ESCURO,
+                        errorTextColor = VERMELHO,
+                        errorPlaceholderColor = VERMELHO,
+                        errorCursorColor = VERMELHO
                     ),
                     shape = RoundedCornerShape(0.dp),
                     keyboardOptions = KeyboardOptions(
@@ -221,7 +228,10 @@ fun TextBox(
                         unfocusedTextColor = VERDE_ESCURO,
                         focusedTextColor = VERDE_ESCURO,
                         unfocusedPlaceholderColor = VERDE_ESCURO,
-                        focusedPlaceholderColor = VERDE_ESCURO
+                        focusedPlaceholderColor = VERDE_ESCURO,
+                        errorTextColor = VERMELHO,
+                        errorPlaceholderColor = VERMELHO,
+                        errorCursorColor = VERMELHO
                     ),
                     shape = RoundedCornerShape(0.dp),
                     keyboardOptions = KeyboardOptions(
@@ -271,7 +281,10 @@ fun TextBox(
                         unfocusedTextColor = VERDE_ESCURO,
                         focusedTextColor = VERDE_ESCURO,
                         unfocusedPlaceholderColor = VERDE_ESCURO,
-                        focusedPlaceholderColor = VERDE_ESCURO
+                        focusedPlaceholderColor = VERDE_ESCURO,
+                        errorTextColor = VERMELHO,
+                        errorPlaceholderColor = VERMELHO,
+                        errorCursorColor = VERMELHO
                     ),
                     shape = RoundedCornerShape(0.dp),
                     keyboardOptions = KeyboardOptions(

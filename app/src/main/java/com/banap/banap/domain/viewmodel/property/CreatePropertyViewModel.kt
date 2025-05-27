@@ -25,7 +25,6 @@ class CreatePropertyViewModel @Inject constructor(
             when (result) {
                 is Resource.Success -> {
                     _state.value = CreatePropertyState(response = result.data)
-                    Log.d("CREATE PROPERTY", result.data.toString())
                 }
 
                 is Resource.Error -> {

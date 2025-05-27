@@ -8,6 +8,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -17,6 +18,7 @@ import com.banap.banap.core.ui.util.setColorInText
 
 @Composable
 fun Activities(
+    icone: ImageVector = Icons.Outlined.Person,
     autor: String,
     atividade: String
 ) {
@@ -27,7 +29,7 @@ fun Activities(
         )
     ) {
         Icon(
-            Icons.Outlined.Person,
+            imageVector = icone,
             contentDescription = "Icone de pessoa"
         )
 

@@ -25,7 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import com.banap.banap.app.presentation.task.ui.registration.enum.PickerTarget
+import com.banap.banap.app.util.enumerator.PickerTarget
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.PRETO
 import com.banap.banap.core.ui.theme.Typography

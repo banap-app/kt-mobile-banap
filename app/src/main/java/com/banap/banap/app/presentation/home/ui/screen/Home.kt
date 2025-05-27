@@ -62,7 +62,6 @@ import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
 import com.banap.banap.data.model.property.ListPropertiesResponse
 import com.banap.banap.data.model.weather.WeatherResponse
-import com.banap.banap.domain.model.property.ListPropertiesState
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.property.ListPropertiesViewModel
 import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
@@ -663,6 +662,8 @@ fun Home(
                                                 Property(
                                                     titulo = it.name,
                                                     navigationController = navigationController,
+                                                    propertyId = it.id,
+                                                    producerId = it.producerId,
                                                     fieldList = fieldList
                                                 )
                                             }
