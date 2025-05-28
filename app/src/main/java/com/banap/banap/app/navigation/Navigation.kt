@@ -55,17 +55,13 @@ fun Navigation() {
     val listPropertiesViewModel: ListPropertiesViewModel = hiltViewModel()
     val animationDuration: Int = 700
 
-    val fieldList: MutableList<String> = mutableListOf(
-        "Talhao 01"
-    )
     val analysisList: MutableList<String> = mutableListOf()
     val taskListHome: MutableList<TaskList> = mutableListOf()
     val taskListFieldInformation: MutableList<String> = mutableListOf()
+    val logList: MutableList<LogList> = mutableListOf()
 
     val listPropertiesState = listPropertiesViewModel.state.value
     val weatherState = weatherViewModel.state.value
-
-    val logList: MutableList<LogList> = mutableListOf()
 
     LaunchedEffect(navigationController) {
         navigationController
@@ -127,8 +123,7 @@ fun Navigation() {
                 listPropertiesViewModel = listPropertiesViewModel,
                 listPropertiesState = listPropertiesState,
                 taskList = taskListHome,
-                logList = logList,
-                fieldList = fieldList
+                logList = logList
             )
         }
 
@@ -442,8 +437,7 @@ fun Navigation() {
             }
         ) {
             Property(
-                navigationController,
-                fieldList = fieldList
+                navigationController
             )
         }
 

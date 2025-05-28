@@ -1,6 +1,5 @@
 package com.banap.banap.app.presentation.home.ui.components
 
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,33 +7,61 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.banap.banap.app.navigation.screens.Screen
+import com.banap.banap.app.presentation.skeleton.ui.home.components.ListFieldsHomeSkeleton
+import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.core.ui.util.clickableText
+import com.banap.banap.data.model.field.FieldResponse
+import com.banap.banap.domain.model.field.ListFieldsState
 
 @Composable
 fun Property(
-    titulo: String,
     navigationController: NavController,
+    titulo: String,
     propertyId: String,
     producerId: String,
-    fieldList: MutableList<String>,
-    withSpacing: Boolean
+    fields: List<FieldResponse>,
+    fieldsState: ListFieldsState,
+    withSpacing: Boolean,
 ) {
+    var error: String by remember {
+        mutableStateOf("")
+    }
+
+    var loading: Boolean by remember {
+        mutableStateOf(true)
+    }
+
+    LaunchedEffect(fieldsState.error) {
+        error = fieldsState.error
+    }
+
+    LaunchedEffect(fieldsState.isLoading) {
+        loading = fieldsState.isLoading
+    }
+
     Column(
         modifier = Modifier
             .padding(horizontal = 30.dp)
@@ -73,36 +100,85 @@ fun Property(
 
         }
 
-        Row(
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(
-                space = 25.dp
-            )
-        ) {
-            when {
-                fieldList.isNotEmpty() -> {
-                    fieldList.forEach {
+        when {
+            loading -> {
+                ListFieldsHomeSkeleton()
+            }
+
+            fields.isNotEmpty() -> {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(
+                        space = 25.dp
+                    )
+                ) {
+                    items(
+                        count = fields.size,
+                        key = {
+                            fields[it].id
+                        }
+                    ) {
                         FieldCard(
-                            nomeTalhao = it,
+                            nomeTalhao = fields[it].name,
                             navigationController
+                        )
+                    }
+
+                    item {
+                        NewFieldCard(
+                            onClick = {
+                                navigationController.navigate(
+                                    Screen.NewField.createRoute(
+                                        producerId = producerId,
+                                        propertyId = propertyId
+                                    )
+                                )
+                            }
                         )
                     }
                 }
             }
 
-            NewFieldCard(
-                onClick = {
-                    navigationController.navigate(
-                        Screen.NewField.createRoute(
-                            producerId = producerId,
-                            propertyId = propertyId
-                        )
+            error.isNotEmpty() -> {
+                Row (
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Ocorreu um erro ao\n carregar os campos...",
+                        textAlign = TextAlign.Center,
+                        style = Typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = CINZA_ESCURO
                     )
                 }
-            )
+            }
+
+            else -> {
+                Row (
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(
+                        space = 25.dp
+                    )
+                ) {
+                    NewFieldCard(
+                        onClick = {
+                            navigationController.navigate(
+                                Screen.NewField.createRoute(
+                                    producerId = producerId,
+                                    propertyId = propertyId
+                                )
+                            )
+                        }
+                    )
+                }
+            }
         }
     }
 
