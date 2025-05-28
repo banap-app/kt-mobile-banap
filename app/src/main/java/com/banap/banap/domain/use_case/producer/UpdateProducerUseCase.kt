@@ -1,7 +1,7 @@
 package com.banap.banap.domain.use_case.producer
 
 import com.banap.banap.common.Resource
-import com.banap.banap.data.model.producer.ProducerResponse
+import com.banap.banap.data.model.producer.WithoutResponse
 import com.banap.banap.data.repository.producer.ProducerRepositoryImpl
 import com.banap.banap.domain.model.producer.ProducerRequest
 import kotlinx.coroutines.flow.Flow
@@ -9,20 +9,28 @@ import kotlinx.coroutines.flow.flow
 import java.io.IOException
 import javax.inject.Inject
 
-class CreateProducerUseCase @Inject constructor(
+class UpdateProducerUseCase @Inject constructor(
     private val repository: ProducerRepositoryImpl
 ) {
-    operator fun invoke(name: String, email: String, password: String) : Flow<Resource<ProducerResponse>> = flow {
+    operator fun invoke(
+        name: String,
+        email: String,
+        password: String
+    ): Flow<Resource<WithoutResponse>> = flow {
         try {
             emit(Resource.Loading())
-            val producerResponse = repository.createProducer(
+            repository.updateProducer(
                 ProducerRequest(
                     name,
                     email,
                     password
                 )
             )
-            emit(Resource.Success(producerResponse))
+            emit(Resource.Success(
+                WithoutResponse(
+                    success = true
+                )
+            ))
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "Um erro inesperado aconteceu"))
         } catch (e: IOException) {

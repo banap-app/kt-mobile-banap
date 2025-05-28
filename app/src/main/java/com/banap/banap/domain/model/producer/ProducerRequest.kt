@@ -1,6 +1,6 @@
 package com.banap.banap.domain.model.producer
 
-data class CreateProducerRequest(
+data class ProducerRequest(
     val name: String,
     val email: String,
     val password: String,

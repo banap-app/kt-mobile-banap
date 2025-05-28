@@ -5,41 +5,37 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.banap.banap.common.Resource
-import com.banap.banap.domain.model.producer.ProducerState
-import com.banap.banap.domain.use_case.producer.CreateProducerUseCase
+import com.banap.banap.domain.model.producer.WithoutResponseState
+import com.banap.banap.domain.use_case.producer.DeleteProducerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
-class CreateProducerViewModel @Inject constructor(
-    private val createProducerUseCase: CreateProducerUseCase
+class DeleteProducerViewModel @Inject constructor(
+    private val deleteProducerUseCase: DeleteProducerUseCase
 ) : ViewModel() {
-    private val _state = mutableStateOf((ProducerState()))
-    val state: State<ProducerState> = _state
+    private val _state = mutableStateOf((WithoutResponseState()))
+    val state: State<WithoutResponseState> = _state
 
-    fun createProducer(name: String, email: String, password: String) {
-        createProducerUseCase(name, email, password).onEach { result ->
+    fun deleteProducer(id: String) {
+        deleteProducerUseCase(id).onEach { result ->
             when (result) {
                 is Resource.Success -> {
-                    _state.value = ProducerState(response = result.data)
+                    _state.value = WithoutResponseState(response = result.data)
                 }
 
                 is Resource.Error -> {
-                    _state.value = ProducerState(
+                    _state.value = WithoutResponseState(
                         error = result.message ?: "Um erro inesperado aconteceu"
                     )
                 }
 
                 is Resource.Loading -> {
-                    _state.value = ProducerState(isLoading = true)
+                    _state.value = WithoutResponseState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)
-    }
-
-    fun clearError() {
-        _state.value = _state.value.copy(error = "")
     }
 }
