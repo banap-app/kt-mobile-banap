@@ -17,6 +17,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -24,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -48,7 +50,8 @@ fun Carousel(
     weather: WeatherResponse?,
     temperature: Double,
     description: String,
-    iconUrl: String
+    iconUrl: String,
+    onClick: () -> Unit
 ) {
     val currentTime = Calendar.getInstance()
     val dayOfWeek = currentTime.get(Calendar.DAY_OF_WEEK)
@@ -79,6 +82,8 @@ fun Carousel(
     )
 
     Column(
+        modifier = Modifier
+            .padding(bottom = 60.dp)
     ) {
         HorizontalPager(
             state = pagerState,
@@ -86,7 +91,7 @@ fun Carousel(
                 .padding(horizontal = 30.dp)
                 .fillMaxWidth(),
             pageSpacing = 30.dp
-        ) { page ->
+        ) {
             Card(
                 modifier = Modifier
                     .shadow(elevation = 3.dp, shape = ShapeCarousel.medium)
@@ -106,79 +111,123 @@ fun Carousel(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (!isLoading) {
-                        Column {
-                            Text(
-                                text = if (weather != null) "${temperature.toInt()} °C" else "Erro",
-                                style = Typography.headlineLarge,
-                                color = VERDE_CLARO
-                            )
-                            Text(
-                                text = "$dayOfWeekString, $hourString:$minuteString",
-                                style = Typography.bodyLarge,
-                                fontWeight = FontWeight.Normal,
-                                color = VERDE_CLARO
-                            )
+                    when {
+                        weather != null -> {
+                            Column {
+                                Text(
+                                    text = "${temperature.toInt()} °C",
+                                    style = Typography.headlineLarge,
+                                    color = VERDE_CLARO
+                                )
+                                Text(
+                                    text = "$dayOfWeekString, $hourString:$minuteString",
+                                    style = Typography.bodyLarge,
+                                    fontWeight = FontWeight.Normal,
+                                    color = VERDE_CLARO
+                                )
 
-                            Spacer(modifier = Modifier.height(12.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
 
-                            Text(
-                                text =
-                                if (description.isEmpty())
-                                    "Tente novamente"
-                                else
-                                    description.replaceFirstChar {
-                                        if (it.isLowerCase())
-                                            it.titlecase(Locale.ROOT)
-                                        else
-                                            it.toString()
-                                    },
-                                style = Typography.bodyLarge,
-                                fontWeight = FontWeight.Light,
-                                color = VERDE_CLARO
-                            )
-                        }
-
-                        when (state) {
-                            is AsyncImagePainter.State.Loading -> {
-                                CircularProgressIndicator(
-                                    modifier = Modifier
-                                        .padding(end = 20.dp)
-                                        .size(40.dp),
-                                    strokeWidth = 4.dp,
+                                Text(
+                                    text =
+                                    if (description.isEmpty())
+                                        "Tente novamente"
+                                    else
+                                        description.replaceFirstChar {
+                                            if (it.isLowerCase())
+                                                it.titlecase(Locale.ROOT)
+                                            else
+                                                it.toString()
+                                        },
+                                    style = Typography.bodyLarge,
+                                    fontWeight = FontWeight.Light,
                                     color = VERDE_CLARO
                                 )
                             }
 
-                            is AsyncImagePainter.State.Success -> {
-                                Image(
-                                    painter = painter,
-                                    contentDescription = "Ícone do clima",
-                                    modifier = Modifier
-                                        .size(100.dp)
-                                )
-                            }
+                            when (state) {
+                                is AsyncImagePainter.State.Loading -> {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .padding(end = 20.dp)
+                                            .size(40.dp),
+                                        strokeWidth = 4.dp,
+                                        color = VERDE_CLARO
+                                    )
+                                }
 
-                            is AsyncImagePainter.State.Error -> {
-                                Icon(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.homeiconretry),
-                                    contentDescription = "Erro no carregamento",
-                                    modifier = Modifier.size(80.dp),
-                                    tint = VERDE_CLARO
-                                )
-                            }
+                                is AsyncImagePainter.State.Success -> {
+                                    Image(
+                                        painter = painter,
+                                        contentDescription = "Ícone do clima",
+                                        modifier = Modifier
+                                            .size(100.dp)
+                                    )
+                                }
 
-                            else -> {
-                                Icon(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.homeiconretry),
-                                    contentDescription = "Erro no carregamento",
-                                    modifier = Modifier.size(60.dp),
-                                    tint = VERDE_CLARO
-                                )
+                                is AsyncImagePainter.State.Error -> {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(id = R.drawable.homeiconretry),
+                                        contentDescription = "Erro no carregamento",
+                                        modifier = Modifier.size(80.dp),
+                                        tint = VERDE_CLARO
+                                    )
+                                }
+
+                                else -> {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(id = R.drawable.homeiconretry),
+                                        contentDescription = "Erro no carregamento",
+                                        modifier = Modifier.size(60.dp),
+                                        tint = VERDE_CLARO
+                                    )
+                                }
                             }
                         }
-                    } else {
-                        WeatherDataHomeSkeleton()
+
+                        isLoading -> {
+                            WeatherDataHomeSkeleton()
+                        }
+
+                        else -> {
+                            Column {
+                                Text(
+                                    text = "Erro",
+                                    style = Typography.headlineLarge,
+                                    color = VERDE_CLARO
+                                )
+                                Text(
+                                    text = "$dayOfWeekString, $hourString:$minuteString",
+                                    style = Typography.bodyLarge,
+                                    fontWeight = FontWeight.Normal,
+                                    color = VERDE_CLARO
+                                )
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                Text(
+                                    text = "Tente novamente",
+                                    style = Typography.bodyLarge,
+                                    fontWeight = FontWeight.Light,
+                                    color = VERDE_CLARO
+                                )
+                            }
+
+                            IconButton(
+                                onClick = onClick,
+                                modifier = Modifier
+                                    .size(70.dp)
+                            ) {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.homeiconretry),
+                                    contentDescription = "Erro no carregamento",
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    tint = VERDE_CLARO
+                                )
+                            }
+
+                        }
                     }
                 }
             }

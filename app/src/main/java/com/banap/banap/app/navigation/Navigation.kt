@@ -36,7 +36,6 @@ import com.banap.banap.app.presentation.userchoice.ui.UserChoice
 import com.banap.banap.core.ui.components.SplashScreen
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
-import com.banap.banap.data.model.property.ListPropertiesResponse
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.property.ListPropertiesViewModel
 import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
@@ -63,7 +62,9 @@ fun Navigation() {
     val taskListHome: MutableList<TaskList> = mutableListOf()
     val taskListFieldInformation: MutableList<String> = mutableListOf()
 
-    val listProperties: MutableList<ListPropertiesResponse> = mutableListOf()
+    val listPropertiesState = listPropertiesViewModel.state.value
+    val weatherState = weatherViewModel.state.value
+
     val logList: MutableList<LogList> = mutableListOf()
 
     LaunchedEffect(navigationController) {
@@ -121,11 +122,13 @@ fun Navigation() {
                 tokenViewModel = tokenViewModel,
                 tokenVerificationViewModel = tokenVerificationViewModel,
                 weatherViewModel = weatherViewModel,
+                weatherState = weatherState,
                 locationViewModel = locationViewModel,
                 listPropertiesViewModel = listPropertiesViewModel,
-                fieldList = fieldList,
+                listPropertiesState = listPropertiesState,
                 taskList = taskListHome,
-                logList = logList
+                logList = logList,
+                fieldList = fieldList
             )
         }
 

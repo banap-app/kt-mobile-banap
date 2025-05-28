@@ -5,16 +5,15 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
@@ -32,7 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
@@ -43,6 +42,7 @@ import androidx.navigation.NavController
 import com.banap.banap.R
 import com.banap.banap.app.presentation.home.ui.components.Carousel
 import com.banap.banap.app.presentation.home.ui.components.Header
+import com.banap.banap.app.presentation.home.ui.components.NoData
 import com.banap.banap.app.presentation.home.ui.components.Property
 import com.banap.banap.app.presentation.home.ui.components.RecentActivities
 import com.banap.banap.app.presentation.home.ui.components.Tasks
@@ -53,15 +53,15 @@ import com.banap.banap.core.ui.components.Button
 import com.banap.banap.core.ui.components.Modal
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
-import com.banap.banap.core.ui.theme.ShapeCarousel
 import com.banap.banap.core.ui.theme.ShapeProperty
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
-import com.banap.banap.core.ui.util.shimmerEffect
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
 import com.banap.banap.data.model.property.ListPropertiesResponse
 import com.banap.banap.data.model.weather.WeatherResponse
+import com.banap.banap.domain.model.property.ListPropertiesState
+import com.banap.banap.domain.model.weather.WeatherState
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.property.ListPropertiesViewModel
 import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
@@ -75,8 +75,10 @@ fun Home(
     tokenViewModel: TokenViewModel,
     tokenVerificationViewModel: TokenVerificationViewModel,
     weatherViewModel: WeatherViewModel,
+    weatherState: WeatherState,
     locationViewModel: LocationViewModel,
     listPropertiesViewModel: ListPropertiesViewModel,
+    listPropertiesState: ListPropertiesState,
     taskList: MutableList<TaskList>,
     logList: MutableList<LogList>,
     fieldList: MutableList<String>
@@ -87,12 +89,8 @@ fun Home(
 
     val scope = rememberCoroutineScope()
 
-    val scrollState = rememberScrollState()
-
     val tokenVerificationState = tokenVerificationViewModel.state.value
-    val weatherState = weatherViewModel.state.value
     val locationState = locationViewModel.state.value
-    val listPropertiesState = listPropertiesViewModel.state.value
 
     var isTokenValid: Boolean by remember {
         mutableStateOf(false)
@@ -102,12 +100,16 @@ fun Home(
         mutableStateOf(null)
     }
 
+    var listPropertiesError: String by remember {
+        mutableStateOf("")
+    }
+
     var weather: WeatherResponse? by remember {
         mutableStateOf(null)
     }
 
-    var properties: List<ListPropertiesResponse>? by remember {
-        mutableStateOf(null)
+    var properties: List<ListPropertiesResponse> by remember {
+        mutableStateOf(listOf())
     }
 
     var weatherLoading: Boolean by remember {
@@ -230,9 +232,7 @@ fun Home(
             tokenViewModel.saveToken("verifiedToken", it.success.toString())
             isTokenValid = it.success
 
-            if (it.success) {
-                listPropertiesViewModel.listProperties()
-            }
+            listPropertiesViewModel.listProperties()
         }
     }
 
@@ -257,7 +257,7 @@ fun Home(
     }
 
     LaunchedEffect(listPropertiesState.error) {
-        Log.d("ERROR", listPropertiesState.error)
+        listPropertiesError = ""
     }
 
     Scaffold(
@@ -278,358 +278,62 @@ fun Home(
         }
     ) { innerPadding ->
         if (isTokenValid && !hasToken.isNullOrEmpty()) {
-            Column(
-                modifier =
-                if (properties?.isNotEmpty() == true) {
-                    Modifier
-                        .verticalScroll(rememberScrollState())
-                        .fillMaxSize()
-                        .padding(top = 40.dp, bottom = 60.dp)
-                } else {
-                    Modifier
-                        .fillMaxSize()
-                        .padding(top = 40.dp, bottom = 60.dp)
-                }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 30.dp)
             ) {
-                Header(
-                    nome = "Gilmar",
-                    navigationController = navigationController,
-                    onItemClick = {
-                        modalVisible = true
-                    }
-                )
+                item {
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                if (modalVisible) {
-                    Modal(
-                        onConfirm = {
-                            tokenViewModel.clearAll()
-                            navigationController.navigate("Login")
-                        },
-                        onDismiss = {
-                            modalVisible = false
-                        },
-                        icon = R.drawable.baseline_logout_24,
-                        title = "Tem certeza que\n deseja sair?",
-                        description = "",
-                        onConfirmText = "Sair",
-                        onDismissText = "Cancelar",
-                        space = 0.dp
+                    Header(
+                        nome = "Gilmar",
+                        navigationController = navigationController,
+                        onItemClick = {
+                            modalVisible = true
+                        }
+                    )
+
+                    if (modalVisible) {
+                        Modal(
+                            onConfirm = {
+                                tokenViewModel.clearAll()
+                                navigationController.navigate("Login")
+                            },
+                            onDismiss = {
+                                modalVisible = false
+                            },
+                            icon = R.drawable.baseline_logout_24,
+                            title = "Tem certeza que\n deseja sair?",
+                            description = "",
+                            onConfirmText = "Sair",
+                            onDismissText = "Cancelar",
+                            space = 0.dp
+                        )
+                    }
+                }
+
+                item {
+                    Image(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.linhas),
+                        contentDescription = "Linhas que separam o conteúdo",
+                        modifier = Modifier
+                            .padding(
+                                top = 20.dp,
+                                bottom = 40.dp
+                            )
                     )
                 }
 
-                Image(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.linhas),
-                    contentDescription = "Linhas que separam o conteúdo",
-                    modifier = Modifier
-                        .padding(
-                            top = 20.dp,
-                            bottom = 40.dp
-                        )
-                )
-
                 when {
                     propertiesLoading -> {
-                        Column(
-                            modifier = Modifier
-                                .padding(horizontal = 30.dp),
-                            verticalArrangement = Arrangement.spacedBy(
-                                space = 60.dp
-                            )
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(
-                                    space = 20.dp
-                                ),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(
-                                            shape = ShapeCarousel.medium
-                                        )
-                                        .fillMaxWidth()
-                                        .height(156.dp)
-                                        .shimmerEffect(),
-                                    content = {}
-                                )
-
-                                Box(
-                                    modifier = Modifier
-                                        .clip(
-                                            shape = ShapeCarousel.medium
-                                        )
-                                        .width(64.dp)
-                                        .height(8.dp)
-                                        .shimmerEffect(),
-                                    content = {}
-                                )
-                            }
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(
-                                    space = 35.dp
-                                )
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(
-                                            shape = ShapeCarousel.medium
-                                        )
-                                        .fillMaxWidth()
-                                        .height(30.dp)
-                                        .shimmerEffect(),
-                                    content = {}
-                                )
-
-                                Row(
-                                    modifier = Modifier
-                                        .horizontalScroll(
-                                            state = scrollState,
-                                            enabled = false
-                                        )
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(
-                                        space = 25.dp
-                                    )
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeProperty.medium
-                                            )
-                                            .height(178.dp)
-                                            .width(124.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeProperty.medium
-                                            )
-                                            .height(178.dp)
-                                            .width(124.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeProperty.medium
-                                            )
-                                            .height(178.dp)
-                                            .width(124.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-                                }
-                            }
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(
-                                            shape = ShapeProperty.medium
-                                        )
-                                        .height(60.dp)
-                                        .fillMaxWidth(0.7f)
-                                        .shimmerEffect(),
-                                    content = {}
-                                )
-                            }
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(
-                                    space = 20.dp
-                                )
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(
-                                            shape = ShapeCarousel.medium
-                                        )
-                                        .fillMaxWidth()
-                                        .height(30.dp)
-                                        .shimmerEffect(),
-                                    content = {}
-                                )
-
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(
-                                        space = 10.dp
-                                    )
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeCarousel.medium
-                                            )
-                                            .fillMaxWidth(0.7f)
-                                            .height(15.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeCarousel.medium
-                                            )
-                                            .fillMaxWidth(0.5f)
-                                            .height(15.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeCarousel.medium
-                                            )
-                                            .fillMaxWidth(0.8f)
-                                            .height(15.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-                                }
-
-                                Box(
-                                    modifier = Modifier
-                                        .clip(
-                                            shape = ShapeCarousel.medium
-                                        )
-                                        .fillMaxWidth(0.4f)
-                                        .height(10.dp)
-                                        .shimmerEffect(),
-                                    content = {}
-                                )
-                            }
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(
-                                    space = 40.dp
-                                )
-                            ) {
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(
-                                        space = 5.dp
-                                    )
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeCarousel.medium
-                                            )
-                                            .fillMaxWidth()
-                                            .height(30.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(
-                                                shape = ShapeCarousel.medium
-                                            )
-                                            .fillMaxWidth(0.7f)
-                                            .height(20.dp)
-                                            .shimmerEffect(),
-                                        content = {}
-                                    )
-                                }
-
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(
-                                        space = 60.dp
-                                    )
-                                ) {
-                                    Column(
-                                        verticalArrangement = Arrangement.spacedBy(
-                                            space = 10.dp
-                                        )
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .clip(
-                                                    shape = ShapeCarousel.medium
-                                                )
-                                                .fillMaxWidth(0.5f)
-                                                .height(15.dp)
-                                                .shimmerEffect(),
-                                            content = {}
-                                        )
-
-                                        Column(
-                                            verticalArrangement = Arrangement.spacedBy(
-                                                space = 5.dp
-                                            )
-                                        ) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .clip(
-                                                        shape = ShapeCarousel.medium
-                                                    )
-                                                    .fillMaxWidth(0.4f)
-                                                    .height(10.dp)
-                                                    .shimmerEffect(),
-                                                content = {}
-                                            )
-
-                                            Box(
-                                                modifier = Modifier
-                                                    .clip(
-                                                        shape = ShapeProperty.medium
-                                                    )
-                                                    .height(50.dp)
-                                                    .fillMaxWidth()
-                                                    .shimmerEffect(),
-                                                content = {}
-                                            )
-                                        }
-                                    }
-
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.End
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .clip(
-                                                    shape = ShapeProperty.medium
-                                                )
-                                                .height(60.dp)
-                                                .fillMaxWidth(0.7f)
-                                                .shimmerEffect(),
-                                            content = {}
-                                        )
-                                    }
-                                }
-                            }
+                        item {
+                            ListPropertiesHomeSkeleton()
                         }
                     }
 
-                    properties?.isNotEmpty() == true -> {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(
-                                space = 60.dp
-                            )
-                        ) {
+                    properties.isNotEmpty() -> {
+                        item {
                             Carousel(
                                 isLoading = weatherLoading,
                                 weather = weather,
@@ -639,65 +343,63 @@ fun Home(
                                     weather?.weather?.get(
                                         0
                                     )?.icon
-                                }@2x.png"
+                                }@2x.png",
+                                onClick = {
+                                    weatherViewModel.getCurrentWeather()
+                                }
                             )
+                        }
 
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(
-                                    space = 60.dp
-                                )
-                            ) {
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(
-                                        space = 40.dp
-                                    )
-                                ) {
-                                    when {
-                                        propertiesLoading -> {
-                                            ListPropertiesHomeSkeleton()
-                                        }
-
-                                        else -> {
-                                            properties?.forEach {
-                                                Property(
-                                                    titulo = it.name,
-                                                    navigationController = navigationController,
-                                                    propertyId = it.id,
-                                                    producerId = it.producerId,
-                                                    fieldList = fieldList
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-
-                                Row(
-                                    modifier = Modifier
-                                        .padding(horizontal = 30.dp)
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.End
-                                ) {
-                                    Button(
-                                        texto = "Nova Propriedade",
-                                        modifier = Modifier
-                                            .padding(vertical = 18.dp, horizontal = 15.dp),
-                                        hasIcon = true,
-                                        shape = ShapeProperty.small,
-                                        onClick = {
-                                            navigationController.navigate("NewProperty")
-                                        },
-                                        backgroundColor = VERDE_CLARO,
-                                        contentColor = BRANCO,
-                                        defaultElevetion = 3.dp
-                                    )
-                                }
+                        items(
+                            count = properties.size,
+                            key = {
+                                properties[it].id
                             }
+                        ) { index ->
+                            Property(
+                                titulo = properties[index].name,
+                                navigationController = navigationController,
+                                propertyId = properties[index].id,
+                                producerId = properties[index].producerId,
+                                fieldList = fieldList,
+                                withSpacing = index != properties.size - 1
+                            )
+                        }
 
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .padding(
+                                        horizontal = 30.dp,
+                                        vertical = 60.dp
+                                    )
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                Button(
+                                    texto = "Nova Propriedade",
+                                    modifier = Modifier
+                                        .padding(vertical = 18.dp, horizontal = 15.dp),
+                                    hasIcon = true,
+                                    shape = ShapeProperty.small,
+                                    onClick = {
+                                        navigationController.navigate("NewProperty")
+                                    },
+                                    backgroundColor = VERDE_CLARO,
+                                    contentColor = BRANCO,
+                                    defaultElevetion = 3.dp
+                                )
+                            }
+                        }
+
+                        item {
                             RecentActivities(
                                 title = "Atividades recentes",
                                 list = logList
                             )
+                        }
 
+                        item {
                             Tasks(
                                 titulo = "Lista de tarefas",
                                 subTitulo = "Seus afazeres da semana!",
@@ -706,38 +408,49 @@ fun Home(
                                 taskList = taskList
                             )
                         }
+
+                    }
+
+                    listPropertiesError.isNotEmpty() -> {
+                        item {
+                            Column (
+                                modifier = Modifier
+                                    .padding(top = 60.dp)
+                                    .fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(
+                                    space = 30.dp,
+                                    alignment = Alignment.CenterVertically
+                                )
+                            ) {
+                                Image(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.listpropertieserroricon),
+                                    contentDescription = "Imagem representativa de um produtor"
+                                )
+
+                                NoData(
+                                    text = "Não foi possivel carregar\nsuas propriedades...",
+                                    buttonValue = "Tentar Novamente",
+                                    icon = ImageVector.vectorResource(id = R.drawable.homeiconretry),
+                                    onClick = {
+                                        listPropertiesViewModel.listProperties()
+                                    }
+                                )
+                            }
+
+                        }
                     }
 
                     else -> {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(
-                                space = 40.dp,
-                                alignment = Alignment.CenterVertically
-                            )
-                        ) {
-                            Text(
-                                text = "Ainda não há uma\npropriedade cadastrada!",
-                                textAlign = TextAlign.Center,
-                                style = Typography.bodyLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = CINZA_ESCURO
-                            )
+                        item {
+                            Spacer(modifier = Modifier.height(60.dp))
 
-                            Button(
-                                texto = "Nova Propriedade",
-                                modifier = Modifier
-                                    .padding(vertical = 18.dp, horizontal = 15.dp),
-                                hasIcon = true,
-                                shape = ShapeProperty.small,
+                            NoData(
+                                text = "Ainda não há uma\npropriedade cadastrada!",
+                                buttonValue = "Nova Propriedade",
                                 onClick = {
                                     navigationController.navigate("NewProperty")
-                                },
-                                backgroundColor = VERDE_CLARO,
-                                contentColor = BRANCO,
-                                defaultElevetion = 3.dp
+                                }
                             )
                         }
                     }
