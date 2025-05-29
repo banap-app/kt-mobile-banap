@@ -23,7 +23,9 @@ class ListFieldsViewModel @Inject constructor(
         listFieldsUseCase(id).onEach { result ->
             when (result) {
                 is Resource.Success -> {
-                    _state.value = ListFieldsState(response = result.data)
+                    _state.value = ListFieldsState(
+                        response = _state.value.response + (id to (result.data ?: emptyList()))
+                    )
                 }
 
                 is Resource.Error -> {

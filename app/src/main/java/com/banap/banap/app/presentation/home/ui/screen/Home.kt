@@ -121,6 +121,10 @@ fun Home(
         mutableStateOf(false)
     }
 
+    val fieldsMap = remember {
+        mutableStateMapOf<String, List<FieldResponse>>()
+    }
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -257,6 +261,21 @@ fun Home(
         listPropertiesError = listPropertiesState.error
     }
 
+    LaunchedEffect(listPropertiesState.response) {
+        listPropertiesState.response?.let {
+            properties.forEach { property ->
+                Log.d("NAME", property.name)
+                listFieldsViewModel.listFields(property.id)
+            }
+        }
+    }
+
+    LaunchedEffect(listFieldsState.response) {
+        listFieldsState.response.forEach { (propertyId, fieldsList) ->
+            fieldsMap[propertyId] = fieldsList
+        }
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -353,20 +372,6 @@ fun Home(
                                 properties[it].id
                             }
                         ) { index ->
-                            val fieldsMap = remember {
-                                mutableStateMapOf<String, List<FieldResponse>>()
-                            }
-
-                            LaunchedEffect(properties[index].id) {
-                                listFieldsViewModel.listFields(properties[index].id)
-                            }
-
-                            LaunchedEffect(listFieldsState.response) {
-                                listFieldsState.response?.let {
-                                    fieldsMap[properties[index].id] = listFieldsState.response
-                                }
-                            }
-
                             Property(
                                 navigationController = navigationController,
                                 titulo = properties[index].name,
@@ -424,7 +429,7 @@ fun Home(
 
                     listPropertiesError.isNotEmpty() -> {
                         item {
-                            Column (
+                            Column(
                                 modifier = Modifier
                                     .padding(top = 60.dp)
                                     .fillMaxSize(),

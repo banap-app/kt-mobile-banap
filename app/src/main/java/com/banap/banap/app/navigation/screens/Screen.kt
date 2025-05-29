@@ -6,7 +6,7 @@ import androidx.navigation.navArgument
 sealed class Screen (
     val route: String
 ) {
-    object NewField : Screen(route = "NewField") {
+    data object NewField : Screen(route = "NewField") {
         const val PRODUCER_ARGUMENT = "producerId"
         const val PROPERTY_ARGUMENT = "propertyId"
         val routeWithArgument = "$route/{$PRODUCER_ARGUMENT}/{$PROPERTY_ARGUMENT}"
@@ -21,5 +21,18 @@ sealed class Screen (
         )
 
         fun createRoute(producerId: String, propertyId: String) = "$route/$producerId/$propertyId"
+    }
+
+    data object Information : Screen(route = "Information") {
+        const val FIELD_ARGUMENT = "fieldId"
+        val routeWithArgument = "$route/{$FIELD_ARGUMENT}"
+
+        val arguments = listOf(
+            navArgument(FIELD_ARGUMENT) {
+                type = NavType.StringType
+            }
+        )
+
+        fun createRoute(fieldId: String) = "$route/$fieldId"
     }
 }

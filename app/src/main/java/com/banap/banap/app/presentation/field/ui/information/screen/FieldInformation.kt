@@ -1,6 +1,7 @@
 package com.banap.banap.app.presentation.field.ui.information.screen
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,11 +24,13 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.banap.banap.R
 import com.banap.banap.app.presentation.analysis.ui.information.components.CreateDetails
 import com.banap.banap.app.presentation.field.ui.information.components.FieldActions
 import com.banap.banap.app.presentation.home.ui.components.TaskCard
+import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.skeleton.ui.field.screen.FieldInformationSkeleton
 import com.banap.banap.core.ui.components.Button
 import com.banap.banap.core.ui.components.ImageInformation
@@ -42,26 +46,66 @@ import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.core.ui.theme.VERMELHO
+import com.banap.banap.data.model.field.FieldResponse
+import com.banap.banap.domain.viewmodel.field.GetFieldByIdViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun FieldInformation(
     navigationController: NavController,
+    tokenViewModel: TokenViewModel,
+    getFieldByIdViewModel: GetFieldByIdViewModel = hiltViewModel(),
+    fieldId: String,
     analysisList: MutableList<String>,
     taskList: MutableList<String>
 ) {
-    val isLoading by remember {
-        mutableStateOf(false)
-    }
+    val getFieldByIdState = getFieldByIdViewModel.state.value
 
     var modalVisible: Boolean by remember {
         mutableStateOf(false)
     }
 
+    var isLoading by remember {
+        mutableStateOf(false)
+    }
+
+    var error by remember {
+        mutableStateOf("")
+    }
+
+    var field: FieldResponse? by remember {
+        mutableStateOf(null)
+    }
+
+    LaunchedEffect(true) {
+        Log.d("field", tokenViewModel.getToken("fieldId") ?: "")
+
+        if (fieldId.contains("fieldId")) {
+            getFieldByIdViewModel.getFieldById(tokenViewModel.getToken("fieldId") ?: "")
+        } else {
+            getFieldByIdViewModel.getFieldById(fieldId)
+        }
+    }
+
+    LaunchedEffect(getFieldByIdState.isLoading) {
+        isLoading = getFieldByIdState.isLoading
+    }
+
+    LaunchedEffect(getFieldByIdState.response) {
+        getFieldByIdState.response?.let {
+            tokenViewModel.saveToken("fieldId", fieldId)
+            field = getFieldByIdState.response
+        }
+    }
+
+    LaunchedEffect(getFieldByIdState.error) {
+        error = getFieldByIdState.error
+    }
+
     InformationScreenPattern(
         navigationController = navigationController,
         fixedRoute = "Home",
-        title = "Talhão 01",
+        title = field?.name ?: "",
         titleIcon = R.drawable.field,
         isLoading = isLoading
     ) {
@@ -70,7 +114,7 @@ fun FieldInformation(
                 FieldInformationSkeleton()
             }
 
-            else -> {
+            field != null -> {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(
                         space = 20.dp
@@ -79,7 +123,7 @@ fun FieldInformation(
                     ImageInformation(
                         image = R.drawable.fieldimage,
                         icon = R.drawable.fieldiconplant,
-                        text = "Banana Nanica",
+                        text = field?.crop ?: "",
                         child = {
                             Text(
                                 text = "10",
@@ -118,7 +162,7 @@ fun FieldInformation(
                     title = "Descrição",
                     child = {
                         Text(
-                            text = "Esse talhão fica perto da cerca ao leste da fazenda, ao lado de outros talhões de banana prata.",
+                            text = field?.description ?: "",
                             style = Typography.bodyLarge,
                             color = PRETO,
                             fontWeight = FontWeight.Normal,
@@ -386,7 +430,6 @@ fun FieldInformation(
                                     }
                                 }
                             }
-
                         }
                     }
                 )

@@ -291,62 +291,9 @@ fun Navigation() {
             )
         }
 
-//        composable (
-//            route = "FirstPage",
-//            enterTransition = {
-//                fadeIn(
-//                    animationSpec = tween(animationDuration)
-//                )
-//            },
-//            exitTransition = {
-//                fadeOut(
-//                    animationSpec = tween(animationDuration)
-//                )
-//            }
-//        ) {
-//            FirstPage(navigationController)
-//        }
-//
-//        composable (
-//            route = "SecondPage",
-//            enterTransition = {
-//                fadeIn(
-//                    animationSpec = tween(animationDuration)
-//                )
-//            },
-//            exitTransition = {
-//                fadeOut(
-//                    animationSpec = tween(animationDuration)
-//                )
-//            }
-//        ) {
-//            SecondPage(
-//                navigationController = navigationController,
-//                tokenViewModel = tokenViewModel
-//            )
-//        }
-//
-//        composable (
-//            route = "ThirdPage",
-//            enterTransition = {
-//                fadeIn(
-//                    animationSpec = tween(animationDuration)
-//                )
-//            },
-//            exitTransition = {
-//                fadeOut(
-//                    animationSpec = tween(animationDuration)
-//                )
-//            }
-//        ) {
-//            ThirdPage(
-//                navigationController,
-//                logList = logList
-//            )
-//        }
-
         composable(
-            route = "Information",
+            route = Screen.Information.routeWithArgument,
+            arguments = Screen.Information.arguments,
             enterTransition = {
                 fadeIn(
                     animationSpec = tween(animationDuration)
@@ -357,9 +304,13 @@ fun Navigation() {
                     animationSpec = tween(animationDuration)
                 )
             }
-        ) {
+        ) { backStackEntry ->
+            val fieldId = backStackEntry.arguments?.getString(Screen.Information.FIELD_ARGUMENT)
+
             FieldInformation(
-                navigationController,
+                navigationController = navigationController,
+                tokenViewModel = tokenViewModel,
+                fieldId = fieldId ?: "",
                 analysisList = analysisList,
                 taskList = taskListFieldInformation
             )

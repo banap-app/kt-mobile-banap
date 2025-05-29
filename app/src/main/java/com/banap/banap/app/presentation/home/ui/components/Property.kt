@@ -23,10 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.banap.banap.R
 import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.skeleton.ui.home.components.ListFieldsHomeSkeleton
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
@@ -51,7 +54,7 @@ fun Property(
     }
 
     var loading: Boolean by remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
     }
 
     LaunchedEffect(fieldsState.error) {
@@ -115,14 +118,20 @@ fun Property(
                     )
                 ) {
                     items(
-                        count = fields.size,
+                        count = fields.take(5).size,
                         key = {
                             fields[it].id
                         }
                     ) {
                         FieldCard(
                             nomeTalhao = fields[it].name,
-                            navigationController
+                            onClick = {
+                                navigationController.navigate(
+                                    Screen.Information.createRoute(
+                                        fieldId = fields[it].id
+                                    )
+                                )
+                            }
                         )
                     }
 
@@ -142,12 +151,24 @@ fun Property(
             }
 
             error.isNotEmpty() -> {
-                Row (
+                Column (
                     modifier = Modifier
+                        .padding(
+                            top = 35.dp
+                        )
                         .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.spacedBy(
+                        space = 20.dp
+                    ),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.baseline_wifi_off_24),
+                        contentDescription = "Sem conexão com a internet",
+                        modifier = Modifier
+                            .scale(1.4f)
+                    )
+
                     Text(
                         text = "Ocorreu um erro ao\n carregar os campos...",
                         textAlign = TextAlign.Center,
