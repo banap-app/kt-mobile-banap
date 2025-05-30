@@ -9,17 +9,14 @@ import androidx.navigation.NavController
 
 @Composable
 fun clickableText(
-    navigationController: NavController,
-    route: String,
+    onClick: ((LinkAnnotation) -> Unit),
     text: String
 ) : AnnotatedString {
     return buildAnnotatedString {
         withLink(
             LinkAnnotation.Clickable(
                 tag = "Texto clicavel",
-                linkInteractionListener = {
-                    navigationController.navigate(route = route)
-                }
+                linkInteractionListener = onClick
             )
         ) {
             append(text)

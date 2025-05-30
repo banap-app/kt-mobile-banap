@@ -78,8 +78,15 @@ fun Property(
         ) {
             Text(
                 text = clickableText(
-                    navigationController = navigationController,
-                    route = "Property",
+                    onClick = {
+                        navigationController.navigate(
+                            Screen.Property.createRoute(
+                                name = titulo,
+                                propertyId = propertyId,
+                                producerId = producerId
+                            )
+                        )
+                    },
                     text = titulo
                 ),
                 style = Typography.titleLarge,
@@ -88,7 +95,13 @@ fun Property(
 
             IconButton(
                 onClick = {
-                    navigationController.navigate("Property")
+                    navigationController.navigate(
+                        Screen.Property.createRoute(
+                            name = titulo,
+                            propertyId = propertyId,
+                            producerId = producerId
+                        )
+                    )
                 }
             ) {
                 Icon(

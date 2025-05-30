@@ -35,4 +35,25 @@ sealed class Screen (
 
         fun createRoute(fieldId: String) = "$route/$fieldId"
     }
+
+    data object Property : Screen(route = "Property") {
+        const val PROPERTY_NAME_ARGUMENT = "name"
+        const val PROPERTY_ID_ARGUMENT = "propertyId"
+        const val PRODUCER_ARGUMENT = "producerId"
+        val routeWithArgument = "$route/{$PROPERTY_NAME_ARGUMENT}/{$PROPERTY_ID_ARGUMENT}/{$PRODUCER_ARGUMENT}"
+
+        val arguments = listOf(
+            navArgument(PROPERTY_NAME_ARGUMENT) {
+                type = NavType.StringType
+            },
+            navArgument(PROPERTY_ID_ARGUMENT) {
+                type = NavType.StringType
+            },
+            navArgument(PRODUCER_ARGUMENT) {
+                type = NavType.StringType
+            }
+        )
+
+        fun createRoute(name: String, propertyId: String, producerId: String) = "$route/$name/$propertyId/$producerId"
+    }
 }

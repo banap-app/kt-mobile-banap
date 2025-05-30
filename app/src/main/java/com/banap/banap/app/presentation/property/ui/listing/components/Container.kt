@@ -39,6 +39,7 @@ fun Container(
     titulo: String,
     children: @Composable () -> Unit,
     buttonValue: String,
+    onClick: () -> Unit,
     isLoading: Boolean,
     propertyList: List<FieldResponse>
 ) {
@@ -62,9 +63,7 @@ fun Container(
                             .padding(vertical = 18.dp, horizontal = 15.dp),
                         hasIcon = true,
                         shape = ShapeProperty.small,
-                        onClick = {
-                            navigationController.navigate("NewField")
-                        },
+                        onClick = onClick,
                         backgroundColor = BRANCO,
                         contentColor = VERDE_CLARO,
                         defaultElevetion = 3.dp

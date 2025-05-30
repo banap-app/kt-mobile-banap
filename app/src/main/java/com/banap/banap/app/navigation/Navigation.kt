@@ -36,6 +36,7 @@ import com.banap.banap.app.presentation.userchoice.ui.UserChoice
 import com.banap.banap.core.ui.components.SplashScreen
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
+import com.banap.banap.domain.viewmodel.field.ListFieldsViewModel
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.property.ListPropertiesViewModel
 import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
@@ -53,6 +54,7 @@ fun Navigation() {
     val locationViewModel: LocationViewModel = hiltViewModel()
     val navigationViewModel: NavigationViewModel = hiltViewModel()
     val listPropertiesViewModel: ListPropertiesViewModel = hiltViewModel()
+    val listFieldsViewModel: ListFieldsViewModel = hiltViewModel()
     val animationDuration: Int = 700
 
     val analysisList: MutableList<String> = mutableListOf()
@@ -61,6 +63,7 @@ fun Navigation() {
     val logList: MutableList<LogList> = mutableListOf()
 
     val listPropertiesState = listPropertiesViewModel.state.value
+    val listFieldsState = listFieldsViewModel.state.value
     val weatherState = weatherViewModel.state.value
 
     LaunchedEffect(navigationController) {
@@ -122,6 +125,8 @@ fun Navigation() {
                 locationViewModel = locationViewModel,
                 listPropertiesViewModel = listPropertiesViewModel,
                 listPropertiesState = listPropertiesState,
+                listFieldsViewModel = listFieldsViewModel,
+                listFieldsState = listFieldsState,
                 taskList = taskListHome,
                 logList = logList
             )
@@ -375,7 +380,8 @@ fun Navigation() {
         }
 
         composable(
-            route = "Property",
+            route = Screen.Property.routeWithArgument,
+            arguments = Screen.Property.arguments,
             enterTransition = {
                 fadeIn(
                     animationSpec = tween(animationDuration)
@@ -386,9 +392,19 @@ fun Navigation() {
                     animationSpec = tween(animationDuration)
                 )
             }
-        ) {
+        ) { backStackEntry ->
+            val propertyId = backStackEntry.arguments?.getString(Screen.Property.PROPERTY_ID_ARGUMENT)
+            val producerId = backStackEntry.arguments?.getString(Screen.Property.PRODUCER_ARGUMENT)
+            val name = backStackEntry.arguments?.getString(Screen.Property.PROPERTY_NAME_ARGUMENT)
+
             Property(
-                navigationController
+                navigationController = navigationController,
+                name = name ?: "",
+                propertyId = propertyId ?: "",
+                producerId = producerId ?: "",
+                listFieldsViewModel = listFieldsViewModel,
+                listFieldsState = listFieldsState,
+                tokenViewModel = tokenViewModel
             )
         }
 

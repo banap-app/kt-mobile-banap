@@ -55,6 +55,7 @@ import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
 import com.banap.banap.data.model.property.ListPropertiesResponse
 import com.banap.banap.data.model.weather.WeatherResponse
+import com.banap.banap.domain.model.field.ListFieldsState
 import com.banap.banap.domain.model.property.ListPropertiesState
 import com.banap.banap.domain.model.weather.WeatherState
 import com.banap.banap.domain.viewmodel.field.ListFieldsViewModel
@@ -75,7 +76,8 @@ fun Home(
     locationViewModel: LocationViewModel,
     listPropertiesViewModel: ListPropertiesViewModel,
     listPropertiesState: ListPropertiesState,
-    listFieldsViewModel: ListFieldsViewModel = hiltViewModel(),
+    listFieldsViewModel: ListFieldsViewModel,
+    listFieldsState: ListFieldsState,
     taskList: MutableList<TaskList>,
     logList: MutableList<LogList>
 ) {
@@ -87,7 +89,6 @@ fun Home(
 
     val tokenVerificationState = tokenVerificationViewModel.state.value
     val locationState = locationViewModel.state.value
-    val listFieldsState = listFieldsViewModel.state.value
 
     var isTokenValid: Boolean by remember {
         mutableStateOf(false)
