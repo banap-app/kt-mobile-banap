@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.banap.banap.R
 import com.banap.banap.core.ui.theme.BRANCO
@@ -62,6 +63,7 @@ fun FieldCard(
             ) {
                 Column (
                     modifier = Modifier
+                        .padding(horizontal = 10.dp)
                         .fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -70,7 +72,10 @@ fun FieldCard(
                         text = nomeTalhao,
                         style = Typography.bodySmall,
                         fontWeight = FontWeight.SemiBold,
-                        color = BRANCO
+                        color = BRANCO,
+                        softWrap = false,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }

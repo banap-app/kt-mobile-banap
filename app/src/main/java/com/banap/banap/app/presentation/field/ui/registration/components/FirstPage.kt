@@ -20,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.banap.banap.app.presentation.validation.field.utils.validationDataFieldName
+import com.banap.banap.app.presentation.validation.field.viewmodel.FieldNameTextFieldViewModel
 import com.banap.banap.app.presentation.validation.model.RegistrationFormState
 import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.name.utils.validationDataName
@@ -40,12 +42,12 @@ import com.banap.banap.core.ui.theme.VERDE_ESCURO
 fun FirstPage(
     navigationController: NavController,
     currentPage: MutableState<FieldPage>,
-    viewModel: NameTextFieldViewModel,
+    viewModel: FieldNameTextFieldViewModel,
     context: Context,
     state: RegistrationFormState,
     isValidationSuccessful: MutableState<Boolean>
 ) {
-    isValidationSuccessful.value = validationDataName(
+    isValidationSuccessful.value = validationDataFieldName(
         context = context,
         viewModelName = viewModel,
         stateName = state
