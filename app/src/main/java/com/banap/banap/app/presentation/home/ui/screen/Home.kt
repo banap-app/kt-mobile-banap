@@ -343,12 +343,6 @@ fun Home(
                 }
 
                 when {
-                    propertiesLoading -> {
-                        item {
-                            ListPropertiesHomeSkeleton()
-                        }
-                    }
-
                     properties.isNotEmpty() -> {
                         item {
                             Carousel(
@@ -426,6 +420,12 @@ fun Home(
                             )
                         }
 
+                    }
+
+                    propertiesLoading -> {
+                        item {
+                            ListPropertiesHomeSkeleton()
+                        }
                     }
 
                     listPropertiesError.isNotEmpty() -> {

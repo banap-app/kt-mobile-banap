@@ -110,10 +110,6 @@ fun FieldInformation(
         isLoading = isLoading
     ) {
         when {
-            isLoading -> {
-                FieldInformationSkeleton()
-            }
-
             field != null -> {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(
@@ -433,6 +429,10 @@ fun FieldInformation(
                         }
                     }
                 )
+            }
+
+            isLoading -> {
+                FieldInformationSkeleton()
             }
         }
     }

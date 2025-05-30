@@ -117,10 +117,6 @@ fun Property(
         }
 
         when {
-            loading -> {
-                ListFieldsHomeSkeleton()
-            }
-
             fields.isNotEmpty() -> {
                 LazyRow(
                     modifier = Modifier
@@ -161,6 +157,10 @@ fun Property(
                         )
                     }
                 }
+            }
+
+            loading -> {
+                ListFieldsHomeSkeleton()
             }
 
             error.isNotEmpty() -> {
