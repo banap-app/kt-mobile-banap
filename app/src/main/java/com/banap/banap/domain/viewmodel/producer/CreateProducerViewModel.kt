@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.banap.banap.common.Resource
-import com.banap.banap.domain.model.producer.CreateProducerState
+import com.banap.banap.domain.model.producer.ProducerState
 import com.banap.banap.domain.use_case.producer.CreateProducerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -16,24 +16,24 @@ import javax.inject.Inject
 class CreateProducerViewModel @Inject constructor(
     private val createProducerUseCase: CreateProducerUseCase
 ) : ViewModel() {
-    private val _state = mutableStateOf((CreateProducerState()))
-    val state: State<CreateProducerState> = _state
+    private val _state = mutableStateOf((ProducerState()))
+    val state: State<ProducerState> = _state
 
     fun createProducer(name: String, email: String, password: String) {
         createProducerUseCase(name, email, password).onEach { result ->
             when (result) {
                 is Resource.Success -> {
-                    _state.value = CreateProducerState(response = result.data)
+                    _state.value = ProducerState(response = result.data)
                 }
 
                 is Resource.Error -> {
-                    _state.value = CreateProducerState(
+                    _state.value = ProducerState(
                         error = result.message ?: "Um erro inesperado aconteceu"
                     )
                 }
 
                 is Resource.Loading -> {
-                    _state.value = CreateProducerState(isLoading = true)
+                    _state.value = ProducerState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

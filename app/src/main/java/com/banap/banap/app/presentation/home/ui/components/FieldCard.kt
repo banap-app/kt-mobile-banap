@@ -17,8 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.banap.banap.R
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_CLARO
@@ -29,12 +29,10 @@ import com.banap.banap.core.ui.theme.VERDE_CLARO
 @Composable
 fun FieldCard(
     nomeTalhao: String,
-    navigationController: NavController
+    onClick: () -> Unit
 ) {
     Card (
-        onClick = {
-            navigationController.navigate("Information")
-        },
+        onClick = onClick,
         modifier = Modifier
             .clip(
                 shape = ShapeProperty.medium
@@ -65,6 +63,7 @@ fun FieldCard(
             ) {
                 Column (
                     modifier = Modifier
+                        .padding(horizontal = 10.dp)
                         .fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -73,7 +72,10 @@ fun FieldCard(
                         text = nomeTalhao,
                         style = Typography.bodySmall,
                         fontWeight = FontWeight.SemiBold,
-                        color = BRANCO
+                        color = BRANCO,
+                        softWrap = false,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
