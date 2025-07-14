@@ -6,45 +6,32 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.banap.banap.common.Resource
 import com.banap.banap.domain.model.field.FieldState
-import com.banap.banap.domain.model.field.FieldBoundary
-import com.banap.banap.domain.use_case.field.CreateFieldUseCase
+import com.banap.banap.domain.use_case.field.GetFieldByIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
-class CreateFieldViewModel @Inject constructor(
-    private val createFieldUseCase: CreateFieldUseCase
+class GetFieldByIdViewModel @Inject constructor(
+    private val getFieldByIdUseCase: GetFieldByIdUseCase
 ) : ViewModel() {
     private val _state = mutableStateOf(FieldState())
     val state: State<FieldState> = _state
 
-    fun createField(
-        producerId: String,
-        propertyId: String,
-        name: String,
-        description: String,
-        crop: String,
-        fieldBoundary: List<FieldBoundary>
-    ) {
-        createFieldUseCase(
-            producerId = producerId,
-            propertyId = propertyId,
-            name = name,
-            description = description,
-            crop = crop,
-            fieldBoundary = fieldBoundary
-        ).onEach { result ->
+    fun getFieldById(id: String) {
+        getFieldByIdUseCase(id).onEach { result ->
             when (result) {
                 is Resource.Success -> {
                     _state.value = FieldState(response = result.data)
                 }
+
                 is Resource.Error -> {
                     _state.value = FieldState(
                         error = result.message ?: "Um erro inesperado aconteceu"
                     )
                 }
+
                 is Resource.Loading -> {
                     _state.value = FieldState(isLoading = true)
                 }

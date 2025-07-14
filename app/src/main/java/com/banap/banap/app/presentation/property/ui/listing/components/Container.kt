@@ -24,13 +24,13 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.banap.banap.core.ui.components.Button
-import com.banap.banap.core.ui.components.LoadingScreen
 import com.banap.banap.core.ui.components.RegistrationHeader
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.ShapeProperty
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
+import com.banap.banap.data.model.field.FieldResponse
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -40,7 +40,7 @@ fun Container(
     children: @Composable () -> Unit,
     buttonValue: String,
     isLoading: Boolean,
-    propertyList: MutableList<String>
+    propertyList: List<FieldResponse>
 ) {
     Scaffold(
         modifier = Modifier

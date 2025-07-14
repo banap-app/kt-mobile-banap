@@ -35,14 +35,18 @@ import com.banap.banap.core.ui.theme.ShapeProperty
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.util.shimmerEffect
+import com.banap.banap.data.model.field.FieldResponse
 
 @Composable
 fun Property(
-    navigationController: NavController,
-    fieldList: MutableList<String>
+    navigationController: NavController
 ) {
     var fieldsLoading: Boolean by remember {
         mutableStateOf(false)
+    }
+
+    var fields: List<FieldResponse> by remember {
+        mutableStateOf(listOf())
     }
 
     Container(
@@ -50,7 +54,7 @@ fun Property(
         titulo = "Propriedade 01",
         children = {
             when {
-                fieldList.isEmpty() -> {
+                fields.isEmpty() -> {
                     Column(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -96,7 +100,7 @@ fun Property(
                                 .fillMaxSize(),
                             verticalArrangement = Arrangement.spacedBy(20.dp)
                         ) {
-                            items(fieldList.size) {
+                            items(fields.size) {
                                 ListItemCard(
                                     modifier = Modifier
                                         .height(150.dp)
@@ -104,7 +108,7 @@ fun Property(
                                     title = "Talhão",
                                     titleStyle = Typography.titleMedium,
                                     nameStyle = Typography.displayLarge,
-                                    name = fieldList[it]
+                                    name = fields[it].name
                                 ) {
                                     Image(
                                         imageVector = ImageVector.vectorResource(id = R.drawable.propertyimagefield),
@@ -180,6 +184,6 @@ fun Property(
         },
         buttonValue = "Novo Talhão",
         isLoading = fieldsLoading,
-        propertyList = fieldList
+        propertyList = fields
     )
 }
