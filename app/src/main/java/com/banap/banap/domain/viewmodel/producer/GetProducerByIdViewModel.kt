@@ -6,21 +6,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.banap.banap.common.Resource
 import com.banap.banap.domain.model.producer.ProducerState
-import com.banap.banap.domain.use_case.producer.CreateProducerUseCase
+import com.banap.banap.domain.use_case.producer.GetProducerByIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
-class CreateProducerViewModel @Inject constructor(
-    private val createProducerUseCase: CreateProducerUseCase
+class GetProducerByIdViewModel @Inject constructor(
+    private val getProducerByIdUseCase: GetProducerByIdUseCase
 ) : ViewModel() {
     private val _state = mutableStateOf((ProducerState()))
     val state: State<ProducerState> = _state
 
-    fun createProducer(name: String, email: String, password: String) {
-        createProducerUseCase(name, email, password).onEach { result ->
+    fun getProducerById(id: String) {
+        getProducerByIdUseCase(id).onEach { result ->
             when (result) {
                 is Resource.Success -> {
                     _state.value = ProducerState(response = result.data)
@@ -37,9 +37,5 @@ class CreateProducerViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
-    }
-
-    fun clearError() {
-        _state.value = _state.value.copy(error = "")
     }
 }

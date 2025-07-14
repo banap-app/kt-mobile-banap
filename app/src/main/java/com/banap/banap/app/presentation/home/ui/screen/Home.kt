@@ -14,30 +14,26 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.banap.banap.R
 import com.banap.banap.app.presentation.home.ui.components.Carousel
@@ -52,16 +48,17 @@ import com.banap.banap.app.presentation.skeleton.ui.home.screen.HomeSkeleton
 import com.banap.banap.core.ui.components.Button
 import com.banap.banap.core.ui.components.Modal
 import com.banap.banap.core.ui.theme.BRANCO
-import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.ShapeProperty
-import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
+import com.banap.banap.data.model.field.FieldResponse
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
 import com.banap.banap.data.model.property.ListPropertiesResponse
 import com.banap.banap.data.model.weather.WeatherResponse
+import com.banap.banap.domain.model.field.ListFieldsState
 import com.banap.banap.domain.model.property.ListPropertiesState
 import com.banap.banap.domain.model.weather.WeatherState
+import com.banap.banap.domain.viewmodel.field.ListFieldsViewModel
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.property.ListPropertiesViewModel
 import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
@@ -79,9 +76,10 @@ fun Home(
     locationViewModel: LocationViewModel,
     listPropertiesViewModel: ListPropertiesViewModel,
     listPropertiesState: ListPropertiesState,
+    listFieldsViewModel: ListFieldsViewModel,
+    listFieldsState: ListFieldsState,
     taskList: MutableList<TaskList>,
-    logList: MutableList<LogList>,
-    fieldList: MutableList<String>
+    logList: MutableList<LogList>
 ) {
     val context = LocalContext.current
 
@@ -122,6 +120,10 @@ fun Home(
 
     var modalVisible: Boolean by remember {
         mutableStateOf(false)
+    }
+
+    val fieldsMap = remember {
+        mutableStateMapOf<String, List<FieldResponse>>()
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -257,7 +259,22 @@ fun Home(
     }
 
     LaunchedEffect(listPropertiesState.error) {
-        listPropertiesError = ""
+        listPropertiesError = listPropertiesState.error
+    }
+
+    LaunchedEffect(listPropertiesState.response) {
+        listPropertiesState.response?.let {
+            properties.forEach { property ->
+                Log.d("NAME", property.name)
+                listFieldsViewModel.listFields(property.id)
+            }
+        }
+    }
+
+    LaunchedEffect(listFieldsState.response) {
+        listFieldsState.response.forEach { (propertyId, fieldsList) ->
+            fieldsMap[propertyId] = fieldsList
+        }
     }
 
     Scaffold(
@@ -326,12 +343,6 @@ fun Home(
                 }
 
                 when {
-                    propertiesLoading -> {
-                        item {
-                            ListPropertiesHomeSkeleton()
-                        }
-                    }
-
                     properties.isNotEmpty() -> {
                         item {
                             Carousel(
@@ -357,11 +368,12 @@ fun Home(
                             }
                         ) { index ->
                             Property(
-                                titulo = properties[index].name,
                                 navigationController = navigationController,
+                                titulo = properties[index].name,
                                 propertyId = properties[index].id,
                                 producerId = properties[index].producerId,
-                                fieldList = fieldList,
+                                fields = fieldsMap[properties[index].id] ?: listOf(),
+                                fieldsState = listFieldsState,
                                 withSpacing = index != properties.size - 1
                             )
                         }
@@ -404,16 +416,21 @@ fun Home(
                                 titulo = "Lista de tarefas",
                                 subTitulo = "Seus afazeres da semana!",
                                 navigationController = navigationController,
-                                fieldList = fieldList,
                                 taskList = taskList
                             )
                         }
 
                     }
 
+                    propertiesLoading -> {
+                        item {
+                            ListPropertiesHomeSkeleton()
+                        }
+                    }
+
                     listPropertiesError.isNotEmpty() -> {
                         item {
-                            Column (
+                            Column(
                                 modifier = Modifier
                                     .padding(top = 60.dp)
                                     .fillMaxSize(),

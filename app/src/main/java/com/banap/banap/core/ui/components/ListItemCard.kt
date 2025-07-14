@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
@@ -42,7 +43,9 @@ fun ListItemCard(
     ) {
         Row (
             modifier = Modifier
-                .padding(start = 30.dp)
+                .padding(
+                    start = 30.dp
+                )
                 .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -55,8 +58,11 @@ fun ListItemCard(
                 )
 
                 Text(
-                    text = name,
-                    style = nameStyle
+                    text = if (name.length > 9) name.substring(0, 9) + "..." else name,
+                    style = nameStyle,
+                    maxLines = 1,
+                    softWrap = false,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 

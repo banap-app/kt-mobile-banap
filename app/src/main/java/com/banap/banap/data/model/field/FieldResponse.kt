@@ -1,6 +1,6 @@
-package com.banap.banap.domain.model.field
+package com.banap.banap.data.model.field
 
-data class CreateFieldResponse(
+data class FieldResponse(
     val id: String,
     val propertyId: String,
     val producerId: String,

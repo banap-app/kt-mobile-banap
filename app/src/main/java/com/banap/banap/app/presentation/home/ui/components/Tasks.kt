@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -23,16 +27,21 @@ import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.core.ui.theme.VERMELHO
+import com.banap.banap.data.model.field.FieldResponse
 import com.banap.banap.data.model.producer.TaskList
+import com.banap.banap.domain.model.field.ListFieldsState
 
 @Composable
 fun Tasks(
     titulo: String,
     subTitulo: String,
     navigationController: NavController,
-    fieldList: MutableList<String>,
     taskList: MutableList<TaskList>
 ) {
+    var fields: List<FieldResponse> by remember {
+        mutableStateOf(listOf())
+    }
+
     Column(
         modifier = Modifier
             .padding(
@@ -62,7 +71,7 @@ fun Tasks(
         )
 
         when {
-            fieldList.isEmpty() -> {
+            fields.isEmpty() -> {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth(),

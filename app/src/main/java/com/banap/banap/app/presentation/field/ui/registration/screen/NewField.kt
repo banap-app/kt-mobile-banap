@@ -18,7 +18,7 @@ import com.banap.banap.app.presentation.field.ui.registration.components.FirstPa
 import com.banap.banap.app.presentation.field.ui.registration.components.SecondPage
 import com.banap.banap.app.presentation.field.ui.registration.components.ThirdPage
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
-import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
+import com.banap.banap.app.presentation.validation.field.viewmodel.FieldNameTextFieldViewModel
 import com.banap.banap.app.util.enumerator.FieldPage
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
@@ -43,7 +43,7 @@ fun NewField(
         )
     }
 
-    val viewModelName = viewModel<NameTextFieldViewModel>()
+    val viewModelName = viewModel<FieldNameTextFieldViewModel>()
     val stateName = viewModelName.state
 
     var markers = remember {
