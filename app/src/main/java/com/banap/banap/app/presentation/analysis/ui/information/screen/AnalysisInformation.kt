@@ -1,5 +1,6 @@
 package com.banap.banap.app.presentation.analysis.ui.information.screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,9 +10,11 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -22,6 +25,7 @@ import com.banap.banap.R
 import com.banap.banap.app.presentation.analysis.ui.information.components.AnalysisCard
 import com.banap.banap.app.presentation.analysis.ui.information.components.CreateDetails
 import com.banap.banap.app.presentation.analysis.ui.information.components.Description
+import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.skeleton.ui.analysis.screen.AnalysisInformationSkeleton
 import com.banap.banap.core.ui.components.Button
 import com.banap.banap.core.ui.components.ImageInformation
@@ -35,14 +39,27 @@ import com.banap.banap.core.ui.theme.VERDE_ESCURO
 
 @Composable
 fun AnalysisInformation(
-    navigationController: NavController
+    navigationController: NavController,
+    tokenViewModel: TokenViewModel
 ) {
     val isLoading by remember {
         mutableStateOf(false)
     }
 
+    var fieldId by remember {
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("fieldId")?.let {
+            Log.d("ID", it)
+            fieldId = it
+        }
+    }
+
     InformationScreenPattern(
         navigationController = navigationController,
+        fieldId = fieldId,
         fixedRoute = "Information",
         title = "Análise 01",
         titleIcon = R.drawable.analysisicontitle,

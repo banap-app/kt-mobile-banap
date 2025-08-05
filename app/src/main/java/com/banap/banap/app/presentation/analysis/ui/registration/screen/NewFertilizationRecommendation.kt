@@ -1,5 +1,6 @@
 package com.banap.banap.app.presentation.analysis.ui.registration.screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,8 +17,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.analysis.ui.registration.components.AnalysisResult
 import com.banap.banap.app.presentation.analysis.ui.registration.components.ResultCard
+import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.validation.dropdown.event.DropdownTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.dropdown.utils.validationDataDropdown
 import com.banap.banap.app.presentation.validation.dropdown.viewmodel.DropdownTextFieldViewModel
@@ -38,6 +41,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun NewFertilizationRecommendation(
     navigationController: NavController,
+    tokenViewModel: TokenViewModel,
     analysisList: MutableList<String>,
     logList: MutableList<LogList>
 ) {
@@ -89,6 +93,17 @@ fun NewFertilizationRecommendation(
         mutableIntStateOf(1)
     }
 
+    var fieldId by remember {
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("fieldId")?.let {
+            Log.d("ID", it)
+            fieldId = it
+        }
+    }
+
     LaunchedEffect(isLoading) {
         if (isLoading) {
             delay(1_000)
@@ -100,6 +115,7 @@ fun NewFertilizationRecommendation(
 
     RegistrationScreenPattern(
         navigationController = navigationController,
+        fieldId = fieldId,
         fallbackRoute = "Information",
         isValidationSuccessful = isValidationSuccessful,
         stateError = null,
@@ -182,11 +198,11 @@ fun NewFertilizationRecommendation(
                             value = stateDropdown.option,
                             placeholder = "Qual é a produtividade esperada?",
                             options = listOf(
-                                "Menor que 20%",
-                                "Entre 20 e 30%",
-                                "Entre 30 e 40%",
-                                "Entre 40 e 50%",
-                                "Maior que 50%"
+                                "Menor que 20 t/ha",
+                                "Entre 20 e 30 t/ha",
+                                "Entre 30 e 40 t/ha",
+                                "Entre 40 e 50 t/ha",
+                                "Maior que 50 t/ha"
                             ),
                             onOptionSelected = {
                                 viewModelDropdown.onEvent(
@@ -232,7 +248,11 @@ fun NewFertilizationRecommendation(
                     )
                 )
 
-                navigationController.navigate("Information")
+                navigationController.navigate(
+                    Screen.Information.createRoute(
+                        fieldId = fieldId
+                    )
+                )
             }
         },
         buttonValue = if (analysisMade) "Cadastrar" else "Calcular",

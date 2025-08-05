@@ -334,7 +334,10 @@ fun Navigation() {
                 )
             }
         ) {
-            NewLimingCalculation(navigationController)
+            NewLimingCalculation(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
         }
 
         composable(
@@ -352,6 +355,7 @@ fun Navigation() {
         ) {
             NewFertilizationRecommendation(
                 navigationController,
+                tokenViewModel = tokenViewModel,
                 analysisList = analysisList,
                 logList = logList
             )
@@ -442,7 +446,10 @@ fun Navigation() {
                 )
             }
         ) {
-            AnalysisInformation(navigationController)
+            AnalysisInformation(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
         }
 
         composable(

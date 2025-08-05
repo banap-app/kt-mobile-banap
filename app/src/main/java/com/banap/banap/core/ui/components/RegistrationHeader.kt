@@ -14,14 +14,16 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.banap.banap.R
+import com.banap.banap.app.navigation.screens.Screen
 
 @Composable
 fun RegistrationHeader(
     navigationController: NavController,
+    fieldId: String? = null,
     fixedRoute: String? = null,
     fallbackRoute: String = ""
 ) {
-    Box{
+    Box {
         Image(
             imageVector = ImageVector.vectorResource(id = R.drawable.linhas_propriedade),
             contentDescription = "Vetor de linhas",
@@ -35,14 +37,24 @@ fun RegistrationHeader(
 
         IconButton(
             onClick = {
-                fixedRoute
+                fieldId
                     ?.let {
-                        navigationController.navigate(it)
+                        navigationController.navigate(
+                            Screen.Information.createRoute(
+                                fieldId = it
+                            )
+                        )
                     }
                     ?: run {
-                        if (!navigationController.popBackStack()) {
-                            navigationController.navigate(fallbackRoute)
-                        }
+                        fixedRoute
+                            ?.let {
+                                navigationController.navigate(it)
+                            }
+                            ?: run {
+                                if (!navigationController.popBackStack()) {
+                                    navigationController.navigate(fallbackRoute)
+                                }
+                            }
                     }
             },
             modifier = Modifier

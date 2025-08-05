@@ -1,5 +1,6 @@
 package com.banap.banap.app.presentation.analysis.ui.registration.screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.app.presentation.analysis.ui.registration.components.AnalysisResult
 import com.banap.banap.app.presentation.analysis.ui.registration.components.ResultCard
+import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.validation.ctc.event.CTCTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.ctc.utils.validationDataCtc
 import com.banap.banap.app.presentation.validation.ctc.viewmodel.CTCTextFieldViewModel
@@ -35,7 +37,8 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun NewLimingCalculation(
-    navigationController: NavController
+    navigationController: NavController,
+    tokenViewModel: TokenViewModel
 ) {
     val context = LocalContext.current
 
@@ -84,6 +87,17 @@ fun NewLimingCalculation(
         mutableIntStateOf(1)
     }
 
+    var fieldId by remember {
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("fieldId")?.let {
+            Log.d("ID", it)
+            fieldId = it
+        }
+    }
+
     LaunchedEffect(isLoading) {
         if (isLoading) {
             delay(1_000)
@@ -95,6 +109,7 @@ fun NewLimingCalculation(
 
     RegistrationScreenPattern(
         navigationController = navigationController,
+        fieldId = fieldId,
         fallbackRoute = "Information",
         isValidationSuccessful = isValidationSuccessful,
         stateError = stateSba.sbaError,

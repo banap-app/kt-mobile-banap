@@ -27,6 +27,7 @@ import com.banap.banap.core.ui.util.shimmerEffect
 @Composable
 fun InformationScreenPattern(
     navigationController: NavController,
+    fieldId: String? = null,
     fixedRoute: String,
     title: String,
     titleIcon: Int,
@@ -46,6 +47,7 @@ fun InformationScreenPattern(
         ) {
             RegistrationHeader(
                 navigationController = navigationController,
+                fieldId = fieldId,
                 fixedRoute = fixedRoute
             )
 

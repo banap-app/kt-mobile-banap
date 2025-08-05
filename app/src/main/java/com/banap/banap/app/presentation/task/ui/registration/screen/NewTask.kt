@@ -220,7 +220,6 @@ fun NewTask(
                     errorState = stateDropdownPriority.optionPriorityError
                 )
             }
-
         }
     )
 }

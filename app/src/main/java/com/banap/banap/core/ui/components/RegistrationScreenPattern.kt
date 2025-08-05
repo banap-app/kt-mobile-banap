@@ -31,6 +31,7 @@ import com.banap.banap.core.ui.theme.VERDE_ESCURO
 @Composable
 fun RegistrationScreenPattern(
     navigationController: NavController,
+    fieldId: String? = null,
     fallbackRoute: String,
     texto: String,
     textoASerDestacado: String,
@@ -101,6 +102,7 @@ fun RegistrationScreenPattern(
             ) {
                 RegistrationHeader(
                     navigationController = navigationController,
+                    fieldId = fieldId,
                     fallbackRoute = fallbackRoute
                 )
 
