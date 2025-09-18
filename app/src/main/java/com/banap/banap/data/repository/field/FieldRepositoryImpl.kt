@@ -20,4 +20,12 @@ class FieldRepositoryImpl @Inject constructor(
     override suspend fun getFieldById(id: String): FieldResponse {
         return service.getFieldById(id)
     }
+
+    override suspend fun updateField(id: String, field: CreateFieldRequest) {
+        return service.updateField(id, field)
+    }
+
+    override suspend fun deleteField(id: String) {
+        return service.deleteField(id)
+    }
 }

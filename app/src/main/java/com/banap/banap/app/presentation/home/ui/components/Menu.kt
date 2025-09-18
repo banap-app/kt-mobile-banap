@@ -41,10 +41,10 @@ fun Menu(
     }
 
     Image(
-        painter = painterResource(R.drawable.foto_de_perfil),
+        painter = painterResource(R.drawable.user_error),
         contentDescription = "Foto de perfil",
         modifier = Modifier
-            .size(60.dp)
+            .size(45.dp)
             .pointerInput(true) {
                 detectTapGestures(
                     onTap = {
@@ -64,8 +64,7 @@ fun Menu(
             .background(BRANCO),
         shape = RoundedCornerShape(10.dp)
     ) {
-        dropDownItems.forEach {
-            item ->
+        dropDownItems.forEach { item ->
             DropdownMenuItem(
                 onClick = {
                     item.optionSelected(item)

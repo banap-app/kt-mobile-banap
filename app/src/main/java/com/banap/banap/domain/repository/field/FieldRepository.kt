@@ -7,4 +7,6 @@ interface FieldRepository {
     suspend fun createField(field: CreateFieldRequest): FieldResponse
     suspend fun listFields(id: String): List<FieldResponse>
     suspend fun getFieldById(id: String): FieldResponse
+    suspend fun updateField(id: String, field: CreateFieldRequest)
+    suspend fun deleteField(id: String)
 }

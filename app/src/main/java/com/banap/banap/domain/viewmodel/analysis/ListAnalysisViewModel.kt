@@ -1,39 +1,39 @@
-package com.banap.banap.domain.viewmodel.producer
+package com.banap.banap.domain.viewmodel.analysis
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.banap.banap.common.Resource
-import com.banap.banap.domain.model.producer.ProducerState
-import com.banap.banap.domain.use_case.producer.GetProducerByIdUseCase
+import com.banap.banap.domain.model.analysis.ListAnalysisState
+import com.banap.banap.domain.use_case.analysis.ListAnalysisUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
-class GetProducerByIdViewModel @Inject constructor(
-    private val getProducerByIdUseCase: GetProducerByIdUseCase
+class ListAnalysisViewModel @Inject constructor(
+    private val listAnalysisUseCase: ListAnalysisUseCase
 ) : ViewModel() {
-    private val _state = mutableStateOf((ProducerState()))
-    val state: State<ProducerState> = _state
+    private val _state = mutableStateOf(ListAnalysisState())
+    val state: State<ListAnalysisState> = _state
 
-    fun getProducerById() {
-        getProducerByIdUseCase().onEach { result ->
+    fun listAnalysis(id: String) {
+        listAnalysisUseCase(id).onEach { result ->
             when (result) {
                 is Resource.Success -> {
-                    _state.value = ProducerState(response = result.data)
+                    _state.value = ListAnalysisState(response = result.data)
                 }
 
                 is Resource.Error -> {
-                    _state.value = ProducerState(
+                    _state.value = ListAnalysisState(
                         error = result.message ?: "Um erro inesperado aconteceu"
                     )
                 }
 
                 is Resource.Loading -> {
-                    _state.value = ProducerState(isLoading = true)
+                    _state.value = ListAnalysisState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

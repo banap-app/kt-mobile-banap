@@ -1,39 +1,39 @@
-package com.banap.banap.domain.viewmodel.producer
+package com.banap.banap.domain.viewmodel.field
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.banap.banap.common.Resource
-import com.banap.banap.domain.model.producer.ProducerState
-import com.banap.banap.domain.use_case.producer.GetProducerByIdUseCase
+import com.banap.banap.domain.model.producer.WithoutResponseState
+import com.banap.banap.domain.use_case.field.DeleteFieldUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
-class GetProducerByIdViewModel @Inject constructor(
-    private val getProducerByIdUseCase: GetProducerByIdUseCase
+class DeleteFieldViewModel @Inject constructor(
+    private val deleteFieldUseCase: DeleteFieldUseCase
 ) : ViewModel() {
-    private val _state = mutableStateOf((ProducerState()))
-    val state: State<ProducerState> = _state
+    private val _state = mutableStateOf((WithoutResponseState()))
+    val state: State<WithoutResponseState> = _state
 
-    fun getProducerById() {
-        getProducerByIdUseCase().onEach { result ->
+    fun deleteField(id: String) {
+        deleteFieldUseCase(id).onEach { result ->
             when (result) {
                 is Resource.Success -> {
-                    _state.value = ProducerState(response = result.data)
+                    _state.value = WithoutResponseState(response = result.data)
                 }
 
                 is Resource.Error -> {
-                    _state.value = ProducerState(
+                    _state.value = WithoutResponseState(
                         error = result.message ?: "Um erro inesperado aconteceu"
                     )
                 }
 
                 is Resource.Loading -> {
-                    _state.value = ProducerState(isLoading = true)
+                    _state.value = WithoutResponseState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

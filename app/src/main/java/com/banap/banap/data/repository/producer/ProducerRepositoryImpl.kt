@@ -13,8 +13,8 @@ class ProducerRepositoryImpl @Inject constructor(
         return service.createProducer(producer)
     }
 
-    override suspend fun getProducerById(id: String): ProducerResponse {
-        return service.getProducerById(id)
+    override suspend fun getProducerById(): ProducerResponse {
+        return service.getProducerById()
     }
 
     override suspend fun updateProducer(producer: ProducerRequest) {

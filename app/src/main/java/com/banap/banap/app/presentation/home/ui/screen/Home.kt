@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
@@ -21,6 +23,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -33,14 +36,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.banap.banap.R
+import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.home.ui.components.Carousel
 import com.banap.banap.app.presentation.home.ui.components.Header
 import com.banap.banap.app.presentation.home.ui.components.NoData
 import com.banap.banap.app.presentation.home.ui.components.Property
 import com.banap.banap.app.presentation.home.ui.components.RecentActivities
+import com.banap.banap.app.presentation.home.ui.components.SelectProperty
 import com.banap.banap.app.presentation.home.ui.components.Tasks
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.skeleton.ui.home.components.ListPropertiesHomeSkeleton
@@ -48,18 +52,23 @@ import com.banap.banap.app.presentation.skeleton.ui.home.screen.HomeSkeleton
 import com.banap.banap.core.ui.components.Button
 import com.banap.banap.core.ui.components.Modal
 import com.banap.banap.core.ui.theme.BRANCO
+import com.banap.banap.core.ui.theme.CINZA_INTERMEDIARIO
+import com.banap.banap.core.ui.theme.PRETO
 import com.banap.banap.core.ui.theme.ShapeProperty
 import com.banap.banap.core.ui.theme.VERDE_CLARO
+import com.banap.banap.core.ui.theme.VERMELHO
 import com.banap.banap.data.model.field.FieldResponse
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
 import com.banap.banap.data.model.property.ListPropertiesResponse
 import com.banap.banap.data.model.weather.WeatherResponse
 import com.banap.banap.domain.model.field.ListFieldsState
+import com.banap.banap.domain.model.producer.ProducerState
 import com.banap.banap.domain.model.property.ListPropertiesState
 import com.banap.banap.domain.model.weather.WeatherState
 import com.banap.banap.domain.viewmodel.field.ListFieldsViewModel
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
+import com.banap.banap.domain.viewmodel.producer.GetProducerByIdViewModel
 import com.banap.banap.domain.viewmodel.property.ListPropertiesViewModel
 import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
 import com.banap.banap.domain.viewmodel.weather.WeatherViewModel
@@ -78,6 +87,8 @@ fun Home(
     listPropertiesState: ListPropertiesState,
     listFieldsViewModel: ListFieldsViewModel,
     listFieldsState: ListFieldsState,
+    getProducerByIdViewModel: GetProducerByIdViewModel,
+    getProducerByIdState: ProducerState,
     taskList: MutableList<TaskList>,
     logList: MutableList<LogList>
 ) {
@@ -96,6 +107,14 @@ fun Home(
 
     var hasToken: String? by remember {
         mutableStateOf(null)
+    }
+
+    var producerId: String by remember {
+        mutableStateOf("")
+    }
+
+    var username: String by remember {
+        mutableStateOf("")
     }
 
     var listPropertiesError: String by remember {
@@ -122,9 +141,19 @@ fun Home(
         mutableStateOf(false)
     }
 
+    var selectProperty: Boolean by remember {
+        mutableStateOf(false)
+    }
+
     val fieldsMap = remember {
         mutableStateMapOf<String, List<FieldResponse>>()
     }
+
+    val radioOptions: Map<String, String> by remember(properties) {
+        derivedStateOf { properties.associate { it.id to it.name } }
+    }
+
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions.keys.firstOrNull()) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -234,6 +263,7 @@ fun Home(
             tokenViewModel.saveToken("verifiedToken", it.success.toString())
             isTokenValid = it.success
 
+            getProducerByIdViewModel.getProducerById()
             listPropertiesViewModel.listProperties()
         }
     }
@@ -271,6 +301,14 @@ fun Home(
         }
     }
 
+    LaunchedEffect(getProducerByIdState.response) {
+        getProducerByIdState.response?.let {
+            Log.d("PRODUCER", it.toString())
+            username = it.name
+            producerId = it.id
+        }
+    }
+
     LaunchedEffect(listFieldsState.response) {
         listFieldsState.response.forEach { (propertyId, fieldsList) ->
             fieldsMap[propertyId] = fieldsList
@@ -304,8 +342,9 @@ fun Home(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     Header(
-                        nome = "Gilmar",
+                        name = username,
                         navigationController = navigationController,
+                        getProducerByIdState = getProducerByIdState,
                         onItemClick = {
                             modalVisible = true
                         }
@@ -320,11 +359,16 @@ fun Home(
                             onDismiss = {
                                 modalVisible = false
                             },
-                            icon = R.drawable.baseline_logout_24,
+                            icon = ImageVector.vectorResource(id = R.drawable.baseline_logout_24),
+                            iconColor = VERMELHO,
                             title = "Tem certeza que\n deseja sair?",
                             description = "",
                             onConfirmText = "Sair",
+                            onConfirmButtonBackgroundColor = VERMELHO,
+                            onConfirmButtonContentColor = BRANCO,
                             onDismissText = "Cancelar",
+                            onDismissButtonBackgroundColor = CINZA_INTERMEDIARIO,
+                            onDismissButtonContentColor = PRETO,
                             space = 0.dp
                         )
                     }
@@ -416,10 +460,60 @@ fun Home(
                                 titulo = "Lista de tarefas",
                                 subTitulo = "Seus afazeres da semana!",
                                 navigationController = navigationController,
-                                taskList = taskList
+                                taskList = taskList,
+                                onClick = {
+                                    selectProperty = true
+                                }
                             )
-                        }
 
+                            if (selectProperty) {
+                                Modal(
+                                    onConfirm = {
+                                        selectedOption?.let {
+                                            navigationController.navigate(
+                                                Screen.NewField.createRoute(
+                                                    producerId = producerId,
+                                                    propertyId = selectedOption
+                                                )
+                                            )
+                                        }
+                                    },
+                                    onDismiss = {
+                                        selectProperty = false
+                                    },
+                                    icon = Icons.Outlined.Home,
+                                    iconColor = VERDE_CLARO,
+                                    title = "Escolha uma das propriedades abaixo:",
+                                    description = "",
+                                    disableOnConfirmButton = selectedOption.isNullOrEmpty(),
+                                    onConfirmText = "Selecionar Propriedade",
+                                    onConfirmButtonBackgroundColor = VERDE_CLARO,
+                                    onConfirmButtonContentColor = BRANCO,
+                                    onDismissText = "Cancelar",
+                                    onDismissButtonBackgroundColor = CINZA_INTERMEDIARIO,
+                                    onDismissButtonContentColor = PRETO,
+                                    space = 40.dp
+                                ) {
+                                    Column (
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 20.dp),
+                                        verticalArrangement = Arrangement.spacedBy(
+                                            space = 5.dp
+                                        )
+                                    ) {
+                                        radioOptions.forEach { (id, name) ->
+                                            SelectProperty(
+                                                name = name,
+                                                id = id,
+                                                onOptionSelected = onOptionSelected,
+                                                selectedOption = selectedOption
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     propertiesLoading -> {

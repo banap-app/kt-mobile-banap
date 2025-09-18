@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.banap.banap.core.ui.theme.Typography
+import com.banap.banap.core.ui.theme.VERDE_CLARO
 
 @Composable
 fun Button(
@@ -30,6 +31,7 @@ fun Button(
     hasIcon: Boolean,
     icon: ImageVector = Icons.Outlined.Add,
     shape: Shape,
+    disableButton: Boolean = false,
     onClick: () -> Unit,
     backgroundColor: Color,
     contentColor: Color,
@@ -40,7 +42,7 @@ fun Button(
     Card (
         shape = shape,
         colors = CardDefaults.cardColors(
-            containerColor = backgroundColor,
+            containerColor = if (disableButton) VERDE_CLARO.copy(alpha = 0.5F) else backgroundColor,
             contentColor = contentColor
         ),
         elevation = CardDefaults.cardElevation(

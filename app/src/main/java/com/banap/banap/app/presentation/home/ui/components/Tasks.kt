@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.core.ui.components.Button
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
@@ -36,7 +37,8 @@ fun Tasks(
     titulo: String,
     subTitulo: String,
     navigationController: NavController,
-    taskList: MutableList<TaskList>
+    taskList: MutableList<TaskList>,
+    onClick: () -> Unit
 ) {
     var fields: List<FieldResponse> by remember {
         mutableStateOf(listOf())
@@ -94,9 +96,7 @@ fun Tasks(
                             .padding(vertical = 18.dp, horizontal = 15.dp),
                         hasIcon = true,
                         shape = ShapeProperty.small,
-                        onClick = {
-                            navigationController.navigate("NewField")
-                        },
+                        onClick = onClick,
                         backgroundColor = VERDE_CLARO,
                         contentColor = BRANCO,
                         defaultElevetion = 3.dp

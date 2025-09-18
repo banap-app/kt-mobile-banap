@@ -5,7 +5,7 @@ import com.banap.banap.domain.model.producer.ProducerRequest
 
 interface ProducerRepository {
     suspend fun createProducer(producer: ProducerRequest): ProducerResponse
-    suspend fun getProducerById(id: String): ProducerResponse
+    suspend fun getProducerById(): ProducerResponse
     suspend fun updateProducer(producer: ProducerRequest)
     suspend fun deleteProducer(id: String)
 }

@@ -40,6 +40,7 @@ import com.banap.banap.core.ui.components.ListItemCard
 import com.banap.banap.core.ui.components.Modal
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
+import com.banap.banap.core.ui.theme.CINZA_INTERMEDIARIO
 import com.banap.banap.core.ui.theme.PRETO
 import com.banap.banap.core.ui.theme.ShapeProperty
 import com.banap.banap.core.ui.theme.Typography
@@ -47,6 +48,7 @@ import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.core.ui.theme.VERMELHO
 import com.banap.banap.data.model.field.FieldResponse
+import com.banap.banap.domain.viewmodel.field.DeleteFieldViewModel
 import com.banap.banap.domain.viewmodel.field.GetFieldByIdViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -55,10 +57,12 @@ fun FieldInformation(
     navigationController: NavController,
     tokenViewModel: TokenViewModel,
     getFieldByIdViewModel: GetFieldByIdViewModel = hiltViewModel(),
+    deleteFieldViewModel: DeleteFieldViewModel = hiltViewModel(),
     fieldId: String,
     analysisList: MutableList<String>,
     taskList: MutableList<String>
 ) {
+    val deleteFieldState = deleteFieldViewModel.state.value
     val getFieldByIdState = getFieldByIdViewModel.state.value
 
     var modalVisible: Boolean by remember {
@@ -69,7 +73,15 @@ fun FieldInformation(
         mutableStateOf(false)
     }
 
+    var isLoadingDelete by remember {
+        mutableStateOf(false)
+    }
+
     var error by remember {
+        mutableStateOf("")
+    }
+
+    var errorDelete by remember {
         mutableStateOf("")
     }
 
@@ -102,11 +114,28 @@ fun FieldInformation(
         error = getFieldByIdState.error
     }
 
+    LaunchedEffect(deleteFieldState.isLoading) {
+        isLoadingDelete = deleteFieldState.isLoading
+    }
+
+    LaunchedEffect(deleteFieldState.response) {
+        deleteFieldState.response?.let {
+            if (it.success) {
+                navigationController.navigate("Home")
+            }
+        }
+    }
+
+    LaunchedEffect(deleteFieldState.error) {
+        errorDelete = deleteFieldState.error
+    }
+
     InformationScreenPattern(
         navigationController = navigationController,
         fixedRoute = "Home",
         title = field?.name ?: "",
         titleIcon = R.drawable.field,
+        isLoadingDelete = isLoadingDelete,
         isLoading = isLoading
     ) {
         when {
@@ -140,15 +169,24 @@ fun FieldInformation(
 
                     if (modalVisible) {
                         Modal(
-                            onConfirm = {},
+                            onConfirm = {
+                                deleteFieldViewModel.deleteField(tokenViewModel.getToken("fieldId") ?: fieldId)
+                                modalVisible = false
+                            },
                             onDismiss = {
                                 modalVisible = false
                             },
-                            icon = R.drawable.fieldicondelete,
+                            icon = ImageVector.vectorResource(id = R.drawable.fieldicondelete),
+                            iconColor = VERMELHO,
                             title = "Tem certeza que deseja\n apagar o talhão?",
                             description = "Apagando o talhão, todas as informações relacionadas a ele tambem serão apagadas!",
                             onConfirmText = "Excluir",
-                            onDismissText = "Cancelar"
+                            onConfirmButtonBackgroundColor = VERMELHO,
+                            onConfirmButtonContentColor = BRANCO,
+                            onDismissText = "Cancelar",
+                            onDismissButtonBackgroundColor = CINZA_INTERMEDIARIO,
+                            onDismissButtonContentColor = PRETO,
+                            space = 0.dp
                         )
                     }
                 }

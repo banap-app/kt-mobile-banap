@@ -38,6 +38,7 @@ import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
 import com.banap.banap.domain.viewmodel.field.ListFieldsViewModel
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
+import com.banap.banap.domain.viewmodel.producer.GetProducerByIdViewModel
 import com.banap.banap.domain.viewmodel.property.ListPropertiesViewModel
 import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
 import com.banap.banap.domain.viewmodel.weather.WeatherViewModel
@@ -55,6 +56,7 @@ fun Navigation() {
     val navigationViewModel: NavigationViewModel = hiltViewModel()
     val listPropertiesViewModel: ListPropertiesViewModel = hiltViewModel()
     val listFieldsViewModel: ListFieldsViewModel = hiltViewModel()
+    val getProducerByIdViewModel: GetProducerByIdViewModel = hiltViewModel()
     val animationDuration: Int = 700
 
     val analysisList: MutableList<String> = mutableListOf()
@@ -64,6 +66,7 @@ fun Navigation() {
 
     val listPropertiesState = listPropertiesViewModel.state.value
     val listFieldsState = listFieldsViewModel.state.value
+    val getProducerByIdState = getProducerByIdViewModel.state.value
     val weatherState = weatherViewModel.state.value
 
     LaunchedEffect(navigationController) {
@@ -127,6 +130,8 @@ fun Navigation() {
                 listPropertiesState = listPropertiesState,
                 listFieldsViewModel = listFieldsViewModel,
                 listFieldsState = listFieldsState,
+                getProducerByIdViewModel = getProducerByIdViewModel,
+                getProducerByIdState = getProducerByIdState,
                 taskList = taskListHome,
                 logList = logList
             )

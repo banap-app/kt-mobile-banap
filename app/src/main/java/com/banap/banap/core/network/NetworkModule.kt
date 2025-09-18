@@ -4,6 +4,7 @@ import com.banap.banap.common.Constants.AUTH_URL
 import com.banap.banap.common.Constants.PRODUCER_URL
 import com.banap.banap.common.Constants.WEATHER_URL
 import com.banap.banap.core.data.local.token.TokenManager
+import com.banap.banap.data.remote.analysis.AnalysisService
 import com.banap.banap.data.remote.field.FieldService
 import com.banap.banap.data.remote.login.LoginService
 import com.banap.banap.data.remote.producer.ProducerService
@@ -110,4 +111,11 @@ object NetworkModule {
         @Named("PRODUCER_RETROFIT") retrofit: Retrofit
     ): FieldService =
         retrofit.create(FieldService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideAnalysisService(
+        @Named("PRODUCER_RETROFIT") retrofit: Retrofit
+    ): AnalysisService =
+        retrofit.create(AnalysisService::class.java)
 }

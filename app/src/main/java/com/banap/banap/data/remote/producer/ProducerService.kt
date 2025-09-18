@@ -13,8 +13,8 @@ interface ProducerService {
     @POST("/producer")
     suspend fun createProducer(@Body producer: ProducerRequest): ProducerResponse
 
-    @GET("/producer/{id}")
-    suspend fun getProducerById(@Path("id") id: String): ProducerResponse
+    @GET("/producer")
+    suspend fun getProducerById(): ProducerResponse
 
     @PATCH("/producer/{id}")
     suspend fun updateProducer(@Body producer: ProducerRequest)

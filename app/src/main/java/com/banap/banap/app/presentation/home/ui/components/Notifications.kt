@@ -17,14 +17,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.banap.banap.R
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_INTERMEDIARIO
 import com.banap.banap.core.ui.theme.Typography
 
 @Composable
-fun Notifications() {
+fun Notifications(
+    error: String? = null
+) {
     var isNotificationsVisible by rememberSaveable {
         mutableStateOf(false)
     }
@@ -58,7 +63,7 @@ fun Notifications() {
         )
     ) {
         Text(
-            text = "Não há novas mensagens!",
+            text = if (error.isNullOrEmpty()) "Não há novas mensagens!" else "Ocorreu um erro...",
             style = Typography.displaySmall,
             fontWeight = FontWeight.SemiBold,
             color = CINZA_INTERMEDIARIO,

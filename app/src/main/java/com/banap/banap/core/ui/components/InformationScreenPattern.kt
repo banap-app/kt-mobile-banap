@@ -31,6 +31,7 @@ fun InformationScreenPattern(
     fixedRoute: String,
     title: String,
     titleIcon: Int,
+    isLoadingDelete: Boolean = false,
     isLoading: Boolean,
     child: @Composable () -> Unit
 ) {
@@ -39,58 +40,62 @@ fun InformationScreenPattern(
             .fillMaxSize(),
         containerColor = BRANCO
     ) {
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .fillMaxSize()
-                .padding(bottom = 60.dp)
-        ) {
-            RegistrationHeader(
-                navigationController = navigationController,
-                fieldId = fieldId,
-                fixedRoute = fixedRoute
-            )
+        if (!isLoadingDelete) {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize()
+                    .padding(bottom = 60.dp)
+            ) {
+                RegistrationHeader(
+                    navigationController = navigationController,
+                    fieldId = fieldId,
+                    fixedRoute = fixedRoute
+                )
 
-            when {
-                isLoading -> {
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
+                when {
+                    isLoading -> {
+                        Row(
                             modifier = Modifier
-                                .clip(
-                                    shape = ShapeCarousel.medium
-                                )
-                                .fillMaxWidth(0.4f)
-                                .height(30.dp)
-                                .shimmerEffect(),
-                            content = {}
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(
+                                        shape = ShapeCarousel.medium
+                                    )
+                                    .fillMaxWidth(0.4f)
+                                    .height(30.dp)
+                                    .shimmerEffect(),
+                                content = {}
+                            )
+                        }
+                    }
+
+                    else -> {
+                        TitleInformation(
+                            title = title,
+                            icon = titleIcon
                         )
                     }
                 }
 
-                else -> {
-                    TitleInformation(
-                        title = title,
-                        icon = titleIcon
+                Spacer(Modifier.height(40.dp))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(
+                        space = 60.dp
                     )
+                ) {
+                    child()
                 }
             }
-
-            Spacer(Modifier.height(40.dp))
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(
-                    space = 60.dp
-                )
-            ) {
-                child()
-            }
+        } else {
+            LoadingScreen()
         }
     }
 }
