@@ -94,15 +94,15 @@ fun Header(
                                 ),
                                 optionSelected = onItemClick
                             ),
-                            DropDownItem(
-                                option = MenuOption(
-                                    icon = R.drawable.fieldiconedit,
-                                    text = "Editar"
-                                ),
-                                optionSelected = {
-                                    navigationController.navigate("EditProfile")
-                                }
-                            )
+//                            DropDownItem(
+//                                option = MenuOption(
+//                                    icon = R.drawable.fieldiconedit,
+//                                    text = "Editar"
+//                                ),
+//                                optionSelected = {
+//                                    navigationController.navigate("EditProfile")
+//                                }
+//                            )
                         )
                     )
                 }
@@ -138,15 +138,15 @@ fun Header(
                                 ),
                                 optionSelected = onItemClick
                             ),
-                            DropDownItem(
-                                option = MenuOption(
-                                    icon = R.drawable.fieldiconedit,
-                                    text = "Editar"
-                                ),
-                                optionSelected = {
-                                    navigationController.navigate("EditProfile")
-                                }
-                            )
+//                            DropDownItem(
+//                                option = MenuOption(
+//                                    icon = R.drawable.fieldiconedit,
+//                                    text = "Editar"
+//                                ),
+//                                optionSelected = {
+//                                    navigationController.navigate("EditProfile")
+//                                }
+//                            )
                         )
                     )
                 }

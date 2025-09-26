@@ -2,6 +2,7 @@ package com.banap.banap.data.repository.analysis
 
 import com.banap.banap.data.model.analysis.AnalysisResponse
 import com.banap.banap.data.model.analysis.CreateAnalysisRequest
+import com.banap.banap.data.model.analysis.ListAnalysisResponse
 import com.banap.banap.data.remote.analysis.AnalysisService
 import com.banap.banap.domain.repository.analysis.AnalysisRepository
 import javax.inject.Inject
@@ -13,7 +14,11 @@ class AnalysisRepositoryImpl @Inject constructor(
         return service.createAnalysis(analysis)
     }
 
-    override suspend fun listAnalysis(id: String): List<AnalysisResponse> {
+    override suspend fun listAnalysis(id: String): ListAnalysisResponse {
         return service.listAnalysis(id)
+    }
+
+    override suspend fun getAnalysisById(id: String): AnalysisResponse {
+        return service.getAnalysisById(id)
     }
 }

@@ -36,6 +36,7 @@ import com.banap.banap.app.presentation.userchoice.ui.UserChoice
 import com.banap.banap.core.ui.components.SplashScreen
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
+import com.banap.banap.domain.viewmodel.analysis.ListAnalysisViewModel
 import com.banap.banap.domain.viewmodel.field.ListFieldsViewModel
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.producer.GetProducerByIdViewModel
@@ -56,10 +57,10 @@ fun Navigation() {
     val navigationViewModel: NavigationViewModel = hiltViewModel()
     val listPropertiesViewModel: ListPropertiesViewModel = hiltViewModel()
     val listFieldsViewModel: ListFieldsViewModel = hiltViewModel()
+    val listAnalysisViewModel: ListAnalysisViewModel = hiltViewModel()
     val getProducerByIdViewModel: GetProducerByIdViewModel = hiltViewModel()
     val animationDuration: Int = 700
 
-    val analysisList: MutableList<String> = mutableListOf()
     val taskListHome: MutableList<TaskList> = mutableListOf()
     val taskListFieldInformation: MutableList<String> = mutableListOf()
     val logList: MutableList<LogList> = mutableListOf()
@@ -316,12 +317,14 @@ fun Navigation() {
             }
         ) { backStackEntry ->
             val fieldId = backStackEntry.arguments?.getString(Screen.Information.FIELD_ARGUMENT)
+            val userName = backStackEntry.arguments?.getString(Screen.Information.USER_ARGUMENT)
 
             FieldInformation(
                 navigationController = navigationController,
                 tokenViewModel = tokenViewModel,
                 fieldId = fieldId ?: "",
-                analysisList = analysisList,
+                userName = userName ?: "",
+                listAnalysisViewModel = listAnalysisViewModel,
                 taskList = taskListFieldInformation
             )
         }
@@ -360,9 +363,7 @@ fun Navigation() {
         ) {
             NewFertilizationRecommendation(
                 navigationController,
-                tokenViewModel = tokenViewModel,
-                analysisList = analysisList,
-                logList = logList
+                tokenViewModel = tokenViewModel
             )
         }
 
@@ -405,10 +406,12 @@ fun Navigation() {
             val propertyId = backStackEntry.arguments?.getString(Screen.Property.PROPERTY_ID_ARGUMENT)
             val producerId = backStackEntry.arguments?.getString(Screen.Property.PRODUCER_ARGUMENT)
             val name = backStackEntry.arguments?.getString(Screen.Property.PROPERTY_NAME_ARGUMENT)
+            val userName = backStackEntry.arguments?.getString(Screen.Property.USERNAME_ARGUMENT)
 
             Property(
                 navigationController = navigationController,
                 name = name ?: "",
+                userName = userName ?: "",
                 propertyId = propertyId ?: "",
                 producerId = producerId ?: "",
                 listFieldsViewModel = listFieldsViewModel,
@@ -439,7 +442,8 @@ fun Navigation() {
         }
 
         composable(
-            route = "AnalysisInformation",
+            route = Screen.AnalysisInformation.routeWithArgument,
+            arguments = Screen.AnalysisInformation.arguments,
             enterTransition = {
                 fadeIn(
                     animationSpec = tween(animationDuration)
@@ -450,10 +454,17 @@ fun Navigation() {
                     animationSpec = tween(animationDuration)
                 )
             }
-        ) {
+        ) { backStackEntry ->
+            val analysisId = backStackEntry.arguments?.getString(Screen.AnalysisInformation.ANALYSIS_ARGUMENT)
+            val analysisName = backStackEntry.arguments?.getString(Screen.AnalysisInformation.ANALYSIS_NAME_ARGUMENT)
+            val fieldName = backStackEntry.arguments?.getString(Screen.AnalysisInformation.FIELD_NAME_ARGUMENT)
+
             AnalysisInformation(
                 navigationController,
-                tokenViewModel = tokenViewModel
+                tokenViewModel = tokenViewModel,
+                analysisId = analysisId ?: "",
+                analysisName = analysisName ?: "",
+                fieldName = fieldName ?: ""
             )
         }
 
@@ -470,7 +481,10 @@ fun Navigation() {
                 )
             }
         ) {
-            ReadMore(navigationController)
+            ReadMore(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
         }
     }
 }

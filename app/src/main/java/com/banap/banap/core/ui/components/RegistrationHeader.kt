@@ -20,6 +20,7 @@ import com.banap.banap.app.navigation.screens.Screen
 fun RegistrationHeader(
     navigationController: NavController,
     fieldId: String? = null,
+    userName: String? = null,
     fixedRoute: String? = null,
     fallbackRoute: String = ""
 ) {
@@ -41,7 +42,8 @@ fun RegistrationHeader(
                     ?.let {
                         navigationController.navigate(
                             Screen.Information.createRoute(
-                                fieldId = it
+                                fieldId = it,
+                                userName = userName
                             )
                         )
                     }

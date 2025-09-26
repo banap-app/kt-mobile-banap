@@ -43,6 +43,7 @@ import com.banap.banap.domain.model.field.ListFieldsState
 fun Property(
     navigationController: NavController,
     titulo: String,
+    userName: String,
     propertyId: String,
     producerId: String,
     fields: List<FieldResponse>,
@@ -82,6 +83,7 @@ fun Property(
                         navigationController.navigate(
                             Screen.Property.createRoute(
                                 name = titulo,
+                                userName = userName,
                                 propertyId = propertyId,
                                 producerId = producerId
                             )
@@ -98,6 +100,7 @@ fun Property(
                     navigationController.navigate(
                         Screen.Property.createRoute(
                             name = titulo,
+                            userName = userName,
                             propertyId = propertyId,
                             producerId = producerId
                         )
@@ -137,7 +140,8 @@ fun Property(
                             onClick = {
                                 navigationController.navigate(
                                     Screen.Information.createRoute(
-                                        fieldId = fields[it].id
+                                        fieldId = fields[it].id,
+                                        userName = userName
                                     )
                                 )
                             }

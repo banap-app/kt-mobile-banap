@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.app.navigation.screens.Screen
@@ -33,19 +34,19 @@ import com.banap.banap.app.presentation.validation.potassium.viewmodel.Potassium
 import com.banap.banap.core.ui.components.DropdownTextField
 import com.banap.banap.core.ui.components.RegistrationScreenPattern
 import com.banap.banap.core.ui.components.TextBoxRegistration
-import com.banap.banap.core.ui.util.FertilizerCalculator
-import com.banap.banap.data.model.producer.LogList
+import com.banap.banap.data.model.analysis.TypeAnalysis
 import com.banap.banap.domain.model.analysis.NPKResult
-import kotlinx.coroutines.delay
+import com.banap.banap.domain.viewmodel.analysis.CreateAnalysisViewModel
 
 @Composable
 fun NewFertilizationRecommendation(
     navigationController: NavController,
-    tokenViewModel: TokenViewModel,
-    analysisList: MutableList<String>,
-    logList: MutableList<LogList>
+    createAnalysisViewModel: CreateAnalysisViewModel = hiltViewModel(),
+    tokenViewModel: TokenViewModel
 ) {
     val context = LocalContext.current
+
+    val createAnalysisState = createAnalysisViewModel.state.value
 
     val viewModelDropdown = viewModel<DropdownTextFieldViewModel>()
     val stateDropdown = viewModelDropdown.state
@@ -85,6 +86,10 @@ fun NewFertilizationRecommendation(
         mutableStateOf(false)
     }
 
+    var error by remember {
+        mutableStateOf("")
+    }
+
     var npkResult: NPKResult? by remember {
         mutableStateOf(null)
     }
@@ -97,6 +102,10 @@ fun NewFertilizationRecommendation(
         mutableStateOf("")
     }
 
+    var userName by remember {
+        mutableStateOf("")
+    }
+
     LaunchedEffect(true) {
         tokenViewModel.getToken("fieldId")?.let {
             Log.d("ID", it)
@@ -104,13 +113,31 @@ fun NewFertilizationRecommendation(
         }
     }
 
-    LaunchedEffect(isLoading) {
-        if (isLoading) {
-            delay(1_000)
-            page = 2
-            isLoading = false
-            analysisMade = true
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("userName")?.let {
+            Log.d("userName", it)
+            userName = it
         }
+    }
+
+    LaunchedEffect(createAnalysisState.response) {
+        createAnalysisState.response?.let {
+            page = 2
+            analysisMade = true
+            npkResult = NPKResult(
+                nitrogen = it.typeAnalysis.nitrogen ?: 0.0,
+                phosphor = it.typeAnalysis.phosphor ?: 0.0,
+                potassium = it.typeAnalysis.potassium ?: 0.0
+            )
+        }
+    }
+
+    LaunchedEffect(createAnalysisState.isLoading) {
+        isLoading = createAnalysisState.isLoading
+    }
+
+    LaunchedEffect(createAnalysisState.error) {
+        error = createAnalysisState.error
     }
 
     RegistrationScreenPattern(
@@ -225,32 +252,28 @@ fun NewFertilizationRecommendation(
                 viewModelDropdown.onEvent(DropdownTextFieldFormEvent.Submit)
 
                 if (isValidationSuccessful && !analysisMade) {
-                    npkResult = FertilizerCalculator.calculateNPK(
-                        phosphor = statePhosphorus.phosphorus.toDouble(),
-                        potassium = statePotassium.potassium.toDouble(),
-                        expectedProductivity =
-                        when (stateDropdown.option) {
-                            "Menor que 20%" -> 19
-                            "Entre 20 e 30%" -> 29
-                            "Entre 30 e 40%" -> 39
-                            "Entre 40 e 50%" -> 49
-                            else -> 0
-                        }
+                    createAnalysisViewModel.createAnalysis(
+                        fieldId = fieldId,
+                        typeAnalysis = TypeAnalysis(
+                            phosphor = statePhosphorus.phosphorus.toDouble(),
+                            potassium = statePotassium.potassium.toDouble(),
+                            expectedProductivity =
+                            when (stateDropdown.option) {
+                                "Menor que 20 t/ha" -> 19
+                                "Entre 20 e 30 t/ha" -> 29
+                                "Entre 30 e 40 t/ha" -> 39
+                                "Entre 40 e 50 t/ha" -> 49
+                                "Maior que 50 t/ha" -> 60
+                                else -> 0
+                            }
+                        )
                     )
-                    isLoading = true
                 }
             } else {
-                analysisList.add("Análise 01")
-                logList.add(
-                    LogList(
-                        author = "Gilmar",
-                        activity = "cadastrou uma análise."
-                    )
-                )
-
                 navigationController.navigate(
                     Screen.Information.createRoute(
-                        fieldId = fieldId
+                        fieldId = fieldId,
+                        userName = userName
                     )
                 )
             }

@@ -20,6 +20,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +37,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.banap.banap.R
+import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.analysis.ui.readmore.components.ReadMoreContainer
+import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.Typography
@@ -45,7 +48,8 @@ import com.banap.banap.core.ui.theme.VERDE_ESCURO
 
 @Composable
 fun ReadMore(
-    navigationController: NavController
+    navigationController: NavController,
+    tokenViewModel: TokenViewModel
 ) {
     var etapa by remember {
         mutableStateOf("")
@@ -143,7 +147,13 @@ fun ReadMore(
 
                 Button(
                     onClick = {
-                        navigationController.navigate("AnalysisInformation")
+                        navigationController.navigate(
+                            Screen.AnalysisInformation.createRoute(
+                                analysisId = tokenViewModel.getToken("analysisId") ?: "",
+                                analysisName = tokenViewModel.getToken("analysisName") ?: "",
+                                fieldName = tokenViewModel.getToken("fieldName") ?: ""
+                            )
+                        )
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = BRANCO,

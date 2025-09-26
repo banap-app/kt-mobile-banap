@@ -23,13 +23,13 @@ import com.banap.banap.core.ui.theme.VERDE_CLARO
 fun ListItemCard(
     modifier: Modifier,
     onClick: () -> Unit = {},
-    title: String,
+    title: String? = null,
     titleStyle: TextStyle,
     name: String,
     nameStyle: TextStyle,
     child: @Composable () -> Unit
 ) {
-    Card (
+    Card(
         modifier = modifier,
         onClick = onClick,
         colors = CardDefaults.cardColors(
@@ -41,7 +41,7 @@ fun ListItemCard(
             defaultElevation = 3.dp
         )
     ) {
-        Row (
+        Row(
             modifier = Modifier
                 .padding(
                     start = 30.dp
@@ -51,17 +51,19 @@ fun ListItemCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
-                Text(
-                    text = title,
-                    style = titleStyle,
-                    fontWeight = FontWeight.Normal
-                )
+                title?.let {
+                    Text(
+                        text = title,
+                        style = titleStyle,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
 
                 Text(
-                    text = if (name.length > 9) name.substring(0, 9) + "..." else name,
+                    text = if (name.length > 10) name.substring(0, 10) + "..." else name,
                     style = nameStyle,
-                    maxLines = 1,
-                    softWrap = false,
+                    fontWeight = FontWeight.ExtraBold,
+                    softWrap = true,
                     overflow = TextOverflow.Ellipsis
                 )
             }

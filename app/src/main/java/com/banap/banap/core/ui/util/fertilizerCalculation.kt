@@ -83,9 +83,9 @@ object FertilizerCalculator {
         }
 
         return NPKResult(
-            nitrogen = nitrogen,
-            phosphor = phosphorValue,
-            potassium = potassiumValue
+            nitrogen = nitrogen.toDouble(),
+            phosphor = phosphorValue.toDouble(),
+            potassium = potassiumValue.toDouble()
         )
     }
 

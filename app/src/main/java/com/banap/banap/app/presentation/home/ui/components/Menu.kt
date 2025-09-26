@@ -62,7 +62,8 @@ fun Menu(
         },
         modifier = Modifier
             .background(BRANCO),
-        shape = RoundedCornerShape(10.dp)
+        shape = RoundedCornerShape(10.dp),
+        offset = DpOffset(x = (-30).dp, y = 5.dp)
     ) {
         dropDownItems.forEach { item ->
             DropdownMenuItem(
@@ -79,7 +80,9 @@ fun Menu(
                     )
                 },
                 modifier = Modifier
-                    .padding(horizontal = 10.dp)
+                    .padding(
+                        horizontal = 10.dp
+                    )
                     .background(BRANCO),
                 leadingIcon = {
                     Image(

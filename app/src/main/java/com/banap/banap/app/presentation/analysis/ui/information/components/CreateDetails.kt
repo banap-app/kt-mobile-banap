@@ -2,6 +2,7 @@ package com.banap.banap.app.presentation.analysis.ui.information.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -21,10 +22,10 @@ import com.banap.banap.core.ui.theme.VERDE_CLARO
 @Composable
 fun CreateDetails(
     modifier: Modifier = Modifier,
-    alignment: Alignment.Vertical = Alignment.Top,
-    image: Int = R.drawable.foto_de_perfil,
-    size: Dp = 40.dp,
-    username: String,
+    alignment: Alignment.Vertical = Alignment.CenterVertically,
+    image: Int = R.drawable.user_error,
+    size: Dp = 45.dp,
+    username: String? = null,
     createdAt: String
 ) {
     Row (
@@ -42,22 +43,21 @@ fun CreateDetails(
                 .size(size)
         )
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(
-                space = 5.dp
-            ),
-            verticalAlignment = Alignment.CenterVertically
+        Column (
+            verticalArrangement = Arrangement.spacedBy(
+                space = 1.dp
+            )
         ) {
             Text(
-                text = username,
-                style = Typography.bodySmall,
+                text = username ?: "Usuário",
+                style = Typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
                 color = VERDE_CLARO
             )
 
             Text(
                 text = createdAt,
-                style = Typography.displaySmall,
+                style = Typography.bodySmall,
                 fontWeight = FontWeight.Bold,
                 color = CINZA_INTERMEDIARIO
             )

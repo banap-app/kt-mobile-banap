@@ -1,10 +1,11 @@
 package com.banap.banap.data.model.analysis
 
 data class TypeAnalysis(
-    val ctc: Double = 0.0,
-    val prnt: Double = 0.0,
-    val sba: Double = 0.0,
-    val phosphorus: Double = 0.0,
-    val potassium: Double = 0.0,
-    val expectedProductivity: Int = 0
+    val totalCationExchangeCapacity: Double? = null,
+    val relativeTotalNeutralizingPower: Double? = null,
+    val desiredBaseSaturation: Double? = null,
+    val currentBaseSaturation: Double? = null,
+    val phosphor: Double? = null,
+    val potassium: Double? = null,
+    val expectedProductivity: Int? = null
 )

@@ -22,13 +22,18 @@ import com.banap.banap.core.ui.theme.VERDE_ESCURO
 @Composable
 fun Information (
     space: Dp = 20.dp,
+    paddingTop: Dp = 0.dp,
     icon: Int,
     title: String,
     child: @Composable () -> Unit
 ) {
     Column (
         modifier = Modifier
-            .padding(horizontal = 30.dp)
+            .padding(
+                top = paddingTop,
+                start = 30.dp,
+                end = 30.dp
+            )
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(
             space = space

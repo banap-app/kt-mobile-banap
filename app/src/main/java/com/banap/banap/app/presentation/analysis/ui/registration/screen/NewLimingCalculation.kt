@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.app.presentation.analysis.ui.registration.components.AnalysisResult
@@ -32,15 +33,19 @@ import com.banap.banap.app.presentation.validation.sba.utils.validationDataSba
 import com.banap.banap.app.presentation.validation.sba.viewmodel.SBATextFieldViewModel
 import com.banap.banap.core.ui.components.RegistrationScreenPattern
 import com.banap.banap.core.ui.components.TextBoxRegistration
-import com.banap.banap.core.ui.util.limingCalculation
-import kotlinx.coroutines.delay
+import com.banap.banap.data.model.analysis.TypeAnalysis
+import com.banap.banap.domain.viewmodel.analysis.CreateAnalysisViewModel
+import com.banap.banap.domain.viewmodel.analysis.ListAnalysisViewModel
 
 @Composable
 fun NewLimingCalculation(
     navigationController: NavController,
+    createAnalysisViewModel: CreateAnalysisViewModel = hiltViewModel(),
     tokenViewModel: TokenViewModel
 ) {
     val context = LocalContext.current
+
+    val createAnalysisState = createAnalysisViewModel.state.value
 
     val viewModelSba = viewModel<SBATextFieldViewModel>()
     val stateSba = viewModelSba.state
@@ -79,6 +84,10 @@ fun NewLimingCalculation(
         mutableStateOf(false)
     }
 
+    var error by remember {
+        mutableStateOf("")
+    }
+
     var limingCalculation by remember {
         mutableDoubleStateOf(0.0)
     }
@@ -98,13 +107,20 @@ fun NewLimingCalculation(
         }
     }
 
-    LaunchedEffect(isLoading) {
-        if (isLoading) {
-            delay(1_000)
+    LaunchedEffect(createAnalysisState.response) {
+        createAnalysisState.response?.let {
             page = 2
-            isLoading = false
             analysisMade = true
+            limingCalculation = it.typeAnalysis.liming ?: 0.0
         }
+    }
+
+    LaunchedEffect(createAnalysisState.isLoading) {
+        isLoading = createAnalysisState.isLoading
+    }
+
+    LaunchedEffect(createAnalysisState.error) {
+        error = createAnalysisState.error
     }
 
     RegistrationScreenPattern(
@@ -207,14 +223,15 @@ fun NewLimingCalculation(
                 viewModelPrnt.onEvent(PRNTextFieldFormEvent.Submit)
 
                 if (isValidationSuccessful && !analysisMade) {
-                    limingCalculation = limingCalculation(
-                        currentSba = stateSba.sba.toDouble(),
-                        desiredSba = 70.0,
-                        ctc = stateCtc.ctc.toDouble(),
-                        prnt = statePrnt.prnt.toDouble()
+                    createAnalysisViewModel.createAnalysis(
+                        fieldId = fieldId,
+                        typeAnalysis = TypeAnalysis(
+                            desiredBaseSaturation = 70.0,
+                            currentBaseSaturation = stateSba.sba.toDouble(),
+                            totalCationExchangeCapacity = stateCtc.ctc.toDouble(),
+                            relativeTotalNeutralizingPower = statePrnt.prnt.toDouble()
+                        )
                     )
-
-                    isLoading = true
                 }
             } else {
                 navigationController.navigate("NewFertilizationRecommendation")

@@ -1,6 +1,5 @@
 package com.banap.banap.app.presentation.property.ui.listing.screen
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,6 +47,7 @@ import com.banap.banap.domain.viewmodel.field.ListFieldsViewModel
 fun Property(
     navigationController: NavController,
     name: String,
+    userName: String,
     propertyId: String,
     producerId: String,
     listFieldsViewModel: ListFieldsViewModel,
@@ -67,21 +67,22 @@ fun Property(
     }
 
     LaunchedEffect(true) {
-        Log.d("property", tokenViewModel.getToken("propertyId") ?: "")
+        if (!userName.contains("userName")) {
+            tokenViewModel.saveToken("userName", userName)
+        }
+    }
 
-        if (propertyId.contains("propertyId")) {
-            listFieldsViewModel.listFields(tokenViewModel.getToken("propertyId") ?: "")
+    LaunchedEffect(true) {
+        if (!name.contains("name")) {
+            tokenViewModel.saveToken("name", name)
+        }
+    }
+
+    LaunchedEffect(true) {
+        if (tokenViewModel.getToken("propertyId").isNullOrEmpty()) {
+            listFieldsViewModel.listFields(propertyId)
         } else {
-            listFieldsState.response.let {
-                it.forEach { (id, listFields) ->
-                    if (id == propertyId) {
-                        fields = listFields
-
-                        tokenViewModel.saveToken("propertyId", propertyId)
-                        tokenViewModel.saveToken("name", name)
-                    }
-                }
-            }
+            listFieldsViewModel.listFields(tokenViewModel.getToken("propertyId") ?: "")
         }
     }
 
@@ -92,9 +93,8 @@ fun Property(
     LaunchedEffect(listFieldsState.response) {
         listFieldsState.response.let {
             it.forEach { (id, listFields) ->
-                if (id == (tokenViewModel.getToken("propertyId") ?: "")) {
-                    fields = listFields
-                }
+                fields = listFields
+                tokenViewModel.saveToken("propertyId", id)
             }
         }
     }
@@ -105,7 +105,7 @@ fun Property(
 
     Container(
         navigationController = navigationController,
-        titulo = if (name.contains("name")) tokenViewModel.getToken("name") ?: "" else name,
+        titulo = tokenViewModel.getToken("name") ?: name,
         children = {
             when {
                 isLoading -> {
@@ -229,6 +229,14 @@ fun Property(
                                 modifier = Modifier
                                     .height(150.dp)
                                     .fillMaxWidth(),
+                                onClick = {
+                                    navigationController.navigate(
+                                        Screen.Information.createRoute(
+                                            fieldId = fields[it].id,
+                                            userName = tokenViewModel.getToken("userName")
+                                        )
+                                    )
+                                },
                                 title = "Talhão",
                                 titleStyle = Typography.titleMedium,
                                 nameStyle = Typography.displayLarge,

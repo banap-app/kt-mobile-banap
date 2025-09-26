@@ -27,7 +27,7 @@ import com.banap.banap.core.ui.theme.VERDE_CLARO
 fun AnalysisCard(
     modifier: Modifier = Modifier,
     title: String,
-    subTitle: String,
+    subTitle: String? = null,
     fillMaxWidth: Boolean = false,
     child: @Composable () -> Unit = {}
 ) {
@@ -90,14 +90,17 @@ fun AnalysisCard(
                 color = BRANCO
             )
 
-            Text(
-                text = subTitle,
-                style = Typography.displaySmall,
-                color = BRANCO
-            )
+            subTitle?.let {
+                Text(
+                    text = subTitle,
+                    style = Typography.displaySmall,
+                    color = BRANCO
+                )
+            }
+
         }
 
-        Row (
+        Row(
             modifier = Modifier
                 .padding(
                     end = 20.dp

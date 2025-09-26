@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -213,6 +214,9 @@ fun Home(
     }
 
     LaunchedEffect(context) {
+        tokenViewModel.clearToken("userName")
+        tokenViewModel.clearToken("fieldId")
+        tokenViewModel.clearToken("propertyId")
         Log.d("TOKEN", tokenViewModel.getToken("token").toString())
 
         tokenViewModel.getToken("token")?.let { token ->
@@ -406,7 +410,7 @@ fun Home(
                         }
 
                         items(
-                            count = properties.size,
+                            count = properties.take(5).size,
                             key = {
                                 properties[it].id
                             }
@@ -414,6 +418,7 @@ fun Home(
                             Property(
                                 navigationController = navigationController,
                                 titulo = properties[index].name,
+                                userName = username,
                                 propertyId = properties[index].id,
                                 producerId = properties[index].producerId,
                                 fields = fieldsMap[properties[index].id] ?: listOf(),
@@ -494,7 +499,7 @@ fun Home(
                                     onDismissButtonContentColor = PRETO,
                                     space = 40.dp
                                 ) {
-                                    Column (
+                                    Column(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(horizontal = 20.dp),
@@ -554,15 +559,23 @@ fun Home(
 
                     else -> {
                         item {
-                            Spacer(modifier = Modifier.height(60.dp))
-
-                            NoData(
-                                text = "Ainda não há uma\npropriedade cadastrada!",
-                                buttonValue = "Nova Propriedade",
-                                onClick = {
-                                    navigationController.navigate("NewProperty")
-                                }
-                            )
+                            Column(
+                                modifier = Modifier
+                                    .fillParentMaxHeight(0.7f),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(
+                                    space = 40.dp,
+                                    alignment = Alignment.CenterVertically
+                                )
+                            ) {
+                                NoData(
+                                    text = "Ainda não há uma\npropriedade cadastrada!",
+                                    buttonValue = "Nova Propriedade",
+                                    onClick = {
+                                        navigationController.navigate("NewProperty")
+                                    }
+                                )
+                            }
                         }
                     }
                 }

@@ -1,20 +1,20 @@
 package com.banap.banap.domain.use_case.analysis
 
 import com.banap.banap.common.Resource
-import com.banap.banap.data.model.analysis.ListAnalysisResponse
+import com.banap.banap.data.model.analysis.AnalysisResponse
 import com.banap.banap.data.repository.analysis.AnalysisRepositoryImpl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
 import javax.inject.Inject
 
-class ListAnalysisUseCase @Inject constructor(
+class GetAnalysisByIdUseCase @Inject constructor(
     private val repository: AnalysisRepositoryImpl
 ) {
-    operator fun invoke(id: String) : Flow<Resource<ListAnalysisResponse>> = flow {
+    operator fun invoke(id: String) : Flow<Resource<AnalysisResponse>> = flow {
         try {
             emit(Resource.Loading())
-            val analysisResponse = repository.listAnalysis(id)
+            val analysisResponse = repository.getAnalysisById(id)
             emit(Resource.Success(analysisResponse))
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "Um erro inesperado aconteceu"))
