@@ -1,6 +1,5 @@
 package com.banap.banap.app.presentation.property.ui.registration
 
-import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
@@ -27,9 +27,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.name.utils.validationDataName
 import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
+import com.banap.banap.app.presentation.validation.sba.event.SBATextFieldFormEvent
 import com.banap.banap.core.ui.components.ButtonRegistration
 import com.banap.banap.core.ui.components.LoadingScreen
 import com.banap.banap.core.ui.components.RegistrationHeader
@@ -45,12 +47,12 @@ import com.banap.banap.domain.viewmodel.property.CreatePropertyViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NewProperty(
     navigationController: NavController,
     createPropertyViewModel: CreatePropertyViewModel = hiltViewModel(),
-    logList: MutableList<LogList>
+    logList: MutableList<LogList>,
+    tokenViewModel: TokenViewModel
 ) {
     val context = LocalContext.current
 
@@ -125,6 +127,13 @@ fun NewProperty(
         }
     }
 
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("propertyName")?.let {
+            viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
+            viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+        }
+    }
+
     LaunchedEffect(createPropertyState.error) {
         if (createPropertyState.error.isNotEmpty()) {
             isLoading = false
@@ -188,9 +197,15 @@ fun NewProperty(
                 )
             }
         }
-    ) {
+    ) { innerPadding ->
         if (!isLoading) {
-            Column {
+            Column (
+                modifier = Modifier
+                    .padding(
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = innerPadding.calculateBottomPadding()
+                    )
+            ) {
                 RegistrationHeader(
                     navigationController = navigationController,
                     fallbackRoute = "Home"
@@ -217,6 +232,8 @@ fun NewProperty(
                         onValueChange = {
                             viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
                             viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+
+                            tokenViewModel.saveToken("propertyName", it)
                         },
                         isError = stateName.nameError != null || propertyExists == true,
                         errorState = if (propertyExists == true) "A propriedade já existe" else stateName.nameError,
@@ -236,17 +253,6 @@ fun NewProperty(
                                 createPropertyViewModel.createProperty(
                                     name = stateName.name
                                 )
-
-//                                listProperties.add(
-//                                    ListPropertiesResponse(
-//                                        id = "",
-//                                        producerId = ProducerId(
-//                                            id = ""
-//                                        ),
-//                                        name = stateName.name,
-//                                        isActive = true
-//                                    )
-//                                )
 
                                 logList.add(
                                     LogList(

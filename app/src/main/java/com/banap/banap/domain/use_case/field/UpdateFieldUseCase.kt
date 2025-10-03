@@ -35,6 +35,7 @@ class UpdateFieldUseCase @Inject constructor(
                     fieldBoundary = fieldBoundary
                 )
             )
+            emit(Resource.Success(WithoutResponse(success = true)))
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "Um erro inesperado aconteceu"))
         } catch (e: IOException) {

@@ -1,6 +1,5 @@
 package com.banap.banap.app.presentation.userchoice.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -15,15 +14,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -35,10 +38,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.banap.banap.R
+import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
+import com.banap.banap.app.presentation.userchoice.utils.setColorInTextUserChoice
+import com.banap.banap.app.presentation.validation.sba.event.SBATextFieldFormEvent
 import com.banap.banap.core.ui.components.ButtonRegistration
 import com.banap.banap.core.ui.components.RegistrationHeader
 import com.banap.banap.core.ui.components.TitleRegistration
-import com.banap.banap.app.presentation.userchoice.utils.setColorInTextUserChoice
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
@@ -46,10 +51,10 @@ import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun UserChoice(
-    navigationController: NavController
+    navigationController: NavController,
+    tokenViewModel: TokenViewModel
 ) {
 
     var cardProducer by remember {
@@ -70,6 +75,12 @@ fun UserChoice(
 
     var contentColorButton by remember {
         mutableStateOf(CINZA_ESCURO)
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.clearToken("name")
+        tokenViewModel.clearToken("email")
+        tokenViewModel.clearToken("password")
     }
 
     val backgroundColor by animateColorAsState(
@@ -118,8 +129,16 @@ fun UserChoice(
         modifier = Modifier
             .fillMaxSize(),
         containerColor = BRANCO
-    ) {
-        Column {
+    ) { innerPadding ->
+        Column (
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding()
+                )
+        ) {
             RegistrationHeader(
                 navigationController = navigationController,
                 fallbackRoute = "ReadyToStart"
@@ -159,6 +178,9 @@ fun UserChoice(
 
             Row(
                 modifier = Modifier
+                    .padding(
+                        bottom = 60.dp
+                    )
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(
                     space = 20.dp,
@@ -243,7 +265,7 @@ fun UserChoice(
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1F))
+            Spacer(modifier = Modifier.weight(1f))
 
             ButtonRegistration(
                 onClick = {

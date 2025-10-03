@@ -1,6 +1,5 @@
 package com.banap.banap.app.presentation.readytostart.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,7 +35,6 @@ import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ReadyToStart(
     navigationController: NavController
@@ -45,10 +43,13 @@ fun ReadyToStart(
         modifier = Modifier
             .fillMaxSize(),
         containerColor = BRANCO
-    ) {
+    ) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(vertical = 100.dp)
+                .padding(
+                    top = innerPadding.calculateTopPadding() + 80.dp,
+                    bottom = innerPadding.calculateBottomPadding() + 80.dp
+                )
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween

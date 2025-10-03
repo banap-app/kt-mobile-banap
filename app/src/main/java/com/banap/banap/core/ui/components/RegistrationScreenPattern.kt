@@ -1,14 +1,12 @@
 package com.banap.banap.core.ui.components
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
@@ -18,7 +16,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.banap.banap.core.ui.theme.BRANCO
@@ -27,11 +24,11 @@ import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun RegistrationScreenPattern(
     navigationController: NavController,
     fieldId: String? = null,
+    userName: String? = null,
     fallbackRoute: String,
     texto: String,
     textoASerDestacado: String,
@@ -42,7 +39,8 @@ fun RegistrationScreenPattern(
     buttonValue: String,
     isValidationSuccessful: Boolean,
     stateError: String?,
-    isLoading: Boolean
+    isLoading: Boolean,
+    page: Int? = null
 ) {
     var backgroundColorButton by remember {
         mutableStateOf(CINZA_CLARO)
@@ -94,15 +92,22 @@ fun RegistrationScreenPattern(
         modifier = Modifier
             .fillMaxSize(),
         containerColor = BRANCO
-    ) {
+    ) { paddingValues ->
         if (!isLoading) {
             Column(
                 modifier = Modifier
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        bottom = paddingValues.calculateBottomPadding()
+                    )
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+
             ) {
                 RegistrationHeader(
                     navigationController = navigationController,
                     fieldId = fieldId,
+                    userName = userName,
                     fallbackRoute = fallbackRoute
                 )
 
@@ -117,24 +122,16 @@ fun RegistrationScreenPattern(
                     subtitulo = subTitulo
                 )
 
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .weight(1f)
-                        .fillMaxSize(),
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    children()
+                children()
 
-                    Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.weight(1f))
 
-                    ButtonRegistration(
-                        onClick = onClick,
-                        buttonValue = buttonValue,
-                        backgroundColor = backgroundColor,
-                        contentColor = contentColor
-                    )
-                }
+                ButtonRegistration(
+                    onClick = onClick,
+                    buttonValue = buttonValue,
+                    backgroundColor = backgroundColor,
+                    contentColor = contentColor
+                )
             }
         } else {
             LoadingScreen()

@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.times
 import androidx.navigation.NavController
 import com.banap.banap.R
+import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
@@ -42,14 +44,25 @@ import com.banap.banap.core.ui.theme.VERDE_ESCURO
 
 @Composable
 fun ExplanationFormData(
-    navigationController: NavController
+    navigationController: NavController,
+    tokenViewModel: TokenViewModel,
+    id: String
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
 
+    LaunchedEffect(true) {
+        if (!id.contains("id")) {
+            tokenViewModel.saveToken("id", id)
+        }
+    }
+
     Box(
         modifier = Modifier
+            .padding(
+                top = 20.dp
+            )
             .fillMaxSize()
     ) {
         Box(
@@ -61,11 +74,11 @@ fun ExplanationFormData(
         ) {
             IconButton(
                 onClick = {
-                    navigationController.popBackStack()
+                    navigationController.navigate("NewLimingCalculation")
                 },
                 modifier = Modifier
                     .padding(
-                        top = 40.dp,
+                        top = 60.dp,
                         start = 20.dp
                     )
             ) {
@@ -141,18 +154,79 @@ fun ExplanationFormData(
                         )
 
                         Text(
-                            text = "O que é PRNT?",
+                            text =
+                            when (tokenViewModel.getToken("id")) {
+                                "sba" -> {
+                                    "O que é a Saturação de Bases Atual?"
+                                }
+
+                                "ctc" -> {
+                                    "O que é CTC?"
+                                }
+
+                                "prnt" -> {
+                                    "O que é PRNT?"
+                                }
+
+                                else -> {
+                                    ""
+                                }
+                            },
                             style = Typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
                     }
 
-                    Text(
-                        text = "Mede a eficácia do calcário em neutralizar a acidez do solo. Ajuda a determinar quão bem o calcário vai funcionar para corrigir a acidez do solo, garantindo que as plantas absorvam nutrientes adequadamente.",
-                        style = Typography.bodyLarge,
-                        fontWeight = FontWeight.Normal,
-                        textAlign = TextAlign.Justify
-                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(
+                            space = 20.dp
+                        )
+                    ) {
+                        Text(
+                            text =
+                            when (tokenViewModel.getToken("id")) {
+                                "sba" -> {
+                                    "Denomina-se saturação por bases (V%) a soma das bases trocáveis expressa em porcentagem de capacidade de troca de cátions:"
+                                }
+
+                                "ctc" -> {
+                                    "A CTC mede a capacidade do solo de segurar nutrientes importantes para as plantas, como cálcio e potássio. Quanto maior a CTC, mais nutrientes o solo consegue reter e oferecer às plantas, indicando um solo mais fértil."
+                                }
+
+                                "prnt" -> {
+                                    "Mede a eficácia do calcário em neutralizar a acidez do solo. Ajuda a determinar quão bem o calcário vai funcionar para corrigir a acidez do solo, garantindo que as plantas absorvam nutrientes adequadamente."
+                                }
+
+                                else -> {
+                                    ""
+                                }
+                            },
+                            style = Typography.bodyLarge,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Justify
+                        )
+
+                        tokenViewModel.getToken("id")?.let {
+                            if (it == "sba") {
+                                Text(
+                                    text = "(V%) = 100 * SB ÷ CTC",
+                                    style = Typography.bodyLarge,
+                                    fontWeight = FontWeight.Normal,
+                                    textAlign = TextAlign.Justify
+                                )
+
+                                Text(
+                                    text = "Na fórmula utiliza-se o valor da “CTC total”.",
+                                    style = Typography.bodyLarge,
+                                    fontWeight = FontWeight.Normal,
+                                    textAlign = TextAlign.Justify
+                                )
+                            }
+                        }
+                    }
                 }
 
                 Column(
@@ -185,14 +259,31 @@ fun ExplanationFormData(
                     }
 
                     Text(
-                        text = "A saturação por bases é um excelente indicativo das condições gerais de fertilidade do solo, sendo utilizada até como complemento na nomenclatura dos solos. Os solos podem ser divididos de acordo com a saturação por bases: solos eutróficos (férteis) = V% maior ou igual á 50%; solos distróficos (pouco férteis) = V% menor que 50%.",
+                        text =
+                        when (tokenViewModel.getToken("id")) {
+                            "sba" -> {
+                                "A saturação por bases é um excelente indicativo das condições gerais de fertilidade do solo, sendo utilizada até como complemento na nomenclatura dos solos. Os solos podem ser divididos de acordo com a saturação por bases: solos eutróficos (férteis) = V% maior ou igual á 50%; solos distróficos (pouco férteis) = V% menor que 50%."
+                            }
+
+                            "ctc" -> {
+                                "Para representar a graduação da capacidade de liberação de vários nutrientes, favorecendo a manutenção da fertilidade por um prolongado período e reduzindo ou evitando a ocorrência de efeitos tóxicos da aplicação de fertilizantes."
+                            }
+
+                            "prnt" -> {
+                                "A saturação por bases é um excelente indicativo das condições gerais de fertilidade do solo, sendo utilizada até como complemento na nomenclatura dos solos. Os solos podem ser divididos de acordo com a saturação por bases: solos eutróficos (férteis) = V% maior ou igual á 50%; solos distróficos (pouco férteis) = V% menor que 50%."
+                            }
+
+                            else -> {
+                                ""
+                            }
+                        },
                         style = Typography.bodyLarge,
                         fontWeight = FontWeight.Normal,
                         textAlign = TextAlign.Justify
                     )
                 }
 
-                Card (
+                Card(
                     modifier = Modifier
                         .height(
                             max(
@@ -208,6 +299,23 @@ fun ExplanationFormData(
                         modifier = Modifier
                             .fillMaxSize()
                     )
+                }
+
+                tokenViewModel.getToken("id")?.let {
+                    if (it == "sba") {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "A maioria das culturas apresenta boa produtividade quando no solo é obtido valor V% entre 50 e 80% e valor de pH entre 6,0 e 6,5.",
+                                style = Typography.bodyLarge,
+                                fontWeight = FontWeight.Normal,
+                                textAlign = TextAlign.Justify
+                            )
+                        }
+                    }
+
                 }
             }
         }

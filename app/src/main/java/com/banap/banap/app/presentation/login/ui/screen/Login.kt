@@ -1,8 +1,11 @@
 package com.banap.banap.app.presentation.login.ui.screen
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
+import android.os.Build.VERSION_CODES
+import android.provider.Settings.ACTION_WIFI_SETTINGS
+import android.provider.Settings.Panel.ACTION_INTERNET_CONNECTIVITY
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,10 +21,12 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -39,11 +44,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.R
-import com.banap.banap.domain.viewmodel.login.LoginViewModel
-import com.banap.banap.core.ui.components.Button
 import com.banap.banap.app.presentation.login.ui.components.TextBox
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
-import com.banap.banap.core.ui.util.setColorInText
+import com.banap.banap.app.presentation.validation.email.event.EmailTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.email.utils.validationDataEmail
+import com.banap.banap.app.presentation.validation.email.viewmodel.EmailTextFieldViewModel
+import com.banap.banap.app.presentation.validation.password.event.PasswordTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.password.utils.validationDataPassword
+import com.banap.banap.app.presentation.validation.password.viewmodel.PasswordTextFieldViewModel
+import com.banap.banap.core.ui.components.Button
+import com.banap.banap.core.ui.components.LoadingScreen
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.PRETO
 import com.banap.banap.core.ui.theme.ShapeLogin
@@ -51,23 +61,13 @@ import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.core.ui.theme.VERMELHO
-import com.banap.banap.app.presentation.validation.email.event.EmailTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.email.viewmodel.EmailTextFieldViewModel
-import com.banap.banap.app.presentation.validation.password.event.PasswordTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.password.viewmodel.PasswordTextFieldViewModel
-import com.banap.banap.app.presentation.validation.email.utils.validationDataEmail
-import com.banap.banap.app.presentation.validation.password.utils.validationDataPassword
 import com.banap.banap.core.ui.util.ConnectivityAwareContent
-import android.os.Build.VERSION_CODES
-import android.provider.Settings.Panel.ACTION_INTERNET_CONNECTIVITY
-import android.provider.Settings.ACTION_WIFI_SETTINGS
-import android.util.Log
-import com.banap.banap.core.ui.components.LoadingScreen
+import com.banap.banap.core.ui.util.setColorInText
+import com.banap.banap.domain.viewmodel.login.LoginViewModel
 import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Login(
     navigationController: NavController,
@@ -232,10 +232,14 @@ fun Login(
                 )
             }
         }
-    ) {
+    ) { innerPadding ->
         if (!isLoading) {
             Box(
                 modifier = Modifier
+                    .padding(
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = innerPadding.calculateBottomPadding()
+                    )
                     .fillMaxSize(),
             ) {
                 Image(
@@ -243,7 +247,6 @@ fun Login(
                     contentDescription = "Vetor de linhas",
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .scale(1.2F)
                 )
 
                 Column(
@@ -407,7 +410,6 @@ fun Login(
                     contentDescription = "Vetor de linhas",
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .scale(1.2F)
                 )
             }
         } else {

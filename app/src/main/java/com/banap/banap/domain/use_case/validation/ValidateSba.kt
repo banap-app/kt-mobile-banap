@@ -18,8 +18,8 @@ class ValidateSba {
                 "SBA deve ser um número válido"
             )
 
-        if (value < 0 || value > 100) {
-            return ValidationResult(false, "SBA precisa estar entre 0 e 100%")
+        if (value < 1 || value > 100) {
+            return ValidationResult(false, "SBA precisa estar entre 1 e 100%")
         }
 
         return ValidationResult(

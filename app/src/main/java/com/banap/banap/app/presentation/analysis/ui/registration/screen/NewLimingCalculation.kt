@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.analysis.ui.registration.components.AnalysisResult
 import com.banap.banap.app.presentation.analysis.ui.registration.components.ResultCard
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
@@ -35,7 +37,6 @@ import com.banap.banap.core.ui.components.RegistrationScreenPattern
 import com.banap.banap.core.ui.components.TextBoxRegistration
 import com.banap.banap.data.model.analysis.TypeAnalysis
 import com.banap.banap.domain.viewmodel.analysis.CreateAnalysisViewModel
-import com.banap.banap.domain.viewmodel.analysis.ListAnalysisViewModel
 
 @Composable
 fun NewLimingCalculation(
@@ -96,14 +97,50 @@ fun NewLimingCalculation(
         mutableIntStateOf(1)
     }
 
+    var userName by remember {
+        mutableStateOf("")
+    }
+
     var fieldId by remember {
         mutableStateOf("")
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.clearToken("id")
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("sba")?.let {
+            viewModelSba.onEvent(SBATextFieldFormEvent.SBAChanged(it))
+            viewModelSba.onEvent(SBATextFieldFormEvent.Submit)
+        }
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("ctc")?.let {
+            viewModelCtc.onEvent(CTCTextFieldFormEvent.CTChanged(it))
+            viewModelCtc.onEvent(CTCTextFieldFormEvent.Submit)
+        }
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("prnt")?.let {
+            viewModelPrnt.onEvent(PRNTextFieldFormEvent.PRNTChanged(it))
+            viewModelPrnt.onEvent(PRNTextFieldFormEvent.Submit)
+        }
     }
 
     LaunchedEffect(true) {
         tokenViewModel.getToken("fieldId")?.let {
             Log.d("ID", it)
             fieldId = it
+        }
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("userName")?.let {
+            Log.d("userName", it)
+            userName = it
         }
     }
 
@@ -126,6 +163,7 @@ fun NewLimingCalculation(
     RegistrationScreenPattern(
         navigationController = navigationController,
         fieldId = fieldId,
+        userName = userName,
         fallbackRoute = "Information",
         isValidationSuccessful = isValidationSuccessful,
         stateError = stateSba.sbaError,
@@ -153,6 +191,10 @@ fun NewLimingCalculation(
 
                 else -> {
                     Column(
+                        modifier = Modifier
+                            .padding(
+                                bottom = 60.dp
+                            ),
                         verticalArrangement = Arrangement.spacedBy(40.dp)
                     ) {
                         TextBoxRegistration(
@@ -160,6 +202,8 @@ fun NewLimingCalculation(
                             onValueChange = {
                                 viewModelSba.onEvent(SBATextFieldFormEvent.SBAChanged(it))
                                 viewModelSba.onEvent(SBATextFieldFormEvent.Submit)
+
+                                tokenViewModel.saveToken("sba", it)
                             },
                             isError = stateSba.sbaError != null,
                             errorState = stateSba.sbaError,
@@ -170,7 +214,11 @@ fun NewLimingCalculation(
                                 .fillMaxWidth(),
                             informationIcon = true,
                             informationIconOnClick = {
-                                navigationController.navigate("ExplanationFormData")
+                                navigationController.navigate(
+                                    Screen.ExplanationFormData.createRoute(
+                                        id = "sba"
+                                    )
+                                )
                             }
                         )
 
@@ -179,6 +227,8 @@ fun NewLimingCalculation(
                             onValueChange = {
                                 viewModelCtc.onEvent(CTCTextFieldFormEvent.CTChanged(it))
                                 viewModelCtc.onEvent(CTCTextFieldFormEvent.Submit)
+
+                                tokenViewModel.saveToken("ctc", it)
                             },
                             isError = stateCtc.ctcError != null,
                             errorState = stateCtc.ctcError,
@@ -189,7 +239,11 @@ fun NewLimingCalculation(
                                 .fillMaxWidth(),
                             informationIcon = true,
                             informationIconOnClick = {
-                                navigationController.navigate("ExplanationFormData")
+                                navigationController.navigate(
+                                    Screen.ExplanationFormData.createRoute(
+                                        id = "ctc"
+                                    )
+                                )
                             }
                         )
 
@@ -198,6 +252,8 @@ fun NewLimingCalculation(
                             onValueChange = {
                                 viewModelPrnt.onEvent(PRNTextFieldFormEvent.PRNTChanged(it))
                                 viewModelPrnt.onEvent(PRNTextFieldFormEvent.Submit)
+
+                                tokenViewModel.saveToken("prnt", it)
                             },
                             isError = statePrnt.prntError != null,
                             errorState = statePrnt.prntError,
@@ -209,7 +265,11 @@ fun NewLimingCalculation(
                             lastOne = true,
                             informationIcon = true,
                             informationIconOnClick = {
-                                navigationController.navigate("ExplanationFormData")
+                                navigationController.navigate(
+                                    Screen.ExplanationFormData.createRoute(
+                                        id = "prnt"
+                                    )
+                                )
                             }
                         )
                     }
@@ -238,6 +298,7 @@ fun NewLimingCalculation(
             }
         },
         buttonValue = if (analysisMade) "Cadastrar" else "Calcular",
-        isLoading = isLoading
+        isLoading = isLoading,
+        page = page
     )
 }

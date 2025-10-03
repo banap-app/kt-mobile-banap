@@ -85,7 +85,7 @@ fun Tutorial(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(bottom = 30.dp, top = innerPadding.calculateTopPadding() + 15.dp)
+                .padding(bottom = innerPadding.calculateBottomPadding() + 15.dp, top = innerPadding.calculateTopPadding() + 15.dp)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally

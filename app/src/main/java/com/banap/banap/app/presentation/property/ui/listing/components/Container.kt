@@ -1,6 +1,5 @@
 package com.banap.banap.app.presentation.property.ui.listing.components
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,7 +31,6 @@ import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.data.model.field.FieldResponse
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Container(
     navigationController: NavController,
@@ -72,16 +70,22 @@ fun Container(
             }
 
         }
-    ) {
+    ) { innerPadding ->
         Column(
             modifier =
             if (isLoading) {
                 Modifier
                     .verticalScroll(rememberScrollState())
-                    .padding(bottom = 60.dp)
+                    .padding(
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = 60.dp
+                    )
                     .fillMaxSize()
             } else {
                 Modifier
+                    .padding(
+                        top = innerPadding.calculateTopPadding()
+                    )
                     .fillMaxSize()
             }
         ) {

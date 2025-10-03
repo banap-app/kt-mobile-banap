@@ -129,6 +129,12 @@ fun FieldInformation(
     }
 
     LaunchedEffect(true) {
+        tokenViewModel.clearToken("sba")
+        tokenViewModel.clearToken("ctc")
+        tokenViewModel.clearToken("prnt")
+        tokenViewModel.clearToken("phosphorus")
+        tokenViewModel.clearToken("potassium")
+        tokenViewModel.clearToken("option")
         tokenViewModel.clearToken("analysisId")
         Log.d("field", tokenViewModel.getToken("fieldId") ?: "")
 
@@ -192,10 +198,13 @@ fun FieldInformation(
         modifier = Modifier
             .fillMaxSize(),
         containerColor = BRANCO
-    ) {
+    ) { innerPadding ->
         if (!isLoadingDelete) {
             LazyColumn(
                 modifier = Modifier
+                    .padding(
+                        top = innerPadding.calculateTopPadding()
+                    )
                     .fillMaxSize()
             ) {
                 item {

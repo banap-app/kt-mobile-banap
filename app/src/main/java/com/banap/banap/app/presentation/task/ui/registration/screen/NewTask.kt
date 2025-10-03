@@ -3,6 +3,7 @@ package com.banap.banap.app.presentation.task.ui.registration.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.task.ui.registration.components.Scheduling
 import com.banap.banap.app.presentation.validation.dropdown.event.DropdownTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.dropdown.utils.validationDataDropdown
@@ -38,7 +40,8 @@ fun NewTask(
     navigationController: NavController,
     taskListHome: MutableList<TaskList>,
     taskListFieldInformation: MutableList<String>,
-    logList: MutableList<LogList>
+    logList: MutableList<LogList>,
+    tokenViewModel: TokenViewModel
 ) {
     val context = LocalContext.current
 
@@ -56,10 +59,14 @@ fun NewTask(
     }
 
     var startTime = remember {
-        mutableStateOf("")
+        mutableStateOf(
+            tokenViewModel.getToken("startTime") ?: ""
+        )
     }
     var endTime = remember {
-        mutableStateOf("")
+        mutableStateOf(
+            tokenViewModel.getToken("endTime") ?: ""
+        )
     }
 
     var startError = remember {
@@ -93,6 +100,47 @@ fun NewTask(
     )
 
     val isValidationSuccessful = validationDataName && validationDataOptionField && validationDataDropdownPriority && validationDataScheduling
+
+    LaunchedEffect(startTime.value) {
+        if (startTime.value.isNotEmpty()) {
+            tokenViewModel.saveToken("startTime", startTime.value)
+        }
+    }
+
+    LaunchedEffect(endTime.value) {
+        if (endTime.value.isNotEmpty()) {
+            tokenViewModel.saveToken("endTime", endTime.value)
+        }
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("taskName")?.let {
+            viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
+            viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+        }
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("fieldChosen")?.let {
+            viewModelDropdownField.onEvent(
+                DropdownTextFieldFormEvent.OptionChanged(
+                    it
+                )
+            )
+            viewModelDropdownField.onEvent(DropdownTextFieldFormEvent.Submit)
+        }
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("fieldPriority")?.let {
+            viewModelDropdownPriority.onEvent(
+                DropdownTextFieldFormEvent.OptionChanged(
+                    it
+                )
+            )
+            viewModelDropdownPriority.onEvent(DropdownTextFieldFormEvent.Submit)
+        }
+    }
 
     LaunchedEffect(isLoading) {
         if (isLoading) {
@@ -157,6 +205,10 @@ fun NewTask(
         isLoading = isLoading,
         children = {
             Column(
+                Modifier
+                    .padding(
+                        bottom = 60.dp
+                    ),
                 verticalArrangement = Arrangement.spacedBy(40.dp)
             ) {
                 TextBoxRegistration(
@@ -164,6 +216,8 @@ fun NewTask(
                     onValueChange = {
                         viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
                         viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+
+                        tokenViewModel.saveToken("taskName", it)
                     },
                     isError = stateName.nameError != null,
                     errorState = stateName.nameError,
@@ -188,6 +242,8 @@ fun NewTask(
                             )
                         )
                         viewModelDropdownField.onEvent(DropdownTextFieldFormEvent.Submit)
+
+                        tokenViewModel.saveToken("fieldChosen", it)
                     },
                     errorState = stateDropdownField.optionError
                 )
@@ -216,6 +272,8 @@ fun NewTask(
                             )
                         )
                         viewModelDropdownPriority.onEvent(DropdownTextFieldFormEvent.Submit)
+
+                        tokenViewModel.saveToken("fieldPriority", it)
                     },
                     errorState = stateDropdownPriority.optionPriorityError
                 )

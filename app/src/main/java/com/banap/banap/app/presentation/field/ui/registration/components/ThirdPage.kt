@@ -1,6 +1,5 @@
 package com.banap.banap.app.presentation.field.ui.registration.components
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.compose.animation.animateColorAsState
@@ -10,6 +9,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -36,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.R
+import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.validation.description.event.DescriptionTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.description.utils.validationDataDescription
 import com.banap.banap.app.presentation.validation.description.viewmodel.DescriptionTextFieldViewModel
@@ -54,6 +55,7 @@ import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
+import com.banap.banap.core.ui.util.convertLatLngToFieldBoundary
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.domain.model.field.FieldBoundary
 import com.banap.banap.domain.viewmodel.field.CreateFieldViewModel
@@ -61,7 +63,6 @@ import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ThirdPage(
     navigationController: NavController,
@@ -72,22 +73,16 @@ fun ThirdPage(
     producerId: String,
     propertyId: String,
     stateName: RegistrationFormState,
-    markers: List<LatLng>,
     logList: MutableList<LogList>,
-    isValidationSuccessful: MutableState<Boolean>
+    isValidationSuccessful: MutableState<Boolean>,
+    innerPadding: PaddingValues,
+    tokenViewModel: TokenViewModel
 ) {
     val createFieldState = createFieldViewModel.state.value
 
-    val fieldBoundary: List<FieldBoundary> by remember {
-        mutableStateOf(
-            markers.map {
-                FieldBoundary(
-                    lat = it.latitude,
-                    lng = it.longitude
-                )
-            }
-        )
-    }
+    val fieldBoundary: List<FieldBoundary> = tokenViewModel.getMarkers("markers")
+        .map { it.convertLatLngToFieldBoundary() }
+
     val viewModelDescription = viewModel<DescriptionTextFieldViewModel>()
     val stateDescription = viewModelDescription.state
 
@@ -158,6 +153,28 @@ fun ThirdPage(
         }
     }
 
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("description")?.let {
+            viewModelDescription.onEvent(
+                DescriptionTextFieldFormEvent.DescriptionChanged(
+                    it
+                )
+            )
+            viewModelDescription.onEvent(DescriptionTextFieldFormEvent.Submit)
+        }
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("culture")?.let {
+            viewModelDropdown.onEvent(
+                DropdownTextFieldFormEvent.OptionChanged(
+                    it
+                )
+            )
+            viewModelDropdown.onEvent(DropdownTextFieldFormEvent.Submit)
+        }
+    }
+
     LaunchedEffect(createFieldState.error) {
         if (createFieldState.error.isNotEmpty()) {
             isLoading = false
@@ -202,7 +219,13 @@ fun ThirdPage(
     }
 
     if (!isLoading) {
-        Column {
+        Column (
+            modifier = Modifier
+                .padding(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding()
+                )
+        ) {
             Box {
                 Image(
                     imageVector = ImageVector.vectorResource(id = R.drawable.linhas_propriedade),
@@ -263,6 +286,8 @@ fun ThirdPage(
                                 )
                             )
                             viewModelDescription.onEvent(DescriptionTextFieldFormEvent.Submit)
+
+                            tokenViewModel.saveToken("description", it)
                         },
                         isError = stateDescription.descriptionError != null,
                         errorState = stateDescription.descriptionError,
@@ -297,6 +322,8 @@ fun ThirdPage(
                                 )
                             )
                             viewModelDropdown.onEvent(DropdownTextFieldFormEvent.Submit)
+
+                            tokenViewModel.saveToken("culture", it)
                         },
                         errorState = stateDropdown.optionError
                     )
@@ -309,8 +336,8 @@ fun ThirdPage(
 
                         if (isValidationSuccessful.value) {
                             createFieldViewModel.createField(
-                                producerId = producerId,
-                                propertyId = propertyId,
+                                producerId = tokenViewModel.getToken("producerId") ?: producerId,
+                                propertyId = tokenViewModel.getToken("propertyId") ?: propertyId,
                                 name = stateName.name,
                                 description = stateDescription.description,
                                 crop = stateDropdown.option,

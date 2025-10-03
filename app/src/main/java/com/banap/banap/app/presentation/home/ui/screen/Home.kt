@@ -151,7 +151,7 @@ fun Home(
     }
 
     val radioOptions: Map<String, String> by remember(properties) {
-        derivedStateOf { properties.associate { it.id to it.name } }
+        derivedStateOf { properties.take(5).associate { it.id to it.name } }
     }
 
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions.keys.firstOrNull()) }
@@ -216,7 +216,15 @@ fun Home(
     LaunchedEffect(context) {
         tokenViewModel.clearToken("userName")
         tokenViewModel.clearToken("fieldId")
+        tokenViewModel.clearToken("producerId")
         tokenViewModel.clearToken("propertyId")
+        tokenViewModel.clearToken("fieldName")
+        tokenViewModel.clearToken("propertyName")
+        tokenViewModel.clearToken("listingPropertyName")
+        tokenViewModel.clearToken("markers")
+        tokenViewModel.clearToken("description")
+        tokenViewModel.clearToken("culture")
+        tokenViewModel.clearToken("currentPage")
         Log.d("TOKEN", tokenViewModel.getToken("token").toString())
 
         tokenViewModel.getToken("token")?.let { token ->
@@ -340,7 +348,9 @@ fun Home(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 30.dp)
+                    .padding(
+                        top = innerPadding.calculateTopPadding() + 10.dp
+                    )
             ) {
                 item {
                     Spacer(modifier = Modifier.height(10.dp))
@@ -373,7 +383,7 @@ fun Home(
                             onDismissText = "Cancelar",
                             onDismissButtonBackgroundColor = CINZA_INTERMEDIARIO,
                             onDismissButtonContentColor = PRETO,
-                            space = 0.dp
+                            space = 40.dp
                         )
                     }
                 }

@@ -1,15 +1,19 @@
 package com.banap.banap.app.presentation.engineer.ui.registration
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,6 +25,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
+import com.banap.banap.app.presentation.validation.email.event.EmailTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.email.utils.validationDataEmail
+import com.banap.banap.app.presentation.validation.email.viewmodel.EmailTextFieldViewModel
+import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.name.utils.validationDataName
+import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
+import com.banap.banap.app.presentation.validation.password.event.PasswordTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.password.utils.validationDataPassword
+import com.banap.banap.app.presentation.validation.password.viewmodel.PasswordTextFieldViewModel
 import com.banap.banap.core.ui.components.ButtonRegistration
 import com.banap.banap.core.ui.components.RegistrationHeader
 import com.banap.banap.core.ui.components.TextBoxRegistration
@@ -30,23 +44,12 @@ import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
-import com.banap.banap.app.presentation.validation.email.utils.validationDataEmail
-import com.banap.banap.app.presentation.validation.email.event.EmailTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.email.viewmodel.EmailTextFieldViewModel
-import com.banap.banap.app.presentation.validation.name.utils.validationDataName
-import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
-import com.banap.banap.app.presentation.validation.password.utils.validationDataPassword
-import com.banap.banap.app.presentation.validation.password.event.PasswordTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.password.viewmodel.PasswordTextFieldViewModel
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NewEngineerFirstPage(
-    navigationController: NavController
+    navigationController: NavController,
+    tokenViewModel: TokenViewModel
 ) {
-    // Realizar a ação de submit ao carregar a pagina
-
     val context = LocalContext.current
 
     val viewModelName = viewModel<NameTextFieldViewModel>()
@@ -124,12 +127,41 @@ fun NewEngineerFirstPage(
         }
     }
 
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("name")?.let {
+            viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
+            viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+        }
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("email")?.let {
+            viewModelEmail.onEvent(EmailTextFieldFormEvent.EmailChanged(it))
+            viewModelEmail.onEvent(EmailTextFieldFormEvent.Submit)
+        }
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("password")?.let {
+            viewModelPassword.onEvent(PasswordTextFieldFormEvent.PasswordChanged(it))
+            viewModelPassword.onEvent(PasswordTextFieldFormEvent.Submit)
+        }
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
         containerColor = BRANCO
-    ) {
-        Column {
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding()
+                )
+        ) {
             RegistrationHeader(
                 navigationController = navigationController,
                 fallbackRoute = "UserChoice"
@@ -147,76 +179,82 @@ fun NewEngineerFirstPage(
             )
 
             Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceBetween
+                Modifier
+                    .padding(
+                        bottom = 60.dp
+                    ),
+                verticalArrangement = Arrangement.spacedBy(40.dp)
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(40.dp)
-                ) {
-                    TextBoxRegistration(
-                        value = stateName.name,
-                        onValueChange = {
-                            viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
-                            viewModelName.onEvent(NameTextFieldFormEvent.Submit)
-                        },
-                        isError = stateName.nameError != null,
-                        errorState = stateName.nameError,
-                        label = "Nome",
-                        placeholder = "Exemplo",
-                        tipoTeclado = KeyboardType.Text,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    )
-
-                    TextBoxRegistration(
-                        value = stateEmail.email,
-                        onValueChange = {
-                            viewModelEmail.onEvent(EmailTextFieldFormEvent.EmailChanged(it))
-                            viewModelEmail.onEvent(EmailTextFieldFormEvent.Submit)
-                        },
-                        isError = stateEmail.emailError != null,
-                        errorState = stateEmail.emailError,
-                        label = "Email",
-                        placeholder = "exemplo@gmail.com",
-                        tipoTeclado = KeyboardType.Email,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    )
-
-                    TextBoxRegistration(
-                        value = statePassword.password,
-                        onValueChange = {
-                            viewModelPassword.onEvent(PasswordTextFieldFormEvent.PasswordChanged(it))
-                            viewModelPassword.onEvent(PasswordTextFieldFormEvent.Submit)
-                        },
-                        isError = statePassword.passwordError != null,
-                        errorState = statePassword.passwordError,
-                        isPassword = true,
-                        label = "Senha",
-                        placeholder = "12345678",
-                        tipoTeclado = KeyboardType.Password,
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        lastOne = true
-                    )
-                }
-
-                ButtonRegistration(
-                    onClick = {
+                TextBoxRegistration(
+                    value = stateName.name,
+                    onValueChange = {
+                        viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
                         viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+
+                        tokenViewModel.saveToken("name", it)
+                    },
+                    isError = stateName.nameError != null,
+                    errorState = stateName.nameError,
+                    label = "Nome",
+                    placeholder = "Exemplo",
+                    tipoTeclado = KeyboardType.Text,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+
+                TextBoxRegistration(
+                    value = stateEmail.email,
+                    onValueChange = {
+                        viewModelEmail.onEvent(EmailTextFieldFormEvent.EmailChanged(it))
                         viewModelEmail.onEvent(EmailTextFieldFormEvent.Submit)
+
+                        tokenViewModel.saveToken("email", it)
+                    },
+                    isError = stateEmail.emailError != null,
+                    errorState = stateEmail.emailError,
+                    label = "Email",
+                    placeholder = "exemplo@gmail.com",
+                    tipoTeclado = KeyboardType.Email,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+
+                TextBoxRegistration(
+                    value = statePassword.password,
+                    onValueChange = {
+                        viewModelPassword.onEvent(PasswordTextFieldFormEvent.PasswordChanged(it))
                         viewModelPassword.onEvent(PasswordTextFieldFormEvent.Submit)
 
-                        if (isValidationSuccessful) {
-                            navigationController.navigate("NewEngineerSecondPage")
-                        }
+                        tokenViewModel.saveToken("password", it)
                     },
-                    buttonValue = "Continuar",
-                    backgroundColor = backgroundColor,
-                    contentColor = contentColor
+                    isError = statePassword.passwordError != null,
+                    errorState = statePassword.passwordError,
+                    isPassword = true,
+                    label = "Senha",
+                    placeholder = "12345678",
+                    tipoTeclado = KeyboardType.Password,
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    lastOne = true
                 )
             }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            ButtonRegistration(
+                onClick = {
+                    viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+                    viewModelEmail.onEvent(EmailTextFieldFormEvent.Submit)
+                    viewModelPassword.onEvent(PasswordTextFieldFormEvent.Submit)
+
+                    if (isValidationSuccessful) {
+                        navigationController.navigate("NewEngineerSecondPage")
+                    }
+                },
+                buttonValue = "Continuar",
+                backgroundColor = backgroundColor,
+                contentColor = contentColor
+            )
         }
     }
 }

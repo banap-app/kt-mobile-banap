@@ -74,7 +74,7 @@ fun Property(
 
     LaunchedEffect(true) {
         if (!name.contains("name")) {
-            tokenViewModel.saveToken("name", name)
+            tokenViewModel.saveToken("listingPropertyName", name)
         }
     }
 
@@ -105,7 +105,7 @@ fun Property(
 
     Container(
         navigationController = navigationController,
-        titulo = tokenViewModel.getToken("name") ?: name,
+        titulo = tokenViewModel.getToken("listingPropertyName") ?: name,
         children = {
             when {
                 isLoading -> {

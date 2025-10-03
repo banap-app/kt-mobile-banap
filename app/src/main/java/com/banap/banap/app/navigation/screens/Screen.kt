@@ -85,4 +85,17 @@ sealed class Screen (
 
         fun createRoute(analysisId: String, analysisName: String, fieldName: String) = "$route/$analysisId/$analysisName/$fieldName"
     }
+
+    data object ExplanationFormData : Screen(route = "ExplanationFormData") {
+        const val EXPLANATION_ARGUMENT = "id"
+        val routeWithArgument = "$route/{$EXPLANATION_ARGUMENT}"
+
+        val arguments = listOf(
+            navArgument(EXPLANATION_ARGUMENT) {
+                type = NavType.StringType
+            }
+        )
+
+        fun createRoute(id: String) = "$route/$id"
+    }
 }

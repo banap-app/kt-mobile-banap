@@ -75,9 +75,20 @@ fun SplashScreen(
         )
 
         if (token.isNullOrEmpty()) {
-            navigationController.navigate("Tutorial") {
-                popUpTo("SplashScreen") {
-                    inclusive = true
+            if (lastRoute.contains("NewProducer") || lastRoute.contains("NewEngineerFirstPage") || lastRoute.contains(
+                    "NewEngineerSecondPage"
+                )
+            ) {
+                navigationController.navigate(lastRoute) {
+                    popUpTo("SplashScreen") {
+                        inclusive = true
+                    }
+                }
+            } else {
+                navigationController.navigate("Tutorial") {
+                    popUpTo("SplashScreen") {
+                        inclusive = true
+                    }
                 }
             }
         } else {

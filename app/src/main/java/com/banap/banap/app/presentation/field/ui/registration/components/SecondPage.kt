@@ -1,6 +1,8 @@
 package com.banap.banap.app.presentation.field.ui.registration.components
 
-import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings
 import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
@@ -8,6 +10,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +18,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -41,21 +46,26 @@ import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
+import com.banap.banap.core.ui.util.isLocationEnabled
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SecondPage(
     currentPage: MutableState<FieldPage>,
     snackBarHostState: SnackbarHostState,
+    context: Context,
+    scope: CoroutineScope,
     markers: SnapshotStateList<LatLng>,
     tokenViewModel: TokenViewModel,
-    isValidationSuccessful: MutableState<Boolean>
+    isValidationSuccessful: MutableState<Boolean>,
+    innerPadding: PaddingValues
 ) {
-    val scope = rememberCoroutineScope()
+    val isLocationOn = isLocationEnabled(context)
 
     var backgroundColorButton by remember {
         mutableStateOf(CINZA_CLARO)
@@ -142,8 +152,34 @@ fun SecondPage(
         }
     }
 
+    LaunchedEffect(Unit) {
+        if (!isLocationOn) {
+            scope.launch {
+                val result = snackBarHostState.showSnackbar(
+                    message = "Ative a sua localização para continuar",
+                    actionLabel = "Entendi",
+                    duration = SnackbarDuration.Indefinite
+                )
+
+                if (result == SnackbarResult.ActionPerformed) {
+                    context.startActivity(
+                        Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        }
+                    )
+                }
+            }
+        }
+    }
+
     if (!isExpanded.value) {
-        Column {
+        Column (
+            modifier = Modifier
+                .padding(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding()
+                )
+        ) {
             Box {
                 Image(
                     imageVector = ImageVector.vectorResource(id = R.drawable.linhas_propriedade),
@@ -191,7 +227,11 @@ fun SecondPage(
                 isExpanded = isExpanded.value,
                 mapModifier = Modifier
                     .height(350.dp)
-                    .padding(horizontal = 30.dp)
+                    .padding(
+                        start = 30.dp,
+                        end = 30.dp,
+                        bottom = 60.dp
+                    )
                     .fillMaxWidth(),
                 onClick = {
                     isExpanded.value = true
@@ -219,6 +259,10 @@ fun SecondPage(
         MapView(
             isExpanded = isExpanded.value,
             mapModifier = Modifier
+                .padding(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding()
+                )
                 .fillMaxSize(),
             onClick = {
                 isExpanded.value = false

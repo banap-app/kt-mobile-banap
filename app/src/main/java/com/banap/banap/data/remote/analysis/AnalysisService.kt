@@ -4,6 +4,7 @@ import com.banap.banap.data.model.analysis.AnalysisResponse
 import com.banap.banap.data.model.analysis.CreateAnalysisRequest
 import com.banap.banap.data.model.analysis.ListAnalysisResponse
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -17,4 +18,7 @@ interface AnalysisService {
 
     @GET("/analysis/by_id/{id}")
     suspend fun getAnalysisById(@Path("id") id: String): AnalysisResponse
+
+    @DELETE("/analysis/{id}")
+    suspend fun deleteAnalysis(@Path("id") id: String)
 }

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,6 +23,7 @@ import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.analysis.ui.registration.components.AnalysisResult
 import com.banap.banap.app.presentation.analysis.ui.registration.components.ResultCard
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
+import com.banap.banap.app.presentation.validation.ctc.event.CTCTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.dropdown.event.DropdownTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.dropdown.utils.validationDataDropdown
 import com.banap.banap.app.presentation.validation.dropdown.viewmodel.DropdownTextFieldViewModel
@@ -31,6 +33,8 @@ import com.banap.banap.app.presentation.validation.phosphorus.viewmodel.Phosphor
 import com.banap.banap.app.presentation.validation.potassium.event.PotassiumTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.potassium.utils.validationDataPotassium
 import com.banap.banap.app.presentation.validation.potassium.viewmodel.PotassiumTextFieldViewModel
+import com.banap.banap.app.presentation.validation.prnt.event.PRNTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.sba.event.SBATextFieldFormEvent
 import com.banap.banap.core.ui.components.DropdownTextField
 import com.banap.banap.core.ui.components.RegistrationScreenPattern
 import com.banap.banap.core.ui.components.TextBoxRegistration
@@ -107,6 +111,27 @@ fun NewFertilizationRecommendation(
     }
 
     LaunchedEffect(true) {
+        tokenViewModel.getToken("phosphorus")?.let {
+            viewModelPhosphorus.onEvent(PhosphorusTextFieldFormEvent.PhosphorusChanged(it))
+            viewModelPhosphorus.onEvent(PhosphorusTextFieldFormEvent.Submit)
+        }
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("potassium")?.let {
+            viewModelPotassium.onEvent(PotassiumTextFieldFormEvent.PotassiumChanged(it))
+            viewModelPotassium.onEvent(PotassiumTextFieldFormEvent.Submit)
+        }
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("option")?.let {
+            viewModelDropdown.onEvent(DropdownTextFieldFormEvent.OptionChanged(it))
+            viewModelDropdown.onEvent(DropdownTextFieldFormEvent.Submit)
+        }
+    }
+
+    LaunchedEffect(true) {
         tokenViewModel.getToken("fieldId")?.let {
             Log.d("ID", it)
             fieldId = it
@@ -143,6 +168,7 @@ fun NewFertilizationRecommendation(
     RegistrationScreenPattern(
         navigationController = navigationController,
         fieldId = fieldId,
+        userName = userName,
         fallbackRoute = "Information",
         isValidationSuccessful = isValidationSuccessful,
         stateError = null,
@@ -180,6 +206,10 @@ fun NewFertilizationRecommendation(
 
                 else -> {
                     Column(
+                        modifier = Modifier
+                            .padding(
+                                bottom = 60.dp
+                            ),
                         verticalArrangement = Arrangement.spacedBy(40.dp)
                     ) {
                         TextBoxRegistration(
@@ -191,6 +221,8 @@ fun NewFertilizationRecommendation(
                                     )
                                 )
                                 viewModelPhosphorus.onEvent(PhosphorusTextFieldFormEvent.Submit)
+
+                                tokenViewModel.saveToken("phosphorus", it)
                             },
                             isError = statePhosphorus.phosphorusError != null,
                             errorState = statePhosphorus.phosphorusError,
@@ -210,6 +242,8 @@ fun NewFertilizationRecommendation(
                                     )
                                 )
                                 viewModelPotassium.onEvent(PotassiumTextFieldFormEvent.Submit)
+
+                                tokenViewModel.saveToken("potassium", it)
                             },
                             isError = statePotassium.potassiumError != null,
                             errorState = statePotassium.potassiumError,
@@ -238,6 +272,8 @@ fun NewFertilizationRecommendation(
                                     )
                                 )
                                 viewModelDropdown.onEvent(DropdownTextFieldFormEvent.Submit)
+
+                                tokenViewModel.saveToken("option", it)
                             },
                             errorState = stateDropdown.optionError
                         )

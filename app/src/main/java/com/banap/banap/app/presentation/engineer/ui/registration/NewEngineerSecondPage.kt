@@ -1,6 +1,5 @@
 package com.banap.banap.app.presentation.engineer.ui.registration
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -8,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +21,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
+import com.banap.banap.app.presentation.validation.crea.event.CreaTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.crea.utils.validationDataCrea
+import com.banap.banap.app.presentation.validation.crea.viewmodel.CreaTextFieldViewModel
+import com.banap.banap.app.presentation.validation.password.event.PasswordTextFieldFormEvent
 import com.banap.banap.core.ui.components.ButtonRegistration
 import com.banap.banap.core.ui.components.RegistrationHeader
 import com.banap.banap.core.ui.components.TextBoxRegistration
@@ -30,15 +35,12 @@ import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
-import com.banap.banap.app.presentation.validation.crea.utils.validationDataCrea
-import com.banap.banap.app.presentation.validation.crea.event.CreaTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.crea.viewmodel.CreaTextFieldViewModel
 import kotlinx.coroutines.delay
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NewEngineerSecondPage (
-    navigationController: NavController
+    navigationController: NavController,
+    tokenViewModel: TokenViewModel
 ) {
     val context = LocalContext.current
 
@@ -112,12 +114,25 @@ fun NewEngineerSecondPage (
         }
     }
 
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("crea")?.let {
+            viewModelCrea.onEvent(CreaTextFieldFormEvent.CreaChanged(it))
+            viewModelCrea.onEvent(CreaTextFieldFormEvent.Submit)
+        }
+    }
+
     Scaffold (
         modifier = Modifier
             .fillMaxSize(),
         containerColor = BRANCO
-    ) {
-        Column {
+    ) { innerPadding ->
+        Column (
+            Modifier
+                .padding(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding()
+                )
+        ) {
             RegistrationHeader(
                 navigationController = navigationController,
                 fallbackRoute = "NewEngineerFirstPage"
@@ -144,6 +159,8 @@ fun NewEngineerSecondPage (
                     onValueChange = {
                         viewModelCrea.onEvent(CreaTextFieldFormEvent.CreaChanged(it))
                         viewModelCrea.onEvent(CreaTextFieldFormEvent.Submit)
+
+                        tokenViewModel.saveToken("crea", it)
                     },
                     isError = stateCrea.creaError != null,
                     errorState = stateCrea.creaError,

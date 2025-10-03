@@ -8,4 +8,5 @@ interface AnalysisRepository {
     suspend fun createAnalysis(analysis: CreateAnalysisRequest): AnalysisResponse
     suspend fun listAnalysis(id: String): ListAnalysisResponse
     suspend fun getAnalysisById(id: String): AnalysisResponse
+    suspend fun deleteAnalysis(id: String)
 }

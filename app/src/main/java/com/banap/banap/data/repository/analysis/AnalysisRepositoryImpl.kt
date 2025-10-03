@@ -21,4 +21,8 @@ class AnalysisRepositoryImpl @Inject constructor(
     override suspend fun getAnalysisById(id: String): AnalysisResponse {
         return service.getAnalysisById(id)
     }
+
+    override suspend fun deleteAnalysis(id: String) {
+        return service.deleteAnalysis(id)
+    }
 }

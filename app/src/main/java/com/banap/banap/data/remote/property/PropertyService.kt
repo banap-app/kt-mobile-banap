@@ -3,9 +3,13 @@ package com.banap.banap.data.remote.property
 import com.banap.banap.data.model.property.CreatePropertyResponse
 import com.banap.banap.data.model.property.ListPropertiesResponse
 import com.banap.banap.domain.model.property.CreatePropertyRequest
+import com.banap.banap.domain.model.property.UpdatePropertyRequest
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface PropertyService {
@@ -17,4 +21,10 @@ interface PropertyService {
 
     @GET("/property")
     suspend fun getPropertyById(@Query("id") id: String): ListPropertiesResponse
+
+    @PATCH("/property")
+    suspend fun updateProperty(@Body property: UpdatePropertyRequest)
+
+    @DELETE("/property/{id}")
+    suspend fun deleteProperty(@Path("id") id: String)
 }

@@ -22,7 +22,6 @@ import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.ShapeCarousel
 import com.banap.banap.core.ui.util.shimmerEffect
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun InformationScreenPattern(
     navigationController: NavController,
@@ -39,10 +38,13 @@ fun InformationScreenPattern(
         modifier = Modifier
             .fillMaxSize(),
         containerColor = BRANCO
-    ) {
+    ) { innerPadding ->
         if (!isLoadingDelete) {
             LazyColumn(
                 modifier = Modifier
+                    .padding(
+                        top = innerPadding.calculateTopPadding()
+                    )
                     .fillMaxSize()
             ) {
                 item {

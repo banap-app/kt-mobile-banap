@@ -1,6 +1,7 @@
 package com.banap.banap.app.presentation.field.ui.registration.components
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +13,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,11 +24,14 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.min
 import com.banap.banap.R
+import com.banap.banap.app.util.enumerator.ToggleResult
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
+import com.banap.banap.core.ui.util.toggleMarker
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PinConfig
@@ -35,11 +41,10 @@ import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polygon
 import com.google.maps.android.compose.Polyline
+import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnrememberedMutableState")
@@ -61,7 +66,8 @@ fun MapView(
             )
     ) {
         GoogleMap(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize(),
             cameraPositionState = cameraPositionState,
             googleMapOptionsFactory = {
                 GoogleMapOptions().mapId("DEMO_MAP_ID")
@@ -69,37 +75,50 @@ fun MapView(
             properties = MapProperties(isMyLocationEnabled = true),
             uiSettings = MapUiSettings(myLocationButtonEnabled = true),
             onMapClick = { latLng ->
-                if (marcadores.size < maxMarkers) {
-                    marcadores.add(latLng)
-                } else {
-                    scope.launch {
-                        val autoDismissJob = launch {
-                            delay(5_000L)
-                            snackBarHostState.currentSnackbarData?.dismiss()
+                when (marcadores.toggleMarker(latLng, maxMarkers)) {
+                    ToggleResult.ADDED -> {
+                        Log.d("MAP", "Ponto adicionado: $latLng")
+                    }
+                    ToggleResult.REMOVED -> {
+                        Log.d("MAP", "Ponto removido: $latLng")
+                    }
+                    ToggleResult.LIMIT_REACHED -> {
+                        scope.launch {
+                            snackBarHostState.showSnackbar(
+                                message = "Você atingiu o limite de pontos!",
+                                actionLabel = "Entendi",
+                                duration = SnackbarDuration.Short
+                            )
                         }
-
-                        snackBarHostState.showSnackbar(
-                            message = "Você atingiu o limite de pontos!",
-                            actionLabel = "Entendi",
-                            duration = SnackbarDuration.Indefinite
-                        )
-
-                        autoDismissJob.cancel()
                     }
                 }
             }
         ) {
-            marcadores.forEach { posicao ->
+            marcadores.forEachIndexed { index, posicao ->
+                val markerState = rememberUpdatedMarkerState(position = posicao)
+
                 val pingConfig = PinConfig.builder()
                     .setBackgroundColor(VERDE_ESCURO.toArgb())
                     .setBorderColor(VERDE_ESCURO.toArgb())
                     .setGlyph(Glyph(BRANCO.toArgb()))
                     .build()
 
+                LaunchedEffect(markerState) {
+                    snapshotFlow { markerState.position }
+                        .collect { newPosition ->
+                            marcadores[index] = newPosition
+                        }
+                }
+
                 AdvancedMarker(
-                    state = MarkerState(position = posicao),
-                    title = "Ponto A",
-                    pinConfig = pingConfig
+                    state = markerState,
+                    title = "Ponto ${index + 1}",
+                    draggable = true,
+                    pinConfig = pingConfig,
+                    onClick = {
+                        marcadores.toggleMarker(posicao, maxMarkers = maxMarkers)
+                        true
+                    }
                 )
             }
 
@@ -120,9 +139,7 @@ fun MapView(
                     color = VERDE_ESCURO,
                     width = 5f
                 )
-            }
 
-            if (marcadores.size >= 3) {
                 Polygon(
                     points = marcadores.toList(),
                     fillColor = VERDE_CLARO.copy(alpha = 0.5f),

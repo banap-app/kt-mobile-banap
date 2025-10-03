@@ -23,8 +23,8 @@ fun ReadMoreContainer(
         Column(
             modifier = Modifier
                 .padding(
-                    bottom = 40.dp,
-                    top = innerPadding.calculateTopPadding() + 30.dp
+                    top = innerPadding.calculateTopPadding() + 30.dp,
+                    bottom = innerPadding.calculateBottomPadding() + 30.dp
                 )
                 .fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween,

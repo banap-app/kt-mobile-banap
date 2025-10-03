@@ -1,14 +1,15 @@
 package com.banap.banap.app.presentation.field.ui.registration.components
 
-import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -20,12 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.validation.field.utils.validationDataFieldName
 import com.banap.banap.app.presentation.validation.field.viewmodel.FieldNameTextFieldViewModel
 import com.banap.banap.app.presentation.validation.model.RegistrationFormState
 import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.name.utils.validationDataName
-import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
 import com.banap.banap.app.util.enumerator.FieldPage
 import com.banap.banap.core.ui.components.ButtonRegistration
 import com.banap.banap.core.ui.components.RegistrationHeader
@@ -37,7 +37,6 @@ import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun FirstPage(
     navigationController: NavController,
@@ -45,7 +44,9 @@ fun FirstPage(
     viewModel: FieldNameTextFieldViewModel,
     context: Context,
     state: RegistrationFormState,
-    isValidationSuccessful: MutableState<Boolean>
+    isValidationSuccessful: MutableState<Boolean>,
+    innerPadding: PaddingValues,
+    tokenViewModel: TokenViewModel
 ) {
     isValidationSuccessful.value = validationDataFieldName(
         context = context,
@@ -99,7 +100,13 @@ fun FirstPage(
         }
     }
 
-    Column {
+    Column (
+        modifier = Modifier
+            .padding(
+                top = innerPadding.calculateTopPadding(),
+                bottom = innerPadding.calculateBottomPadding()
+            )
+    ) {
         RegistrationHeader(
             navigationController = navigationController,
             fallbackRoute = "Home"
@@ -126,6 +133,8 @@ fun FirstPage(
                 onValueChange = {
                     viewModel.onEvent(NameTextFieldFormEvent.NameChanged(it))
                     viewModel.onEvent(NameTextFieldFormEvent.Submit)
+
+                    tokenViewModel.saveToken("fieldName", it)
                 },
                 isError = state.nameError != null,
                 errorState = state.nameError,

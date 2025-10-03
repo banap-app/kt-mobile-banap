@@ -173,7 +173,8 @@ fun Navigation() {
         ) {
             NewProperty(
                 navigationController,
-                logList = logList
+                logList = logList,
+                tokenViewModel = tokenViewModel
             )
         }
 
@@ -209,7 +210,10 @@ fun Navigation() {
                 )
             }
         ) {
-            NewEngineerFirstPage(navigationController)
+            NewEngineerFirstPage(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
         }
 
         composable (
@@ -225,7 +229,10 @@ fun Navigation() {
                 )
             }
         ) {
-            NewEngineerSecondPage(navigationController)
+            NewEngineerSecondPage(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
         }
 
         composable (
@@ -273,7 +280,10 @@ fun Navigation() {
                 )
             }
         ) {
-            UserChoice(navigationController)
+            UserChoice(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
         }
 
         composable(
@@ -368,7 +378,8 @@ fun Navigation() {
         }
 
         composable(
-            route = "ExplanationFormData",
+            route = Screen.ExplanationFormData.routeWithArgument,
+            arguments = Screen.ExplanationFormData.arguments,
             enterTransition = {
                 slideInVertically (
                     initialOffsetY = { fullHeight ->
@@ -385,8 +396,14 @@ fun Navigation() {
                     animationSpec = tween(animationDuration)
                 )
             }
-        ) {
-            ExplanationFormData(navigationController)
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString(Screen.ExplanationFormData.EXPLANATION_ARGUMENT)
+
+            ExplanationFormData(
+                navigationController,
+                tokenViewModel = tokenViewModel,
+                id = id ?: ""
+            )
         }
 
         composable(
@@ -437,7 +454,8 @@ fun Navigation() {
                 navigationController,
                 taskListHome = taskListHome,
                 taskListFieldInformation = taskListFieldInformation,
-                logList = logList
+                logList = logList,
+                tokenViewModel = tokenViewModel
             )
         }
 
