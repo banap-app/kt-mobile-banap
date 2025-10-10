@@ -10,7 +10,6 @@ import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
-import retrofit2.http.Query
 
 interface PropertyService {
     @POST("/property")
@@ -19,8 +18,8 @@ interface PropertyService {
     @GET("/property")
     suspend fun listProperties(): List<ListPropertiesResponse>
 
-    @GET("/property")
-    suspend fun getPropertyById(@Query("id") id: String): ListPropertiesResponse
+    @GET("/property/{id}")
+    suspend fun getPropertyById(@Path("id") id: String): ListPropertiesResponse
 
     @PATCH("/property")
     suspend fun updateProperty(@Body property: UpdatePropertyRequest)

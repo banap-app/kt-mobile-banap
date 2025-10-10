@@ -25,8 +25,10 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.banap.banap.R
@@ -89,10 +91,12 @@ fun Property(
                             )
                         )
                     },
-                    text = titulo
+                    text = if (titulo.length > 16) titulo.take(16) + "..." else titulo
                 ),
                 style = Typography.titleLarge,
-                color = VERDE_ESCURO
+                color = VERDE_ESCURO,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
 
             IconButton(
@@ -154,7 +158,8 @@ fun Property(
                                 navigationController.navigate(
                                     Screen.NewField.createRoute(
                                         producerId = producerId,
-                                        propertyId = propertyId
+                                        propertyId = propertyId,
+                                        fieldId = "fieldId"
                                     )
                                 )
                             }
@@ -210,7 +215,8 @@ fun Property(
                             navigationController.navigate(
                                 Screen.NewField.createRoute(
                                     producerId = producerId,
-                                    propertyId = propertyId
+                                    propertyId = propertyId,
+                                    fieldId = "fieldId"
                                 )
                             )
                         }

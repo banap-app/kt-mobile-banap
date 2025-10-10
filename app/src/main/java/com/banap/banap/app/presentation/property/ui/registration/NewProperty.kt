@@ -27,11 +27,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.validation.name.event.NameTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.name.utils.validationDataName
 import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldViewModel
-import com.banap.banap.app.presentation.validation.sba.event.SBATextFieldFormEvent
 import com.banap.banap.core.ui.components.ButtonRegistration
 import com.banap.banap.core.ui.components.LoadingScreen
 import com.banap.banap.core.ui.components.RegistrationHeader
@@ -44,6 +44,8 @@ import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.domain.viewmodel.property.CreatePropertyViewModel
+import com.banap.banap.domain.viewmodel.property.GetPropertyByIdViewModel
+import com.banap.banap.domain.viewmodel.property.UpdatePropertyViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -51,12 +53,17 @@ import kotlinx.coroutines.launch
 fun NewProperty(
     navigationController: NavController,
     createPropertyViewModel: CreatePropertyViewModel = hiltViewModel(),
+    getPropertyByIdViewModel: GetPropertyByIdViewModel = hiltViewModel(),
+    updatePropertyViewModel: UpdatePropertyViewModel = hiltViewModel(),
     logList: MutableList<LogList>,
-    tokenViewModel: TokenViewModel
+    tokenViewModel: TokenViewModel,
+    propertyId: String
 ) {
     val context = LocalContext.current
 
     val createPropertyState = createPropertyViewModel.state.value
+    val getPropertyByIdState = getPropertyByIdViewModel.state.value
+    val updatePropertyState = updatePropertyViewModel.state.value
 
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -73,6 +80,14 @@ fun NewProperty(
 
     var propertyExists: Boolean? by remember {
         mutableStateOf(null)
+    }
+
+    var getPropertyByIdError: String by remember {
+        mutableStateOf("")
+    }
+
+    var updatePropertyError: String by remember {
+        mutableStateOf("")
     }
 
     isValidationSuccessful = validationDataName(
@@ -127,11 +142,62 @@ fun NewProperty(
         }
     }
 
+    LaunchedEffect(Unit) {
+        if (!propertyId.contains("propertyId")) {
+            tokenViewModel.getToken("updatePropertyId")?.let {
+                getPropertyByIdViewModel.getPropertyById(it)
+            } ?: run {
+                getPropertyByIdViewModel.getPropertyById(propertyId)
+            }
+        }
+    }
+
     LaunchedEffect(true) {
         tokenViewModel.getToken("propertyName")?.let {
             viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
             viewModelName.onEvent(NameTextFieldFormEvent.Submit)
         }
+    }
+
+    LaunchedEffect(getPropertyByIdState.error) {
+        getPropertyByIdError = getPropertyByIdState.error
+    }
+
+    LaunchedEffect(getPropertyByIdState.response) {
+        getPropertyByIdState.response?.let {
+            tokenViewModel.saveToken("updatePropertyId", it.id)
+
+            it.name.let { name ->
+                viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(name))
+                viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+
+                tokenViewModel.saveToken("propertyName", name)
+            }
+        }
+    }
+
+    LaunchedEffect(updatePropertyState.error) {
+        updatePropertyError = updatePropertyState.error
+    }
+
+    LaunchedEffect(updatePropertyState.response) {
+        updatePropertyState.response?.let {
+            tokenViewModel.clearToken("listingPropertyName")
+            tokenViewModel.saveToken("listingPropertyName", stateName.name)
+
+            navigationController.navigate(
+                Screen.Property.createRoute(
+                    name = stateName.name,
+                    userName = tokenViewModel.getToken("userName") ?: "",
+                    propertyId = tokenViewModel.getToken("updatePropertyId") ?: "",
+                    producerId = tokenViewModel.getToken("producerId") ?: ""
+                )
+            )
+        }
+    }
+
+    LaunchedEffect(updatePropertyState.isLoading) {
+        isLoading = updatePropertyState.isLoading
     }
 
     LaunchedEffect(createPropertyState.error) {
@@ -181,6 +247,10 @@ fun NewProperty(
         }
     }
 
+    LaunchedEffect(createPropertyState.isLoading) {
+        isLoading = createPropertyState.isLoading
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -199,7 +269,7 @@ fun NewProperty(
         }
     ) { innerPadding ->
         if (!isLoading) {
-            Column (
+            Column(
                 modifier = Modifier
                     .padding(
                         top = innerPadding.calculateTopPadding(),
@@ -212,14 +282,26 @@ fun NewProperty(
                 )
 
                 TitleRegistration(
-                    texto = "Cadastrando sua ",
+                    texto = tokenViewModel.getToken("updatePropertyId")
+                        ?.takeIf { it.isNotBlank() && !it.contains("propertyId") }
+                        ?.let {
+                            "Atualizando sua "
+                        } ?: run {
+                            "Cadastrando sua "
+                    },
                     textoASerDestacado = "propriedade...",
                     corEmDestaque = VERDE_ESCURO,
                     subTexto = "",
                     tamanhoTextoDestacado = 36.sp,
                     paginaUsuario = false,
                     subtituloDestacado = "",
-                    subtitulo = "O primeiro passo a ser feito é cadastrar sua propriedade..."
+                    subtitulo = tokenViewModel.getToken("updatePropertyId")
+                        ?.takeIf { it.isNotBlank() && !it.contains("propertyId") }
+                        ?.let {
+                            "Estaremos atualizando sua propriedade..."
+                        } ?: run {
+                            "O primeiro passo a ser feito é cadastrar sua propriedade..."
+                    }
                 )
 
                 Column(
@@ -250,9 +332,18 @@ fun NewProperty(
                             viewModelName.onEvent(NameTextFieldFormEvent.Submit)
 
                             if (isValidationSuccessful) {
-                                createPropertyViewModel.createProperty(
-                                    name = stateName.name
-                                )
+                                tokenViewModel.getToken("updatePropertyId")
+                                    ?.takeIf { it.isNotBlank() && !it.contains("propertyId") }
+                                    ?.let {
+                                        updatePropertyViewModel.updateProperty(
+                                            propertyId = it,
+                                            name = stateName.name
+                                        )
+                                    } ?: run {
+                                    createPropertyViewModel.createProperty(
+                                        name = stateName.name
+                                    )
+                                }
 
                                 logList.add(
                                     LogList(
@@ -260,11 +351,15 @@ fun NewProperty(
                                         activity = "cadastrou uma propriedade."
                                     )
                                 )
-
-                                isLoading = true
                             }
                         },
-                        buttonValue = "Cadastrar",
+                        buttonValue = tokenViewModel.getToken("updatePropertyId")
+                            ?.takeIf { it.isNotBlank() && !it.contains("propertyId") }
+                            ?.let {
+                                "Atualizar"
+                            } ?: run {
+                            "Cadastrar"
+                        },
                         backgroundColor = backgroundColor,
                         contentColor = contentColor
                     )

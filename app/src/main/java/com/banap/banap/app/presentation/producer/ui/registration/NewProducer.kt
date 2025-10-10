@@ -48,7 +48,6 @@ import com.banap.banap.app.presentation.validation.name.viewmodel.NameTextFieldV
 import com.banap.banap.app.presentation.validation.password.event.PasswordTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.password.utils.validationDataPassword
 import com.banap.banap.app.presentation.validation.password.viewmodel.PasswordTextFieldViewModel
-import com.banap.banap.app.presentation.validation.sba.event.SBATextFieldFormEvent
 import com.banap.banap.core.ui.components.ButtonRegistration
 import com.banap.banap.core.ui.components.LoadingScreen
 import com.banap.banap.core.ui.components.RegistrationHeader

@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.banap.banap.R
+import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.skeleton.ui.home.components.HeaderHomeSkeleton
 import com.banap.banap.core.ui.theme.PRETO
 import com.banap.banap.core.ui.theme.Typography
@@ -32,6 +33,7 @@ import com.banap.banap.domain.model.producer.ProducerState
 @Composable
 fun Header(
     name: String,
+    producerId: String,
     navigationController: NavController,
     getProducerByIdState: ProducerState,
     onItemClick: (DropDownItem) -> Unit
@@ -94,15 +96,17 @@ fun Header(
                                 ),
                                 optionSelected = onItemClick
                             ),
-//                            DropDownItem(
-//                                option = MenuOption(
-//                                    icon = R.drawable.fieldiconedit,
-//                                    text = "Editar"
-//                                ),
-//                                optionSelected = {
-//                                    navigationController.navigate("EditProfile")
-//                                }
-//                            )
+                            DropDownItem(
+                                option = MenuOption(
+                                    icon = R.drawable.fieldiconedit,
+                                    text = "Editar"
+                                ),
+                                optionSelected = {
+                                    navigationController.navigate(
+                                        "UpdateUserInformation"
+                                    )
+                                }
+                            )
                         )
                     )
                 }
@@ -138,15 +142,17 @@ fun Header(
                                 ),
                                 optionSelected = onItemClick
                             ),
-//                            DropDownItem(
-//                                option = MenuOption(
-//                                    icon = R.drawable.fieldiconedit,
-//                                    text = "Editar"
-//                                ),
-//                                optionSelected = {
-//                                    navigationController.navigate("EditProfile")
-//                                }
-//                            )
+                            DropDownItem(
+                                option = MenuOption(
+                                    icon = R.drawable.fieldiconedit,
+                                    text = "Editar"
+                                ),
+                                optionSelected = {
+                                    navigationController.navigate(
+                                        "UpdateUserInformation"
+                                    )
+                                }
+                            )
                         )
                     )
                 }

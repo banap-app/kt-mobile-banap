@@ -1,12 +1,12 @@
 package com.banap.banap.app.presentation.analysis.ui.information.screen
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.banap.banap.R
+import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.analysis.ui.information.components.AnalysisCard
 import com.banap.banap.app.presentation.analysis.ui.information.components.CreateDetails
 import com.banap.banap.app.presentation.analysis.ui.information.components.Description
@@ -32,26 +34,37 @@ import com.banap.banap.core.ui.components.Button
 import com.banap.banap.core.ui.components.ImageInformation
 import com.banap.banap.core.ui.components.Information
 import com.banap.banap.core.ui.components.InformationScreenPattern
+import com.banap.banap.core.ui.components.Modal
 import com.banap.banap.core.ui.theme.BRANCO
+import com.banap.banap.core.ui.theme.CINZA_INTERMEDIARIO
+import com.banap.banap.core.ui.theme.PRETO
 import com.banap.banap.core.ui.theme.ShapeProperty
 import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
+import com.banap.banap.core.ui.theme.VERMELHO
 import com.banap.banap.core.ui.util.ISOConverter
 import com.banap.banap.core.ui.util.getFirstName
 import com.banap.banap.data.model.analysis.AnalysisResponse
+import com.banap.banap.domain.viewmodel.analysis.DeleteAnalysisViewModel
 import com.banap.banap.domain.viewmodel.analysis.GetAnalysisByIdViewModel
 
 @Composable
 fun AnalysisInformation(
     navigationController: NavController,
     getAnalysisByIdViewModel: GetAnalysisByIdViewModel = hiltViewModel(),
+    deleteAnalysisViewModel: DeleteAnalysisViewModel = hiltViewModel(),
     tokenViewModel: TokenViewModel,
     analysisId: String,
     analysisName: String,
     fieldName: String
 ) {
     val getAnalysisByIdState = getAnalysisByIdViewModel.state.value
+    val deleteAnalysisState = deleteAnalysisViewModel.state.value
+
+    var modalVisible: Boolean by remember {
+        mutableStateOf(false)
+    }
 
     var analysis: AnalysisResponse? by remember {
         mutableStateOf(null)
@@ -61,7 +74,15 @@ fun AnalysisInformation(
         mutableStateOf(false)
     }
 
+    var deleteIsLoading by remember {
+        mutableStateOf(false)
+    }
+
     var getAnalysisByIdError by remember {
+        mutableStateOf("")
+    }
+
+    var deleteAnalysisError by remember {
         mutableStateOf("")
     }
 
@@ -100,6 +121,27 @@ fun AnalysisInformation(
         isLoading = getAnalysisByIdState.isLoading
     }
 
+    LaunchedEffect(deleteAnalysisState.response) {
+        deleteAnalysisState.response?.let {
+            if (it.success) {
+                navigationController.navigate(
+                    Screen.Information.createRoute(
+                        fieldId = tokenViewModel.getToken("fieldId") ?: "",
+                        userName = tokenViewModel.getToken("userName") ?: ""
+                    )
+                )
+            }
+        }
+    }
+
+    LaunchedEffect(deleteAnalysisState.isLoading) {
+        deleteIsLoading = deleteAnalysisState.isLoading
+    }
+
+    LaunchedEffect(deleteAnalysisState.error) {
+        deleteAnalysisError = deleteAnalysisState.error
+    }
+
     InformationScreenPattern(
         navigationController = navigationController,
         fieldId = tokenViewModel.getToken("fieldId") ?: "",
@@ -107,6 +149,7 @@ fun AnalysisInformation(
         fixedRoute = "Information",
         title = tokenViewModel.getToken("analysisName") ?: "",
         titleIcon = R.drawable.analysisicontitle,
+        isLoadingDelete = deleteIsLoading,
         isLoading = isLoading
     ) {
         when {
@@ -115,15 +158,73 @@ fun AnalysisInformation(
             }
 
             else -> {
-                ImageInformation(
-                    image = R.drawable.fieldimage,
-                    icon = R.drawable.field,
-                    text = tokenViewModel.getToken("fieldName") ?: ""
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(
+                        space = 20.dp
+                    )
                 ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.analysisiconimageinformation),
-                        contentDescription = "Icone da Cultura",
-                        tint = VERDE_CLARO
+                    ImageInformation(
+                        image = R.drawable.fieldimage,
+                        icon = R.drawable.field,
+                        text = tokenViewModel.getToken("fieldName") ?: ""
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.analysisiconimageinformation),
+                            contentDescription = "Icone da Cultura",
+                            tint = VERDE_CLARO
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .padding(
+                                horizontal = 30.dp
+                            )
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Button(
+                            texto = "Apagar Análise",
+                            modifier = Modifier
+                                .padding(15.dp),
+                            hasIcon = true,
+                            icon = ImageVector.vectorResource(id = R.drawable.fieldicondelete),
+                            shape = RoundedCornerShape(10.dp),
+                            onClick = {
+                                modalVisible = true
+                            },
+                            backgroundColor = VERMELHO,
+                            contentColor = BRANCO,
+                            defaultElevetion = 3.dp
+                        )
+                    }
+
+                }
+
+                if (modalVisible) {
+                    Modal(
+                        onConfirm = {
+                            deleteAnalysisViewModel.deleteAnalysis(
+                                tokenViewModel.getToken("analysisId") ?: analysisId
+                            )
+
+                            modalVisible = false
+                        },
+                        onDismiss = {
+                            modalVisible = false
+                        },
+                        icon = ImageVector.vectorResource(id = R.drawable.fieldicondelete),
+                        iconColor = VERMELHO,
+                        title = "Tem certeza que deseja\n apagar a análise?",
+                        description = "Apagando a análise, todas as informações relacionadas a ele tambem serão apagadas!",
+                        onConfirmText = "Excluir",
+                        onConfirmButtonBackgroundColor = VERMELHO,
+                        onConfirmButtonContentColor = BRANCO,
+                        onDismissText = "Cancelar",
+                        onDismissButtonBackgroundColor = CINZA_INTERMEDIARIO,
+                        onDismissButtonContentColor = PRETO,
+                        space = 0.dp
                     )
                 }
 

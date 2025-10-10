@@ -8,6 +8,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,6 +25,7 @@ import com.banap.banap.app.presentation.engineer.ui.registration.NewEngineerSeco
 import com.banap.banap.app.presentation.field.ui.information.screen.FieldInformation
 import com.banap.banap.app.presentation.field.ui.registration.screen.NewField
 import com.banap.banap.app.presentation.home.ui.screen.Home
+import com.banap.banap.app.presentation.home.ui.screen.UpdateUserInformation
 import com.banap.banap.app.presentation.login.ui.screen.Login
 import com.banap.banap.app.presentation.producer.ui.registration.NewProducer
 import com.banap.banap.app.presentation.property.ui.listing.screen.Property
@@ -65,11 +67,6 @@ fun Navigation() {
     val taskListFieldInformation: MutableList<String> = mutableListOf()
     val logList: MutableList<LogList> = mutableListOf()
 
-    val listPropertiesState = listPropertiesViewModel.state.value
-    val listFieldsState = listFieldsViewModel.state.value
-    val getProducerByIdState = getProducerByIdViewModel.state.value
-    val weatherState = weatherViewModel.state.value
-
     LaunchedEffect(navigationController) {
         navigationController
             .currentBackStackEntryFlow
@@ -85,8 +82,8 @@ fun Navigation() {
     NavHost(
         navController = navigationController,
         startDestination = "SplashScreen"
-    ){
-        composable (
+    ) {
+        composable(
             route = "SplashScreen",
             enterTransition = {
                 fadeIn(
@@ -107,7 +104,7 @@ fun Navigation() {
             )
         }
 
-        composable (
+        composable(
             route = "Home",
             enterTransition = {
                 fadeIn(
@@ -125,20 +122,16 @@ fun Navigation() {
                 tokenViewModel = tokenViewModel,
                 tokenVerificationViewModel = tokenVerificationViewModel,
                 weatherViewModel = weatherViewModel,
-                weatherState = weatherState,
                 locationViewModel = locationViewModel,
                 listPropertiesViewModel = listPropertiesViewModel,
-                listPropertiesState = listPropertiesState,
                 listFieldsViewModel = listFieldsViewModel,
-                listFieldsState = listFieldsState,
                 getProducerByIdViewModel = getProducerByIdViewModel,
-                getProducerByIdState = getProducerByIdState,
                 taskList = taskListHome,
                 logList = logList
             )
         }
 
-        composable (
+        composable(
             route = "Login",
             enterTransition = {
                 fadeIn(
@@ -158,8 +151,9 @@ fun Navigation() {
             )
         }
 
-        composable (
-            route = "NewProperty",
+        composable(
+            route = Screen.NewProperty.routeWithArgument,
+            arguments = Screen.NewProperty.arguments,
             enterTransition = {
                 fadeIn(
                     animationSpec = tween(animationDuration)
@@ -170,15 +164,19 @@ fun Navigation() {
                     animationSpec = tween(animationDuration)
                 )
             }
-        ) {
+        ) { backStackEntry ->
+            val propertyId =
+                backStackEntry.arguments?.getString(Screen.NewProperty.PROPERTY_ARGUMENT)
+
             NewProperty(
                 navigationController,
                 logList = logList,
-                tokenViewModel = tokenViewModel
+                tokenViewModel = tokenViewModel,
+                propertyId = propertyId ?: ""
             )
         }
 
-        composable (
+        composable(
             route = "NewProducer",
             enterTransition = {
                 fadeIn(
@@ -197,7 +195,7 @@ fun Navigation() {
             )
         }
 
-        composable (
+        composable(
             route = "NewEngineerFirstPage",
             enterTransition = {
                 fadeIn(
@@ -216,7 +214,7 @@ fun Navigation() {
             )
         }
 
-        composable (
+        composable(
             route = "NewEngineerSecondPage",
             enterTransition = {
                 fadeIn(
@@ -235,7 +233,7 @@ fun Navigation() {
             )
         }
 
-        composable (
+        composable(
             route = "Tutorial",
             enterTransition = {
                 fadeIn(
@@ -251,7 +249,7 @@ fun Navigation() {
             Tutorial(navigationController)
         }
 
-        composable (
+        composable(
             route = "ReadyToStart",
             enterTransition = {
                 fadeIn(
@@ -267,7 +265,7 @@ fun Navigation() {
             ReadyToStart(navigationController)
         }
 
-        composable (
+        composable(
             route = "UserChoice",
             enterTransition = {
                 fadeIn(
@@ -302,11 +300,13 @@ fun Navigation() {
         ) { backStackEntry ->
             val producerId = backStackEntry.arguments?.getString(Screen.NewField.PRODUCER_ARGUMENT)
             val propertyId = backStackEntry.arguments?.getString(Screen.NewField.PROPERTY_ARGUMENT)
+            val fieldId = backStackEntry.arguments?.getString(Screen.NewField.FIELD_ARGUMENT)
 
             NewField(
                 navigationController = navigationController,
                 producerId = producerId ?: "",
                 propertyId = propertyId ?: "",
+                fieldId = fieldId,
                 tokenViewModel = tokenViewModel,
                 logList = logList
             )
@@ -381,7 +381,7 @@ fun Navigation() {
             route = Screen.ExplanationFormData.routeWithArgument,
             arguments = Screen.ExplanationFormData.arguments,
             enterTransition = {
-                slideInVertically (
+                slideInVertically(
                     initialOffsetY = { fullHeight ->
                         fullHeight
                     },
@@ -397,7 +397,8 @@ fun Navigation() {
                 )
             }
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getString(Screen.ExplanationFormData.EXPLANATION_ARGUMENT)
+            val id =
+                backStackEntry.arguments?.getString(Screen.ExplanationFormData.EXPLANATION_ARGUMENT)
 
             ExplanationFormData(
                 navigationController,
@@ -420,7 +421,8 @@ fun Navigation() {
                 )
             }
         ) { backStackEntry ->
-            val propertyId = backStackEntry.arguments?.getString(Screen.Property.PROPERTY_ID_ARGUMENT)
+            val propertyId =
+                backStackEntry.arguments?.getString(Screen.Property.PROPERTY_ID_ARGUMENT)
             val producerId = backStackEntry.arguments?.getString(Screen.Property.PRODUCER_ARGUMENT)
             val name = backStackEntry.arguments?.getString(Screen.Property.PROPERTY_NAME_ARGUMENT)
             val userName = backStackEntry.arguments?.getString(Screen.Property.USERNAME_ARGUMENT)
@@ -432,7 +434,6 @@ fun Navigation() {
                 propertyId = propertyId ?: "",
                 producerId = producerId ?: "",
                 listFieldsViewModel = listFieldsViewModel,
-                listFieldsState = listFieldsState,
                 tokenViewModel = tokenViewModel
             )
         }
@@ -473,9 +474,12 @@ fun Navigation() {
                 )
             }
         ) { backStackEntry ->
-            val analysisId = backStackEntry.arguments?.getString(Screen.AnalysisInformation.ANALYSIS_ARGUMENT)
-            val analysisName = backStackEntry.arguments?.getString(Screen.AnalysisInformation.ANALYSIS_NAME_ARGUMENT)
-            val fieldName = backStackEntry.arguments?.getString(Screen.AnalysisInformation.FIELD_NAME_ARGUMENT)
+            val analysisId =
+                backStackEntry.arguments?.getString(Screen.AnalysisInformation.ANALYSIS_ARGUMENT)
+            val analysisName =
+                backStackEntry.arguments?.getString(Screen.AnalysisInformation.ANALYSIS_NAME_ARGUMENT)
+            val fieldName =
+                backStackEntry.arguments?.getString(Screen.AnalysisInformation.FIELD_NAME_ARGUMENT)
 
             AnalysisInformation(
                 navigationController,
@@ -502,6 +506,35 @@ fun Navigation() {
             ReadMore(
                 navigationController,
                 tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "UpdateUserInformation",
+            enterTransition = {
+                slideInVertically(
+                    initialOffsetY = { fullHeight ->
+                        fullHeight
+                    },
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { fullHeight ->
+                        fullHeight
+                    },
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            val getProducerByIdState by getProducerByIdViewModel.state
+
+            UpdateUserInformation(
+                navigationController,
+                tokenViewModel = tokenViewModel,
+                name = getProducerByIdState.response?.name ?: "",
+                email = getProducerByIdState.response?.email ?: "",
             )
         }
     }

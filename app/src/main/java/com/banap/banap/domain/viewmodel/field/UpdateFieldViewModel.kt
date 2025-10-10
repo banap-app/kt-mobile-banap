@@ -3,11 +3,13 @@ package com.banap.banap.domain.viewmodel.field
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.banap.banap.common.Resource
 import com.banap.banap.domain.model.field.FieldBoundary
 import com.banap.banap.domain.model.producer.WithoutResponseState
 import com.banap.banap.domain.use_case.field.UpdateFieldUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
@@ -51,6 +53,6 @@ class UpdateFieldViewModel @Inject constructor(
                     _state.value = WithoutResponseState(isLoading = true)
                 }
             }
-        }
+        }.launchIn(viewModelScope)
     }
 }

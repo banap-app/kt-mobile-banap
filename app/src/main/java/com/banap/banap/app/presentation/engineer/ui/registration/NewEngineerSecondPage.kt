@@ -25,7 +25,6 @@ import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.validation.crea.event.CreaTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.crea.utils.validationDataCrea
 import com.banap.banap.app.presentation.validation.crea.viewmodel.CreaTextFieldViewModel
-import com.banap.banap.app.presentation.validation.password.event.PasswordTextFieldFormEvent
 import com.banap.banap.core.ui.components.ButtonRegistration
 import com.banap.banap.core.ui.components.RegistrationHeader
 import com.banap.banap.core.ui.components.TextBoxRegistration

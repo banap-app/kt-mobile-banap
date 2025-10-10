@@ -20,64 +20,74 @@ import com.banap.banap.app.presentation.skeleton.ui.field.components.TaskSkeleto
 fun FieldInformationSkeleton() {
     Column(
         modifier = Modifier
-            .padding(horizontal = 30.dp),
+            .padding(
+                bottom = 60.dp
+            ),
         verticalArrangement = Arrangement.spacedBy(
-            space = 20.dp
+            space = 60.dp
         )
-    ) {
-        ImageSkeleton()
-
-        ActionsSkeleton()
-    }
-
-    InformationSkeleton(
-        space = 20.dp
-    ) {
-        DescriptionSkeleton(
-            lines = 3
-        )
-    }
-
-    InformationSkeleton(
-        space = 40.dp
     ) {
         Column(
+            modifier = Modifier
+                .padding(horizontal = 30.dp),
             verticalArrangement = Arrangement.spacedBy(
-                space = 60.dp
+                space = 20.dp
             )
         ) {
-            TaskSkeleton()
+            ImageSkeleton()
 
-            ButtonSkeleton()
+            ActionsSkeleton()
         }
-    }
 
-    InformationSkeleton(
-        space = 5.dp
-    ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(
-                space = 40.dp
-            )
+        InformationSkeleton(
+            space = 20.dp
         ) {
-            LineSkeleton()
+            DescriptionSkeleton(
+                lines = 3
+            )
+        }
 
+        InformationSkeleton(
+            space = 40.dp
+        ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(
                     space = 60.dp
                 )
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(
-                        space = 10.dp
-                    )
-                ) {
-                    CreateDetailsSkeleton()
-
-                    AnalysisSkeleton()
-                }
+                TaskSkeleton()
 
                 ButtonSkeleton()
+            }
+        }
+
+        InformationSkeleton(
+            space = 5.dp
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(
+                    space = 40.dp
+                )
+            ) {
+                LineSkeleton()
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(
+                        space = 60.dp
+                    )
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(
+                            space = 10.dp
+                        )
+                    ) {
+                        CreateDetailsSkeleton()
+
+                        AnalysisSkeleton()
+                    }
+
+                    ButtonSkeleton()
+                }
             }
         }
     }

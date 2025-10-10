@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -117,207 +119,221 @@ fun ExplanationFormData(
                 bottomEnd = 0.dp
             )
         ) {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(
-                        start = 30.dp,
-                        end = 30.dp,
-                        bottom = 60.dp,
-                        top = 30.dp
-                    )
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(
-                    space = 40.dp
-                )
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(
-                        space = 20.dp
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(
-                            space = 15.dp
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Info,
-                            contentDescription = "Icone de pergunta",
-                            modifier = Modifier
-                                .scale(1.2F)
-                        )
-
-                        Text(
-                            text =
-                            when (tokenViewModel.getToken("id")) {
-                                "sba" -> {
-                                    "O que é a Saturação de Bases Atual?"
-                                }
-
-                                "ctc" -> {
-                                    "O que é CTC?"
-                                }
-
-                                "prnt" -> {
-                                    "O que é PRNT?"
-                                }
-
-                                else -> {
-                                    ""
-                                }
-                            },
-                            style = Typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-
+            tokenViewModel.getToken("id")
+                ?.takeIf { it.isNotBlank() }
+                ?.let {
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                            .verticalScroll(rememberScrollState())
+                            .padding(
+                                start = 30.dp,
+                                end = 30.dp,
+                                bottom = 60.dp,
+                                top = 30.dp
+                            )
+                            .fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(
-                            space = 20.dp
+                            space = 40.dp
                         )
                     ) {
-                        Text(
-                            text =
-                            when (tokenViewModel.getToken("id")) {
-                                "sba" -> {
-                                    "Denomina-se saturação por bases (V%) a soma das bases trocáveis expressa em porcentagem de capacidade de troca de cátions:"
-                                }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(
+                                space = 20.dp
+                            )
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(
+                                    space = 15.dp
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Info,
+                                    contentDescription = "Icone de pergunta",
+                                    modifier = Modifier
+                                        .scale(1.2F)
+                                )
 
-                                "ctc" -> {
-                                    "A CTC mede a capacidade do solo de segurar nutrientes importantes para as plantas, como cálcio e potássio. Quanto maior a CTC, mais nutrientes o solo consegue reter e oferecer às plantas, indicando um solo mais fértil."
-                                }
-
-                                "prnt" -> {
-                                    "Mede a eficácia do calcário em neutralizar a acidez do solo. Ajuda a determinar quão bem o calcário vai funcionar para corrigir a acidez do solo, garantindo que as plantas absorvam nutrientes adequadamente."
-                                }
-
-                                else -> {
-                                    ""
-                                }
-                            },
-                            style = Typography.bodyLarge,
-                            fontWeight = FontWeight.Normal,
-                            textAlign = TextAlign.Justify
-                        )
-
-                        tokenViewModel.getToken("id")?.let {
-                            if (it == "sba") {
                                 Text(
-                                    text = "(V%) = 100 * SB ÷ CTC",
+                                    text =
+                                    when (it) {
+                                        "sba" -> {
+                                            "O que é a Saturação de Bases Atual?"
+                                        }
+
+                                        "ctc" -> {
+                                            "O que é CTC?"
+                                        }
+
+                                        "prnt" -> {
+                                            "O que é PRNT?"
+                                        }
+
+                                        else -> {
+                                            ""
+                                        }
+                                    },
+                                    style = Typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(
+                                    space = 20.dp
+                                )
+                            ) {
+                                Text(
+                                    text =
+                                    when (it) {
+                                        "sba" -> {
+                                            "Denomina-se saturação por bases (V%) a soma das bases trocáveis expressa em porcentagem de capacidade de troca de cátions:"
+                                        }
+
+                                        "ctc" -> {
+                                            "A CTC mede a capacidade do solo de segurar nutrientes importantes para as plantas, como cálcio e potássio. Quanto maior a CTC, mais nutrientes o solo consegue reter e oferecer às plantas, indicando um solo mais fértil."
+                                        }
+
+                                        "prnt" -> {
+                                            "Mede a eficácia do calcário em neutralizar a acidez do solo. Ajuda a determinar quão bem o calcário vai funcionar para corrigir a acidez do solo, garantindo que as plantas absorvam nutrientes adequadamente."
+                                        }
+
+                                        else -> {
+                                            ""
+                                        }
+                                    },
                                     style = Typography.bodyLarge,
                                     fontWeight = FontWeight.Normal,
                                     textAlign = TextAlign.Justify
                                 )
 
-                                Text(
-                                    text = "Na fórmula utiliza-se o valor da “CTC total”.",
-                                    style = Typography.bodyLarge,
-                                    fontWeight = FontWeight.Normal,
-                                    textAlign = TextAlign.Justify
-                                )
+                                if (it == "sba") {
+                                    Text(
+                                        text = "(V%) = 100 * SB ÷ CTC",
+                                        style = Typography.bodyLarge,
+                                        fontWeight = FontWeight.Normal,
+                                        textAlign = TextAlign.Justify
+                                    )
+
+                                    Text(
+                                        text = "Na fórmula utiliza-se o valor da “CTC total”.",
+                                        style = Typography.bodyLarge,
+                                        fontWeight = FontWeight.Normal,
+                                        textAlign = TextAlign.Justify
+                                    )
+                                }
                             }
                         }
-                    }
-                }
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(
-                        space = 20.dp
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(
-                            space = 15.dp
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Info,
-                            contentDescription = "Icone de pergunta",
+                        Column(
                             modifier = Modifier
-                                .scale(1.2F)
-                        )
-
-                        Text(
-                            text = "Como ele é utilizado?",
-                            style = Typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-
-                    Text(
-                        text =
-                        when (tokenViewModel.getToken("id")) {
-                            "sba" -> {
-                                "A saturação por bases é um excelente indicativo das condições gerais de fertilidade do solo, sendo utilizada até como complemento na nomenclatura dos solos. Os solos podem ser divididos de acordo com a saturação por bases: solos eutróficos (férteis) = V% maior ou igual á 50%; solos distróficos (pouco férteis) = V% menor que 50%."
-                            }
-
-                            "ctc" -> {
-                                "Para representar a graduação da capacidade de liberação de vários nutrientes, favorecendo a manutenção da fertilidade por um prolongado período e reduzindo ou evitando a ocorrência de efeitos tóxicos da aplicação de fertilizantes."
-                            }
-
-                            "prnt" -> {
-                                "A saturação por bases é um excelente indicativo das condições gerais de fertilidade do solo, sendo utilizada até como complemento na nomenclatura dos solos. Os solos podem ser divididos de acordo com a saturação por bases: solos eutróficos (férteis) = V% maior ou igual á 50%; solos distróficos (pouco férteis) = V% menor que 50%."
-                            }
-
-                            else -> {
-                                ""
-                            }
-                        },
-                        style = Typography.bodyLarge,
-                        fontWeight = FontWeight.Normal,
-                        textAlign = TextAlign.Justify
-                    )
-                }
-
-                Card(
-                    modifier = Modifier
-                        .height(
-                            max(
-                                160.dp, 160.dp
+                                .fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(
+                                space = 20.dp
                             )
-                        )
-                        .fillMaxWidth(),
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.analysisimagexplanation),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .fillMaxSize()
-                    )
-                }
-
-                tokenViewModel.getToken("id")?.let {
-                    if (it == "sba") {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
                         ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(
+                                    space = 15.dp
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Info,
+                                    contentDescription = "Icone de pergunta",
+                                    modifier = Modifier
+                                        .scale(1.2F)
+                                )
+
+                                Text(
+                                    text = "Como ele é utilizado?",
+                                    style = Typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+
                             Text(
-                                text = "A maioria das culturas apresenta boa produtividade quando no solo é obtido valor V% entre 50 e 80% e valor de pH entre 6,0 e 6,5.",
+                                text =
+                                when (it) {
+                                    "sba" -> {
+                                        "A saturação por bases é um excelente indicativo das condições gerais de fertilidade do solo, sendo utilizada até como complemento na nomenclatura dos solos. Os solos podem ser divididos de acordo com a saturação por bases: solos eutróficos (férteis) = V% maior ou igual á 50%; solos distróficos (pouco férteis) = V% menor que 50%."
+                                    }
+
+                                    "ctc" -> {
+                                        "Para representar a graduação da capacidade de liberação de vários nutrientes, favorecendo a manutenção da fertilidade por um prolongado período e reduzindo ou evitando a ocorrência de efeitos tóxicos da aplicação de fertilizantes."
+                                    }
+
+                                    "prnt" -> {
+                                        "A saturação por bases é um excelente indicativo das condições gerais de fertilidade do solo, sendo utilizada até como complemento na nomenclatura dos solos. Os solos podem ser divididos de acordo com a saturação por bases: solos eutróficos (férteis) = V% maior ou igual á 50%; solos distróficos (pouco férteis) = V% menor que 50%."
+                                    }
+
+                                    else -> {
+                                        ""
+                                    }
+                                },
                                 style = Typography.bodyLarge,
                                 fontWeight = FontWeight.Normal,
                                 textAlign = TextAlign.Justify
                             )
                         }
-                    }
 
+                        Card(
+                            modifier = Modifier
+                                .height(
+                                    max(
+                                        160.dp, 160.dp
+                                    )
+                                )
+                                .fillMaxWidth(),
+                            shape = RoundedCornerShape(5.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.analysisimagexplanation),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                            )
+                        }
+
+                        if (it == "sba") {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "A maioria das culturas apresenta boa produtividade quando no solo é obtido valor V% entre 50 e 80% e valor de pH entre 6,0 e 6,5.",
+                                    style = Typography.bodyLarge,
+                                    fontWeight = FontWeight.Normal,
+                                    textAlign = TextAlign.Justify
+                                )
+                            }
+                        }
+                    }
                 }
-            }
+
+                ?: run {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator(
+                            strokeWidth = 4.dp,
+                            modifier = Modifier.size(48.dp),
+                            color = VERDE_CLARO
+                        )
+                    }
+                }
         }
     }
 }

@@ -19,7 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.core.ui.components.Button
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
@@ -30,7 +29,6 @@ import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.core.ui.theme.VERMELHO
 import com.banap.banap.data.model.field.FieldResponse
 import com.banap.banap.data.model.producer.TaskList
-import com.banap.banap.domain.model.field.ListFieldsState
 
 @Composable
 fun Tasks(

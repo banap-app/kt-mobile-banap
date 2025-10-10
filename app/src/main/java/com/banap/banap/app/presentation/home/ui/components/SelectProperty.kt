@@ -2,6 +2,7 @@ package com.banap.banap.app.presentation.home.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,7 +37,7 @@ fun SelectProperty(
     Card(
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
-            .height(50.dp)
+            .height(IntrinsicSize.Min)
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = if(id == selectedOption) VERDE_CLARO else BRANCO,

@@ -13,11 +13,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +41,7 @@ import com.banap.banap.R
 import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.analysis.ui.information.components.CreateDetails
 import com.banap.banap.app.presentation.field.ui.information.components.FieldActions
+import com.banap.banap.app.presentation.home.ui.components.SelectProperty
 import com.banap.banap.app.presentation.home.ui.components.TaskCard
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.skeleton.ui.field.screen.FieldInformationSkeleton
@@ -68,7 +72,6 @@ import com.banap.banap.domain.viewmodel.analysis.ListAnalysisViewModel
 import com.banap.banap.domain.viewmodel.field.DeleteFieldViewModel
 import com.banap.banap.domain.viewmodel.field.GetFieldByIdViewModel
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun FieldInformation(
     navigationController: NavController,
@@ -89,6 +92,17 @@ fun FieldInformation(
     var modalVisible: Boolean by remember {
         mutableStateOf(false)
     }
+
+    var selectAnalysis: Boolean by remember {
+        mutableStateOf(false)
+    }
+
+    val radioOptions = mapOf(
+        "1" to "Análise de Calagem",
+        "2" to "Análise de Recomendação de Adubação"
+    )
+
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions.keys.firstOrNull()) }
 
     var analysisList: List<AnalysisResponse> by remember {
         mutableStateOf(listOf())
@@ -123,7 +137,7 @@ fun FieldInformation(
     }
 
     LaunchedEffect(context) {
-        if (userName?.contains("userName") == false) {
+        if (userName?.contains("userName") == false && userName.isNotEmpty()) {
             tokenViewModel.saveToken("userName", userName)
         }
     }
@@ -136,6 +150,13 @@ fun FieldInformation(
         tokenViewModel.clearToken("potassium")
         tokenViewModel.clearToken("option")
         tokenViewModel.clearToken("analysisId")
+        tokenViewModel.clearToken("fieldName")
+        tokenViewModel.clearToken("producerId")
+        tokenViewModel.clearToken("propertyId")
+        tokenViewModel.clearToken("markers")
+        tokenViewModel.clearToken("description")
+        tokenViewModel.clearToken("culture")
+        tokenViewModel.clearToken("currentPage")
         Log.d("field", tokenViewModel.getToken("fieldId") ?: "")
 
         if (tokenViewModel.getToken("fieldId").isNullOrEmpty()) {
@@ -278,7 +299,16 @@ fun FieldInformation(
                                     onClickDelete = {
                                         modalVisible = true
                                     },
-                                    onClickEdit = {}
+                                    onClickEdit = {
+                                        navigationController.navigate(
+                                            Screen.NewField.createRoute(
+                                                producerId = field?.producerId ?: "",
+                                                propertyId = field?.propertyId ?: "",
+                                                fieldId = tokenViewModel.getToken("fieldId")
+                                                    ?: fieldId
+                                            )
+                                        )
+                                    }
                                 )
 
                                 if (modalVisible) {
@@ -507,18 +537,66 @@ fun FieldInformation(
                                             hasIcon = true,
                                             shape = ShapeProperty.small,
                                             onClick = {
-                                                navigationController.navigate("NewLimingCalculation")
+                                                selectAnalysis = true
                                             },
                                             backgroundColor = VERDE_CLARO,
                                             contentColor = BRANCO,
                                             defaultElevetion = 3.dp
                                         )
+
+                                        if (selectAnalysis) {
+                                            Modal(
+                                                onConfirm = {
+                                                    selectedOption?.let {
+                                                        if (selectedOption == "1") {
+                                                            navigationController.navigate("NewLimingCalculation")
+                                                        } else {
+                                                            navigationController.navigate("NewFertilizationRecommendation")
+                                                        }
+                                                    }
+                                                },
+                                                onDismiss = {
+                                                    selectAnalysis = false
+                                                },
+                                                icon = ImageVector.vectorResource(id = R.drawable.analysisicontitle),
+                                                iconColor = VERDE_CLARO,
+                                                title = "Qual das análises deseja realizar?",
+                                                description = "",
+                                                disableOnConfirmButton = selectedOption.isNullOrEmpty(),
+                                                onConfirmText = "Selecionar Análise",
+                                                onConfirmButtonBackgroundColor = VERDE_CLARO,
+                                                onConfirmButtonContentColor = BRANCO,
+                                                onDismissText = "Cancelar",
+                                                onDismissButtonBackgroundColor = CINZA_INTERMEDIARIO,
+                                                onDismissButtonContentColor = PRETO,
+                                                space = 40.dp
+                                            ) {
+                                                Column(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(horizontal = 20.dp),
+                                                    verticalArrangement = Arrangement.spacedBy(
+                                                        space = 5.dp
+                                                    )
+                                                ) {
+                                                    radioOptions.forEach { (id, name) ->
+                                                        SelectProperty(
+                                                            name = name,
+                                                            id = id,
+                                                            onOptionSelected = onOptionSelected,
+                                                            selectedOption = selectedOption
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
 
                             else -> {
-                                val lastAnalysis = analysisList.sortedBy { it.createdAt }.takeLast(3).asReversed()
+                                val lastAnalysis =
+                                    analysisList.sortedBy { it.createdAt }.takeLast(3).asReversed()
 
                                 item {
                                     Row(
@@ -633,7 +711,7 @@ fun FieldInformation(
                                 }
 
                                 item {
-                                    Row (
+                                    Row(
                                         modifier = Modifier
                                             .padding(
                                                 top = 55.dp,
@@ -654,12 +732,59 @@ fun FieldInformation(
                                             hasIcon = true,
                                             shape = ShapeProperty.small,
                                             onClick = {
-                                                navigationController.navigate("NewLimingCalculation")
+                                                selectAnalysis = true
                                             },
                                             backgroundColor = VERDE_CLARO,
                                             contentColor = BRANCO,
                                             defaultElevetion = 3.dp
                                         )
+                                    }
+
+                                    if (selectAnalysis) {
+                                        Modal(
+                                            onConfirm = {
+                                                selectedOption?.let {
+                                                    if (selectedOption == "1") {
+                                                        navigationController.navigate("NewLimingCalculation")
+                                                    } else {
+                                                        navigationController.navigate("NewFertilizationRecommendation")
+                                                    }
+                                                }
+                                            },
+                                            onDismiss = {
+                                                selectAnalysis = false
+                                            },
+                                            icon = ImageVector.vectorResource(id = R.drawable.analysisicontitle),
+                                            iconColor = VERDE_CLARO,
+                                            title = "Qual das análises deseja realizar?",
+                                            description = "",
+                                            disableOnConfirmButton = selectedOption.isNullOrEmpty(),
+                                            onConfirmText = "Selecionar Análise",
+                                            onConfirmButtonBackgroundColor = VERDE_CLARO,
+                                            onConfirmButtonContentColor = BRANCO,
+                                            onDismissText = "Cancelar",
+                                            onDismissButtonBackgroundColor = CINZA_INTERMEDIARIO,
+                                            onDismissButtonContentColor = PRETO,
+                                            space = 40.dp
+                                        ) {
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 20.dp),
+                                                verticalArrangement = Arrangement.spacedBy(
+                                                    space = 5.dp
+                                                )
+                                            ) {
+                                                radioOptions.forEach { (id, name) ->
+                                                    SelectProperty(
+                                                        name = name,
+                                                        id = id,
+                                                        onOptionSelected = onOptionSelected,
+                                                        selectedOption = selectedOption
+                                                    )
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }

@@ -4,12 +4,13 @@ import android.content.Context
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class TokenManager @Inject constructor(
-    context: Context,
+    @ApplicationContext context: Context,
 ) {
     private val prefs = context.getSharedPreferences("auth_token", Context.MODE_PRIVATE)
     private val gson = Gson()

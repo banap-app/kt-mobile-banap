@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -100,7 +99,7 @@ fun FirstPage(
         }
     }
 
-    Column (
+    Column(
         modifier = Modifier
             .padding(
                 top = innerPadding.calculateTopPadding(),
@@ -113,7 +112,10 @@ fun FirstPage(
         )
 
         TitleRegistration(
-            texto = "Cadastrando seu ",
+            texto = if (tokenViewModel.getToken("fieldId")
+                    ?.isNotEmpty() == true && tokenViewModel.getToken("fieldId")
+                    ?.contains("fieldId") == false
+            ) "Atualizando seu " else "Cadastrando seu ",
             textoASerDestacado = "Talhão...",
             corEmDestaque = VERDE_ESCURO,
             subTexto = "",

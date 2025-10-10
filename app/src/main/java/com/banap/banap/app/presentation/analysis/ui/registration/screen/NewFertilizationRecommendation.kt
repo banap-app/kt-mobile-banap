@@ -23,7 +23,6 @@ import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.analysis.ui.registration.components.AnalysisResult
 import com.banap.banap.app.presentation.analysis.ui.registration.components.ResultCard
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
-import com.banap.banap.app.presentation.validation.ctc.event.CTCTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.dropdown.event.DropdownTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.dropdown.utils.validationDataDropdown
 import com.banap.banap.app.presentation.validation.dropdown.viewmodel.DropdownTextFieldViewModel
@@ -33,8 +32,6 @@ import com.banap.banap.app.presentation.validation.phosphorus.viewmodel.Phosphor
 import com.banap.banap.app.presentation.validation.potassium.event.PotassiumTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.potassium.utils.validationDataPotassium
 import com.banap.banap.app.presentation.validation.potassium.viewmodel.PotassiumTextFieldViewModel
-import com.banap.banap.app.presentation.validation.prnt.event.PRNTextFieldFormEvent
-import com.banap.banap.app.presentation.validation.sba.event.SBATextFieldFormEvent
 import com.banap.banap.core.ui.components.DropdownTextField
 import com.banap.banap.core.ui.components.RegistrationScreenPattern
 import com.banap.banap.core.ui.components.TextBoxRegistration

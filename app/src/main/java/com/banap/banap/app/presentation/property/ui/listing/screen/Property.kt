@@ -1,5 +1,6 @@
 package com.banap.banap.app.presentation.property.ui.listing.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.banap.banap.R
 import com.banap.banap.app.navigation.screens.Screen
@@ -40,8 +42,10 @@ import com.banap.banap.core.ui.theme.Typography
 import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.util.shimmerEffect
 import com.banap.banap.data.model.field.FieldResponse
-import com.banap.banap.domain.model.field.ListFieldsState
+import com.banap.banap.data.model.menu.DropDownItem
+import com.banap.banap.data.model.menu.MenuOption
 import com.banap.banap.domain.viewmodel.field.ListFieldsViewModel
+import com.banap.banap.domain.viewmodel.property.DeletePropertyViewModel
 
 @Composable
 fun Property(
@@ -51,9 +55,12 @@ fun Property(
     propertyId: String,
     producerId: String,
     listFieldsViewModel: ListFieldsViewModel,
-    listFieldsState: ListFieldsState,
-    tokenViewModel: TokenViewModel
+    tokenViewModel: TokenViewModel,
+    deletePropertyViewModel: DeletePropertyViewModel = hiltViewModel()
 ) {
+    val deletePropertyState = deletePropertyViewModel.state.value
+    val listFieldsState by listFieldsViewModel.state
+
     var isLoading: Boolean by remember {
         mutableStateOf(false)
     }
@@ -62,27 +69,53 @@ fun Property(
         mutableStateOf("")
     }
 
+    var deleteIsLoading: Boolean by remember {
+        mutableStateOf(false)
+    }
+
+    var deleteError by remember {
+        mutableStateOf("")
+    }
+
     var fields: List<FieldResponse> by remember {
         mutableStateOf(listOf())
+    }
+
+    var modalVisible: Boolean by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(Unit) {
+        tokenViewModel.clearToken("propertyName")
     }
 
     LaunchedEffect(true) {
         if (!userName.contains("userName")) {
             tokenViewModel.saveToken("userName", userName)
+            Log.d("USERNAME", userName)
         }
     }
 
     LaunchedEffect(true) {
         if (!name.contains("name")) {
             tokenViewModel.saveToken("listingPropertyName", name)
+            Log.d("PROPERTYNAME", name)
+        }
+    }
+
+    LaunchedEffect(true) {
+        if (!producerId.contains("producerId")) {
+            tokenViewModel.saveToken("producerId", producerId)
         }
     }
 
     LaunchedEffect(true) {
         if (tokenViewModel.getToken("propertyId").isNullOrEmpty()) {
             listFieldsViewModel.listFields(propertyId)
+            Log.d("ID_VINDO", propertyId)
         } else {
             listFieldsViewModel.listFields(tokenViewModel.getToken("propertyId") ?: "")
+            Log.d("ID_TOKEN", tokenViewModel.getToken("propertyId") ?: "")
         }
     }
 
@@ -95,12 +128,29 @@ fun Property(
             it.forEach { (id, listFields) ->
                 fields = listFields
                 tokenViewModel.saveToken("propertyId", id)
+                Log.d("ID_SALVO", tokenViewModel.getToken("propertyId") ?: "")
             }
         }
     }
 
     LaunchedEffect(listFieldsState.error) {
         error = listFieldsState.error
+    }
+
+    LaunchedEffect(deletePropertyState.response) {
+        deletePropertyState.response?.let {
+            if (it.success) {
+                navigationController.navigate("Home")
+            }
+        }
+    }
+
+    LaunchedEffect(deletePropertyState.isLoading) {
+        deleteIsLoading = deletePropertyState.isLoading
+    }
+
+    LaunchedEffect(deletePropertyState.error) {
+        deleteError = deletePropertyState.error
     }
 
     Container(
@@ -202,8 +252,11 @@ fun Property(
                             onClick = {
                                 navigationController.navigate(
                                     Screen.NewField.createRoute(
-                                        producerId = producerId,
-                                        propertyId = propertyId
+                                        producerId = tokenViewModel.getToken("producerId")
+                                            ?: producerId,
+                                        propertyId = tokenViewModel.getToken("propertyId")
+                                            ?: propertyId,
+                                        fieldId = "fieldId"
                                     )
                                 )
                             },
@@ -260,12 +313,55 @@ fun Property(
         onClick = {
             navigationController.navigate(
                 Screen.NewField.createRoute(
-                    producerId = producerId,
-                    propertyId = propertyId
+                    producerId = tokenViewModel.getToken("producerId") ?: producerId,
+                    propertyId = tokenViewModel.getToken("propertyId") ?: propertyId,
+                    fieldId = "fieldId"
                 )
             )
         },
         isLoading = isLoading,
-        propertyList = fields,
+        deleteIsLoading = deleteIsLoading,
+        modalVisible = modalVisible,
+        dropDownItems = listOf(
+            DropDownItem(
+                option = MenuOption(
+                    icon = R.drawable.fieldicondelete,
+                    text = "Deletar"
+                ),
+                optionSelected = {
+                    Log.d("ID_DELETE_TOKEN", tokenViewModel.getToken("propertyId") ?: "")
+                    Log.d("ID_DELETE_VINDO", propertyId)
+
+                    modalVisible = true
+                }
+            ),
+            DropDownItem(
+                option = MenuOption(
+                    icon = R.drawable.fieldiconedit,
+                    text = "Editar"
+                ),
+                optionSelected = {
+                    navigationController.navigate(
+                        Screen.NewProperty.createRoute(
+                            propertyId = tokenViewModel.getToken("propertyId") ?: propertyId
+                        )
+                    )
+                }
+            )
+        ),
+        modalOnConfirm = {
+            Log.d("ID_DELETE_TOKEN", tokenViewModel.getToken("propertyId") ?: "")
+            Log.d("ID_DELETE_VINDO", propertyId)
+
+            deletePropertyViewModel.deleteProperty(
+                tokenViewModel.getToken("propertyId") ?: propertyId
+            )
+
+            modalVisible = false
+        },
+        modalOnDismiss = {
+            modalVisible = false
+        },
+        propertyList = fields
     )
 }

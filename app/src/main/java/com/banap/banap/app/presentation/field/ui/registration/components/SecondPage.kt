@@ -27,7 +27,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
@@ -213,7 +212,10 @@ fun SecondPage(
             }
 
             TitleRegistration(
-                texto = "Cadastrando seu ",
+                texto = if (tokenViewModel.getToken("fieldId")
+                        ?.isNotEmpty() == true && tokenViewModel.getToken("fieldId")
+                        ?.contains("fieldId") == false
+                ) "Atualizando seu " else "Cadastrando seu ",
                 textoASerDestacado = "Talhão...",
                 corEmDestaque = VERDE_ESCURO,
                 subTexto = "",

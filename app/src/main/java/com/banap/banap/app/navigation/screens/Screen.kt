@@ -9,7 +9,8 @@ sealed class Screen (
     data object NewField : Screen(route = "NewField") {
         const val PRODUCER_ARGUMENT = "producerId"
         const val PROPERTY_ARGUMENT = "propertyId"
-        val routeWithArgument = "$route/{$PRODUCER_ARGUMENT}/{$PROPERTY_ARGUMENT}"
+        const val FIELD_ARGUMENT = "fieldId"
+        val routeWithArgument = "$route/{$PRODUCER_ARGUMENT}/{$PROPERTY_ARGUMENT}/{$FIELD_ARGUMENT}"
 
         val arguments = listOf(
             navArgument(PRODUCER_ARGUMENT) {
@@ -17,10 +18,13 @@ sealed class Screen (
             },
             navArgument(PROPERTY_ARGUMENT) {
                 type = NavType.StringType
+            },
+            navArgument(FIELD_ARGUMENT) {
+                type = NavType.StringType
             }
         )
 
-        fun createRoute(producerId: String, propertyId: String) = "$route/$producerId/$propertyId"
+        fun createRoute(producerId: String, propertyId: String, fieldId: String) = "$route/$producerId/$propertyId/$fieldId"
     }
 
     data object Information : Screen(route = "Information") {
@@ -98,4 +102,34 @@ sealed class Screen (
 
         fun createRoute(id: String) = "$route/$id"
     }
+
+    data object NewProperty : Screen(route = "NewProperty") {
+        const val PROPERTY_ARGUMENT = "propertyId"
+        val routeWithArgument = "$route/{$PROPERTY_ARGUMENT}"
+
+        val arguments = listOf(
+            navArgument(PROPERTY_ARGUMENT) {
+                type = NavType.StringType
+            }
+        )
+
+        fun createRoute(propertyId: String) = "$route/$propertyId"
+    }
+
+//    data object UpdateUserInformation : Screen(route = "UpdateUserInformation") {
+//        const val USER_NAME_ARGUMENT = "name"
+//        const val USER_EMAIL_ARGUMENT = "email"
+//        val routeWithArgument = "$route/{$USER_NAME_ARGUMENT}/{$USER_EMAIL_ARGUMENT}"
+//
+//        val arguments = listOf(
+//            navArgument(USER_NAME_ARGUMENT) {
+//                type = NavType.StringType
+//            },
+//            navArgument(USER_EMAIL_ARGUMENT) {
+//                type = NavType.StringType
+//            }
+//        )
+//
+//        fun createRoute(name: String, email: String) = "$route/$name/$email"
+//    }
 }

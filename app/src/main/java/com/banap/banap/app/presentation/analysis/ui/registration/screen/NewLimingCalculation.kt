@@ -294,7 +294,12 @@ fun NewLimingCalculation(
                     )
                 }
             } else {
-                navigationController.navigate("NewFertilizationRecommendation")
+                navigationController.navigate(
+                    Screen.Information.createRoute(
+                        fieldId = fieldId,
+                        userName = userName
+                    )
+                )
             }
         },
         buttonValue = if (analysisMade) "Cadastrar" else "Calcular",

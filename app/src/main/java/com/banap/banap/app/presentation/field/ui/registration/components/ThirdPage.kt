@@ -33,9 +33,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.R
+import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.validation.description.event.DescriptionTextFieldFormEvent
 import com.banap.banap.app.presentation.validation.description.utils.validationDataDescription
@@ -59,7 +59,7 @@ import com.banap.banap.core.ui.util.convertLatLngToFieldBoundary
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.domain.model.field.FieldBoundary
 import com.banap.banap.domain.viewmodel.field.CreateFieldViewModel
-import com.google.android.gms.maps.model.LatLng
+import com.banap.banap.domain.viewmodel.field.UpdateFieldViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -67,6 +67,7 @@ import kotlinx.coroutines.launch
 fun ThirdPage(
     navigationController: NavController,
     createFieldViewModel: CreateFieldViewModel = hiltViewModel(),
+    updateFieldViewModel: UpdateFieldViewModel = hiltViewModel(),
     currentPage: MutableState<FieldPage>,
     snackBarHostState: SnackbarHostState,
     context: Context,
@@ -76,18 +77,17 @@ fun ThirdPage(
     logList: MutableList<LogList>,
     isValidationSuccessful: MutableState<Boolean>,
     innerPadding: PaddingValues,
-    tokenViewModel: TokenViewModel
+    tokenViewModel: TokenViewModel,
+    viewModelDescription: DescriptionTextFieldViewModel,
+    stateDescription: RegistrationFormState,
+    viewModelDropdown: DropdownTextFieldViewModel,
+    stateDropdown: RegistrationFormState
 ) {
     val createFieldState = createFieldViewModel.state.value
+    val updateFieldState = updateFieldViewModel.state.value
 
     val fieldBoundary: List<FieldBoundary> = tokenViewModel.getMarkers("markers")
         .map { it.convertLatLngToFieldBoundary() }
-
-    val viewModelDescription = viewModel<DescriptionTextFieldViewModel>()
-    val stateDescription = viewModelDescription.state
-
-    val viewModelDropdown = viewModel<DropdownTextFieldViewModel>()
-    val stateDropdown = viewModelDropdown.state
 
     val validationDataDescription = validationDataDescription(
         context = context,
@@ -105,6 +105,10 @@ fun ThirdPage(
 
     var isLoading: Boolean by remember {
         mutableStateOf(false)
+    }
+
+    var error: String by remember {
+        mutableStateOf("")
     }
 
     var backgroundColorButton by remember {
@@ -175,6 +179,12 @@ fun ThirdPage(
         }
     }
 
+    LaunchedEffect(createFieldState.response) {
+        createFieldState.response?.let {
+            navigationController.navigate("Home")
+        }
+    }
+
     LaunchedEffect(createFieldState.error) {
         if (createFieldState.error.isNotEmpty()) {
             isLoading = false
@@ -212,14 +222,32 @@ fun ThirdPage(
         }
     }
 
-    LaunchedEffect(createFieldState.response) {
-        createFieldState.response?.let {
-            navigationController.navigate("Home")
+    LaunchedEffect(updateFieldState.response) {
+        updateFieldState.response?.let {
+            if (it.success) {
+                navigationController.navigate(
+                    Screen.Information.createRoute(
+                        fieldId = tokenViewModel.getToken("fieldId")
+                            .let { token ->
+                                token ?: ""
+                            },
+                        userName = tokenViewModel.getToken("userName")
+                    )
+                )
+            }
         }
     }
 
+    LaunchedEffect(updateFieldState.isLoading) {
+        isLoading = updateFieldState.isLoading
+    }
+
+    LaunchedEffect(updateFieldState.error) {
+
+    }
+
     if (!isLoading) {
-        Column (
+        Column(
             modifier = Modifier
                 .padding(
                     top = innerPadding.calculateTopPadding(),
@@ -259,7 +287,10 @@ fun ThirdPage(
             }
 
             TitleRegistration(
-                texto = "Cadastrando seu ",
+                texto = if (tokenViewModel.getToken("fieldId")
+                        ?.isNotEmpty() == true && tokenViewModel.getToken("fieldId")
+                        ?.contains("fieldId") == false
+                ) "Atualizando seu " else "Cadastrando seu ",
                 textoASerDestacado = "Talhão...",
                 corEmDestaque = VERDE_ESCURO,
                 subTexto = "",
@@ -335,14 +366,33 @@ fun ThirdPage(
                         viewModelDropdown.onEvent(DropdownTextFieldFormEvent.Submit)
 
                         if (isValidationSuccessful.value) {
-                            createFieldViewModel.createField(
-                                producerId = tokenViewModel.getToken("producerId") ?: producerId,
-                                propertyId = tokenViewModel.getToken("propertyId") ?: propertyId,
-                                name = stateName.name,
-                                description = stateDescription.description,
-                                crop = stateDropdown.option,
-                                fieldBoundary = fieldBoundary
-                            )
+                            if (tokenViewModel.getToken("fieldId")
+                                    ?.isNotEmpty() == true && tokenViewModel.getToken("fieldId")
+                                    ?.contains("fieldId") == false
+                            ) {
+                                updateFieldViewModel.updateField(
+                                    id = tokenViewModel.getToken("fieldId") ?: "",
+                                    producerId = tokenViewModel.getToken("producerId")
+                                        ?: producerId,
+                                    propertyId = tokenViewModel.getToken("propertyId")
+                                        ?: propertyId,
+                                    name = stateName.name,
+                                    description = stateDescription.description,
+                                    crop = stateDropdown.option,
+                                    fieldBoundary = fieldBoundary
+                                )
+                            } else {
+                                createFieldViewModel.createField(
+                                    producerId = tokenViewModel.getToken("producerId")
+                                        ?: producerId,
+                                    propertyId = tokenViewModel.getToken("propertyId")
+                                        ?: propertyId,
+                                    name = stateName.name,
+                                    description = stateDescription.description,
+                                    crop = stateDropdown.option,
+                                    fieldBoundary = fieldBoundary
+                                )
+                            }
 
                             logList.add(
                                 LogList(
@@ -354,7 +404,14 @@ fun ThirdPage(
                             isLoading = true
                         }
                     },
-                    buttonValue = "Continuar",
+                    buttonValue = if (tokenViewModel.getToken("fieldId")
+                            ?.isNotEmpty() == true && tokenViewModel.getToken("fieldId")
+                            ?.contains("fieldId") == false
+                    ) {
+                        "Atualizar"
+                    } else {
+                        "Cadastrar"
+                    },
                     backgroundColor = backgroundColor,
                     contentColor = contentColor
                 )

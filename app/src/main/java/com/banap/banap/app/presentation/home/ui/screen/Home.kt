@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -63,10 +62,6 @@ import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
 import com.banap.banap.data.model.property.ListPropertiesResponse
 import com.banap.banap.data.model.weather.WeatherResponse
-import com.banap.banap.domain.model.field.ListFieldsState
-import com.banap.banap.domain.model.producer.ProducerState
-import com.banap.banap.domain.model.property.ListPropertiesState
-import com.banap.banap.domain.model.weather.WeatherState
 import com.banap.banap.domain.viewmodel.field.ListFieldsViewModel
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.producer.GetProducerByIdViewModel
@@ -82,14 +77,10 @@ fun Home(
     tokenViewModel: TokenViewModel,
     tokenVerificationViewModel: TokenVerificationViewModel,
     weatherViewModel: WeatherViewModel,
-    weatherState: WeatherState,
     locationViewModel: LocationViewModel,
     listPropertiesViewModel: ListPropertiesViewModel,
-    listPropertiesState: ListPropertiesState,
     listFieldsViewModel: ListFieldsViewModel,
-    listFieldsState: ListFieldsState,
     getProducerByIdViewModel: GetProducerByIdViewModel,
-    getProducerByIdState: ProducerState,
     taskList: MutableList<TaskList>,
     logList: MutableList<LogList>
 ) {
@@ -99,8 +90,12 @@ fun Home(
 
     val scope = rememberCoroutineScope()
 
-    val tokenVerificationState = tokenVerificationViewModel.state.value
-    val locationState = locationViewModel.state.value
+    val tokenVerificationState by tokenVerificationViewModel.state
+    val weatherState by weatherViewModel.state
+    val locationState by locationViewModel.state
+    val listPropertiesState by listPropertiesViewModel.state
+    val listFieldsState by listFieldsViewModel.state
+    val getProducerByIdState by getProducerByIdViewModel.state
 
     var isTokenValid: Boolean by remember {
         mutableStateOf(false)
@@ -213,11 +208,12 @@ fun Home(
         }
     }
 
-    LaunchedEffect(context) {
+    LaunchedEffect(true) {
         tokenViewModel.clearToken("userName")
         tokenViewModel.clearToken("fieldId")
         tokenViewModel.clearToken("producerId")
         tokenViewModel.clearToken("propertyId")
+        tokenViewModel.clearToken("updatePropertyId")
         tokenViewModel.clearToken("fieldName")
         tokenViewModel.clearToken("propertyName")
         tokenViewModel.clearToken("listingPropertyName")
@@ -225,6 +221,8 @@ fun Home(
         tokenViewModel.clearToken("description")
         tokenViewModel.clearToken("culture")
         tokenViewModel.clearToken("currentPage")
+        tokenViewModel.clearToken("nameProducer")
+        tokenViewModel.clearToken("emailProducer")
         Log.d("TOKEN", tokenViewModel.getToken("token").toString())
 
         tokenViewModel.getToken("token")?.let { token ->
@@ -294,10 +292,7 @@ fun Home(
     }
 
     LaunchedEffect(listPropertiesState.response) {
-        listPropertiesState.response?.let {
-            Log.d("PROPERTIES", it.toString())
-            properties = listPropertiesState.response
-        }
+        properties = listPropertiesState.response ?: emptyList()
     }
 
     LaunchedEffect(listPropertiesState.error) {
@@ -357,6 +352,7 @@ fun Home(
 
                     Header(
                         name = username,
+                        producerId = producerId,
                         navigationController = navigationController,
                         getProducerByIdState = getProducerByIdState,
                         onItemClick = {
@@ -454,7 +450,11 @@ fun Home(
                                     hasIcon = true,
                                     shape = ShapeProperty.small,
                                     onClick = {
-                                        navigationController.navigate("NewProperty")
+                                        navigationController.navigate(
+                                            Screen.NewProperty.createRoute(
+                                                propertyId = "propertyId"
+                                            )
+                                        )
                                     },
                                     backgroundColor = VERDE_CLARO,
                                     contentColor = BRANCO,
@@ -488,7 +488,8 @@ fun Home(
                                             navigationController.navigate(
                                                 Screen.NewField.createRoute(
                                                     producerId = producerId,
-                                                    propertyId = selectedOption
+                                                    propertyId = selectedOption,
+                                                    fieldId = "fieldId"
                                                 )
                                             )
                                         }
@@ -582,7 +583,11 @@ fun Home(
                                     text = "Ainda não há uma\npropriedade cadastrada!",
                                     buttonValue = "Nova Propriedade",
                                     onClick = {
-                                        navigationController.navigate("NewProperty")
+                                        navigationController.navigate(
+                                            Screen.NewProperty.createRoute(
+                                                propertyId = "propertyId"
+                                            )
+                                        )
                                     }
                                 )
                             }
