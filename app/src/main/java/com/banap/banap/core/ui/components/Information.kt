@@ -25,7 +25,7 @@ fun Information (
     paddingTop: Dp = 0.dp,
     icon: Int,
     title: String,
-    child: @Composable () -> Unit
+    child: @Composable () -> Unit = {}
 ) {
     Column (
         modifier = Modifier

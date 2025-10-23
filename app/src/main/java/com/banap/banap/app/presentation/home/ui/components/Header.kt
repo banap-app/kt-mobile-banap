@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.banap.banap.R
-import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.skeleton.ui.home.components.HeaderHomeSkeleton
 import com.banap.banap.core.ui.theme.PRETO
 import com.banap.banap.core.ui.theme.Typography
@@ -33,9 +32,8 @@ import com.banap.banap.domain.model.producer.ProducerState
 @Composable
 fun Header(
     name: String,
-    producerId: String,
     navigationController: NavController,
-    getProducerByIdState: ProducerState,
+    getProducerByIdState: ProducerState? = null,
     onItemClick: (DropDownItem) -> Unit
 ) {
     var error: String by remember {
@@ -46,15 +44,15 @@ fun Header(
         mutableStateOf(false)
     }
 
-    LaunchedEffect(getProducerByIdState.error) {
-        getProducerByIdState.error.let {
+    LaunchedEffect(getProducerByIdState?.error) {
+        getProducerByIdState?.error?.let {
             Log.d("ERROR", it)
             error = it
         }
     }
 
-    LaunchedEffect(getProducerByIdState.isLoading) {
-        getProducerByIdState.isLoading.let {
+    LaunchedEffect(getProducerByIdState?.isLoading) {
+        getProducerByIdState?.isLoading?.let {
             Log.d("LOADING", it.toString())
             loading = it
         }

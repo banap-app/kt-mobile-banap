@@ -16,7 +16,7 @@ class NavigationRepository @Inject constructor(
 
     val lastScreen: Flow<String> = dataStore.data
         .map { preferences ->
-            preferences[SettingsDataStore.LAST_SCREEN_KEY] ?: "Home"
+            preferences[SettingsDataStore.LAST_SCREEN_KEY] ?: "EngineerHome"
         }
 
     suspend fun saveLastScreen(route: String) {

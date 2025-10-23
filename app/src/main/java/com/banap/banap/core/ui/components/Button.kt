@@ -37,7 +37,8 @@ fun Button(
     contentColor: Color,
     defaultElevetion: Dp,
     style: TextStyle = Typography.bodyMedium,
-    fontWeight: FontWeight = FontWeight.ExtraBold
+    fontWeight: FontWeight = FontWeight.ExtraBold,
+    isClientInformation: Boolean = false
 ) {
     Card (
         shape = shape,
@@ -60,7 +61,7 @@ fun Button(
                     imageVector = icon,
                     contentDescription = "Icone de adicionar nova propriedade",
                     modifier = Modifier
-                        .scale(scale = 1.2F)
+                        .scale(scale = if (isClientInformation) 0.8F else 1.2F)
                 )
 
                 if (texto.isNotEmpty()) {

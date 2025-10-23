@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,7 +26,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -120,7 +120,6 @@ fun Property(
                     tint = VERDE_ESCURO
                 )
             }
-
         }
 
         when {
@@ -153,7 +152,10 @@ fun Property(
                     }
 
                     item {
-                        NewFieldCard(
+                        AddNewCard(
+                            height = 178.dp,
+                            width = 124.dp,
+                            icon = Icons.Outlined.Add,
                             onClick = {
                                 navigationController.navigate(
                                     Screen.NewField.createRoute(
@@ -210,7 +212,10 @@ fun Property(
                         space = 25.dp
                     )
                 ) {
-                    NewFieldCard(
+                    AddNewCard(
+                        height = 178.dp,
+                        width = 124.dp,
+                        icon = Icons.Outlined.Add,
                         onClick = {
                             navigationController.navigate(
                                 Screen.NewField.createRoute(

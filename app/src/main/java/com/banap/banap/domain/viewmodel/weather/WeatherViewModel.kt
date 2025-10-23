@@ -19,7 +19,11 @@ class WeatherViewModel @Inject constructor(
     private val _state = mutableStateOf(WeatherState())
     val state: State<WeatherState> = _state
 
-    fun getCurrentWeather(latitude: Double = -24.714174, longitude: Double = -47.8870154, apiKey: String = "4ec81c4f20b26d6d6cdaeb8177fc81a1") {
+    fun getCurrentWeather(
+        latitude: Double = -24.714174,
+        longitude: Double = -47.8870154,
+        apiKey: String = "4ec81c4f20b26d6d6cdaeb8177fc81a1"
+    ) {
         weatherUseCase(latitude, longitude, apiKey).onEach { result ->
             when (result) {
                 is Resource.Success -> {

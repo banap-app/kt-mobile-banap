@@ -15,28 +15,33 @@ import com.banap.banap.core.ui.theme.ShapeCarousel
 import com.banap.banap.core.ui.util.shimmerEffect
 
 @Composable
-fun CreateDetailsSkeleton() {
+fun CreateDetailsSkeleton(
+    profilePicture: Boolean = true,
+    dataSize: Float = 0.7f
+) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(
             space = 10.dp
         )
     ) {
-        Box(
-            modifier = Modifier
-                .clip(
-                    shape = CircleShape
-                )
-                .size(30.dp)
-                .shimmerEffect(),
-            content = {}
-        )
+        if (profilePicture) {
+            Box(
+                modifier = Modifier
+                    .clip(
+                        shape = CircleShape
+                    )
+                    .size(30.dp)
+                    .shimmerEffect(),
+                content = {}
+            )
+        }
 
         Box(
             modifier = Modifier
                 .clip(
                     shape = ShapeCarousel.medium
                 )
-                .fillMaxWidth(0.7f)
+                .fillMaxWidth(dataSize)
                 .height(15.dp)
                 .shimmerEffect(),
             content = {}

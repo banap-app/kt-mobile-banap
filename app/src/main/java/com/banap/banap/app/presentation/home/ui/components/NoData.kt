@@ -26,10 +26,11 @@ fun NoData(
     text: String,
     buttonValue: String,
     icon: ImageVector = Icons.Outlined.Add,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(

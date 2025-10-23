@@ -63,7 +63,7 @@ fun NewEngineerSecondPage (
     LaunchedEffect(isLoading) {
         if (isLoading) {
             delay(1_000)
-            navigationController.navigate("Home")
+            navigationController.navigate("EngineerHome")
         }
     }
 

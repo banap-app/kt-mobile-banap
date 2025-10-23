@@ -6,14 +6,14 @@ class ValidateDescription {
         if (description.isBlank()) {
             return ValidationResult(
                 successful = false,
-                errorMessage = "A descrição não pode estar em branco"
+                errorMessage = "Não pode estar em branco"
             )
         }
 
         if (description.length > 40) {
             return ValidationResult(
                 successful = false,
-                errorMessage = "A descrição não pode ter mais que 40 caracteres"
+                errorMessage = "Não pode ter mais que 40 caracteres"
             )
         }
 

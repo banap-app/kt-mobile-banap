@@ -10,8 +10,12 @@ import androidx.compose.ui.unit.dp
 import com.banap.banap.app.presentation.skeleton.ui.field.components.CreateDetailsSkeleton
 
 @Composable
-fun SetAnalysisSkeleton() {
-    CreateDetailsSkeleton()
+fun SetAnalysisSkeleton(
+    hasCreateDetails: Boolean = true
+) {
+    if (hasCreateDetails) {
+        CreateDetailsSkeleton()
+    }
 
     Row(
         modifier = Modifier

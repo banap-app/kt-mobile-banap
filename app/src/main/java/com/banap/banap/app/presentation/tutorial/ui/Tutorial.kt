@@ -99,7 +99,7 @@ fun Tutorial(
             ) {
                 Button(
                     onClick = {
-                        navigationController.navigate("ReadyToStart")
+                        navigationController.navigate("EngineerHome")
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = BRANCO,

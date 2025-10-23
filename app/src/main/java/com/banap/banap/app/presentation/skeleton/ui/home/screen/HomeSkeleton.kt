@@ -18,26 +18,43 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.banap.banap.app.presentation.skeleton.ui.field.components.AnalysisSkeleton
+import com.banap.banap.app.presentation.skeleton.ui.field.components.CreateDetailsSkeleton
+import com.banap.banap.app.presentation.skeleton.ui.field.components.InformationSkeleton
+import com.banap.banap.app.presentation.skeleton.ui.field.components.LineSkeleton
 import com.banap.banap.core.ui.theme.ShapeCarousel
 import com.banap.banap.core.ui.theme.ShapeProperty
 import com.banap.banap.core.ui.util.shimmerEffect
 
 @Composable
 fun HomeSkeleton(
-    padding: Dp = 30.dp
+    padding: Dp = 30.dp,
+    isEngineerHome: Boolean = false
 ) {
     val scrollState = rememberScrollState()
 
     Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .fillMaxSize()
-            .padding(
-                start = 30.dp,
-                end = 30.dp,
-                top = padding + 30.dp,
-                bottom = 60.dp
-            ),
+        modifier =
+        if (isEngineerHome) {
+            Modifier
+                .fillMaxSize()
+                .padding(
+                    start = 30.dp,
+                    end = 30.dp,
+                    top = padding + 10.dp,
+                    bottom = 60.dp
+                )
+        } else {
+            Modifier
+                .verticalScroll(rememberScrollState())
+                .fillMaxSize()
+                .padding(
+                    start = 30.dp,
+                    end = 30.dp,
+                    top = padding + 30.dp,
+                    bottom = 60.dp
+                )
+        },
         verticalArrangement = Arrangement.spacedBy(
             space = 60.dp
         )
@@ -133,56 +150,100 @@ fun HomeSkeleton(
                     space = 25.dp
                 )
             ) {
+                if (!isEngineerHome) {
+                    repeat(times = 3) {
+                        Box(
+                            modifier = Modifier
+                                .clip(
+                                    shape = ShapeProperty.medium
+                                )
+                                .height(178.dp)
+                                .width(124.dp)
+                                .shimmerEffect(),
+                            content = {}
+                        )
+                    }
+                } else {
+                    repeat(times = 3) {
+                        Box(
+                            modifier = Modifier
+                                .clip(
+                                    shape = ShapeProperty.medium
+                                )
+                                .height(122.dp)
+                                .width(177.dp)
+                                .shimmerEffect(),
+                            content = {}
+                        )
+                    }
+                }
+            }
+        }
+
+        if (isEngineerHome) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(
+                    space = 35.dp
+                )
+            ) {
                 Box(
                     modifier = Modifier
                         .clip(
-                            shape = ShapeProperty.medium
+                            shape = ShapeCarousel.medium
                         )
-                        .height(178.dp)
-                        .width(124.dp)
+                        .fillMaxWidth()
+                        .height(30.dp)
                         .shimmerEffect(),
                     content = {}
                 )
 
-                Box(
+                Row(
                     modifier = Modifier
-                        .clip(
-                            shape = ShapeProperty.medium
+                        .horizontalScroll(
+                            state = scrollState,
+                            enabled = false
                         )
-                        .height(178.dp)
-                        .width(124.dp)
-                        .shimmerEffect(),
-                    content = {}
-                )
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(
+                        space = 15.dp
+                    )
+                ) {
+                    repeat(times = 3) {
+                        Box(
+                            modifier = Modifier
+                                .clip(
+                                    shape = ShapeProperty.medium
+                                )
+                                .height(100.dp)
+                                .width(100.dp)
+                                .shimmerEffect(),
+                            content = {}
+                        )
+                    }
+                }
+            }
+        }
 
+        if (!isEngineerHome) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
                 Box(
                     modifier = Modifier
                         .clip(
                             shape = ShapeProperty.medium
                         )
-                        .height(178.dp)
-                        .width(124.dp)
+                        .height(60.dp)
+                        .fillMaxWidth(0.7f)
                         .shimmerEffect(),
                     content = {}
                 )
             }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Box(
-                modifier = Modifier
-                    .clip(
-                        shape = ShapeProperty.medium
-                    )
-                    .height(60.dp)
-                    .fillMaxWidth(0.7f)
-                    .shimmerEffect(),
-                content = {}
-            )
         }
 
         Column(
@@ -254,108 +315,36 @@ fun HomeSkeleton(
             )
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(
-                space = 40.dp
-            )
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(
-                    space = 5.dp
-                )
-            ) {
-                Box(
-                    modifier = Modifier
-                        .clip(
-                            shape = ShapeCarousel.medium
-                        )
-                        .fillMaxWidth()
-                        .height(30.dp)
-                        .shimmerEffect(),
-                    content = {}
-                )
-
-                Box(
-                    modifier = Modifier
-                        .clip(
-                            shape = ShapeCarousel.medium
-                        )
-                        .fillMaxWidth(0.7f)
-                        .height(20.dp)
-                        .shimmerEffect(),
-                    content = {}
-                )
-            }
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(
-                    space = 60.dp
-                )
+        if (isEngineerHome) {
+            InformationSkeleton(
+                isEngineerHome = true,
+                space = 5.dp
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(
-                        space = 10.dp
+                        space = 40.dp
                     )
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .clip(
-                                shape = ShapeCarousel.medium
-                            )
-                            .fillMaxWidth(0.5f)
-                            .height(15.dp)
-                            .shimmerEffect(),
-                        content = {}
-                    )
+                    LineSkeleton()
 
                     Column(
                         verticalArrangement = Arrangement.spacedBy(
-                            space = 5.dp
+                            space = 60.dp
                         )
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .clip(
-                                    shape = ShapeCarousel.medium
-                                )
-                                .fillMaxWidth(0.4f)
-                                .height(10.dp)
-                                .shimmerEffect(),
-                            content = {}
-                        )
-
-                        Box(
-                            modifier = Modifier
-                                .clip(
-                                    shape = ShapeProperty.medium
-                                )
-                                .height(50.dp)
-                                .fillMaxWidth()
-                                .shimmerEffect(),
-                            content = {}
-                        )
-                    }
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .clip(
-                                shape = ShapeProperty.medium
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(
+                                space = 10.dp
                             )
-                            .height(60.dp)
-                            .fillMaxWidth(0.7f)
-                            .shimmerEffect(),
-                        content = {}
-                    )
+                        ) {
+                            CreateDetailsSkeleton()
+
+                            AnalysisSkeleton()
+                        }
+                    }
                 }
             }
         }
+
     }
 }
