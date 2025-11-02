@@ -1,8 +1,10 @@
 package com.banap.banap.app.presentation.home.ui.engineer.screen
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,37 +17,41 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.banap.banap.R
-import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.analysis.ui.producer.information.components.CreateDetails
 import com.banap.banap.app.presentation.client.ui.listing.components.HandlingAllStates
 import com.banap.banap.app.presentation.home.ui.components.Activities
 import com.banap.banap.app.presentation.home.ui.components.AddNewCard
 import com.banap.banap.app.presentation.home.ui.components.Carousel
 import com.banap.banap.app.presentation.home.ui.components.ClientCard
-import com.banap.banap.app.presentation.home.ui.components.Header
+import com.banap.banap.app.presentation.home.ui.components.Menu
+import com.banap.banap.app.presentation.home.ui.components.Notifications
 import com.banap.banap.app.presentation.home.ui.components.ScaffoldCustomizedForEngineerScreens
 import com.banap.banap.app.presentation.home.ui.components.TitleSection
 import com.banap.banap.app.presentation.home.ui.components.ToolsCard
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.skeleton.ui.clients.components.ClientFieldInformationAnalysisSectionSkeleton
+import com.banap.banap.app.presentation.skeleton.ui.engineerHome.ListClientsHomeSkeleton
 import com.banap.banap.app.presentation.skeleton.ui.home.components.LogListSkeleton
 import com.banap.banap.app.presentation.skeleton.ui.home.screen.HomeSkeleton
 import com.banap.banap.core.ui.components.ListItemCard
@@ -54,31 +60,38 @@ import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.CINZA_INTERMEDIARIO
 import com.banap.banap.core.ui.theme.PRETO
-import com.banap.banap.core.ui.theme.ShapeCarousel
 import com.banap.banap.core.ui.theme.Typography
+import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERMELHO
-import com.banap.banap.core.ui.util.shimmerEffect
-import com.banap.banap.data.model.analysis.AnalysisResponse
+import com.banap.banap.core.ui.util.getFirstName
+import com.banap.banap.core.ui.util.setColorInText
+import com.banap.banap.data.model.menu.DropDownItem
+import com.banap.banap.data.model.menu.MenuOption
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.weather.WeatherResponse
+import com.banap.banap.domain.viewmodel.engineer.GetEngineerByIdViewModel
+import com.banap.banap.domain.viewmodel.location.LocationViewModel
+import com.banap.banap.domain.viewmodel.token.TokenVerificationViewModel
 import com.banap.banap.domain.viewmodel.weather.WeatherViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun EngineerHome(
     navigationController: NavController,
     tokenViewModel: TokenViewModel,
+    tokenVerificationViewModel: TokenVerificationViewModel,
+    locationViewModel: LocationViewModel,
     weatherViewModel: WeatherViewModel,
+    getEngineerByIdViewModel: GetEngineerByIdViewModel,
     logList: MutableList<LogList>
 ) {
     // Variaveis do Scaffold
 
+    val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
     // Estados da tela
-
-    var isContentLoading: Boolean by remember {
-        mutableStateOf(false)
-    }
 
     var hasLoadingScreen: Boolean by remember {
         mutableStateOf(false)
@@ -89,6 +102,98 @@ fun EngineerHome(
     }
 
     // Variaveis utilizadas dentro do conteudo
+
+    // GetCurrentLocation - Pedir permissão para poder pegar localização atual
+
+    val locationState by locationViewModel.state
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            locationViewModel.getCurrentLocation()
+        } else {
+            scope.launch {
+                val autoDismissJob = launch {
+                    delay(5_000L)
+                    weatherViewModel.getCurrentWeather()
+                    snackBarHostState.currentSnackbarData?.dismiss()
+                }
+
+                val result = snackBarHostState.showSnackbar(
+                    message = "Usaremos um valor padrão para mostrar o clima!",
+                    actionLabel = "Entendi",
+                    duration = SnackbarDuration.Indefinite
+                )
+
+                if (result == SnackbarResult.ActionPerformed) {
+                    weatherViewModel.getCurrentWeather()
+                }
+
+                autoDismissJob.cancel()
+            }
+        }
+    }
+
+    LaunchedEffect(locationState.response) {
+        locationState.response?.let {
+            weatherViewModel.getCurrentWeather(
+                latitude = it.latitude,
+                longitude = it.longitude
+            )
+
+            tokenViewModel.saveTokens(
+                mapOf(
+                    "latitude" to it.latitude.toString(),
+                    "longitude" to it.longitude.toString()
+                )
+            )
+        }
+    }
+
+    // Token Verification - Verificando e validando o TOKEN
+
+    val tokenVerificationState by tokenVerificationViewModel.state
+
+    var tokenVerificationLoading: Boolean by remember {
+        mutableStateOf(true)
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("crea")?.let {
+            tokenViewModel.clearToken("password")
+        }
+
+        tokenViewModel.getToken("password")?.let {
+            tokenViewModel.clearToken("crea")
+        }
+
+        tokenViewModel.getToken("token")?.let {
+            tokenVerificationViewModel.verifyToken(it)
+        } ?: run {
+//            tokenViewModel.clearAll()
+//            navigationController.navigate("Login")
+        }
+    }
+
+    LaunchedEffect(tokenVerificationState.response) {
+        tokenVerificationState.response?.let {
+            if (it.success) {
+                permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                getEngineerByIdViewModel.getEngineerById()
+            }
+        }
+    }
+
+    LaunchedEffect(tokenVerificationState.error) {
+        if (tokenVerificationState.error.isNotEmpty()) {
+            hasContentError = "tokenVerificationError: ${tokenVerificationState.error}"
+        }
+    }
+
+    LaunchedEffect(tokenVerificationState.isLoading) {
+        tokenVerificationLoading = tokenVerificationState.isLoading
+    }
 
     // Weather - Clima
 
@@ -103,20 +208,55 @@ fun EngineerHome(
     }
 
     LaunchedEffect(true) {
-        weatherViewModel.getCurrentWeather(
-            tokenViewModel.getToken("latitude")?.toDoubleOrNull() ?: -24.714174,
-            tokenViewModel.getToken("longitude")?.toDoubleOrNull() ?: -47.8870154
-        )
-    }
-
-    LaunchedEffect(weatherState.isLoading) {
-        weatherLoading = weatherState.isLoading
+        tokenViewModel.getToken("latitude")?.let { latitude ->
+            tokenViewModel.getToken("longitude")?.let { longitude ->
+                weatherViewModel.getCurrentWeather(
+                    latitude = latitude.toDouble(),
+                    longitude = longitude.toDouble()
+                )
+            }
+        }
     }
 
     LaunchedEffect(weatherState.response) {
         weatherState.response?.let {
             weatherContent = weatherState.response
         }
+    }
+
+    LaunchedEffect(weatherState.isLoading) {
+        weatherLoading = weatherState.isLoading
+    }
+
+    // Pegar Engenheiro pelo ID
+
+    val getEngineerByIdState = getEngineerByIdViewModel.state.value
+
+    var engineerName: String by remember {
+        mutableStateOf("usuario")
+    }
+
+    var engineerLoading: Boolean by remember {
+        mutableStateOf(true)
+    }
+
+    LaunchedEffect(getEngineerByIdState.response) {
+        getEngineerByIdState.response?.let {
+            if (it.statusCode == 200) {
+                engineerName = it.data?.name.toString()
+                tokenViewModel.saveToken("engineerName", it.data?.name.toString())
+            }
+        }
+    }
+
+    LaunchedEffect(getEngineerByIdState.errorMessage) {
+        getEngineerByIdState.errorMessage?.let {
+            hasContentError = "engineerError: $it"
+        }
+    }
+
+    LaunchedEffect(getEngineerByIdState.isLoading) {
+        engineerLoading = getEngineerByIdState.isLoading
     }
 
     // Modal
@@ -136,6 +276,14 @@ fun EngineerHome(
                 "Gilmar"
             )
         )
+    }
+
+    var clientsLoading: Boolean by remember {
+        mutableStateOf(false)
+    }
+
+    var hasClientsError: String by remember {
+        mutableStateOf("")
     }
 
     // Ferramentas
@@ -164,7 +312,7 @@ fun EngineerHome(
     }
 
     var logListLoading: Boolean by remember {
-        mutableStateOf(false)
+        mutableStateOf(true)
     }
 
     var hasLogListError: String by remember {
@@ -184,7 +332,7 @@ fun EngineerHome(
     }
 
     var analysisLoading: Boolean by remember {
-        mutableStateOf(false)
+        mutableStateOf(true)
     }
 
     var hasAnalysisError: String by remember {
@@ -203,7 +351,7 @@ fun EngineerHome(
                 )
         ) {
             when {
-                isContentLoading -> {
+                tokenVerificationLoading || engineerLoading -> {
                     item {
                         HomeSkeleton(
                             padding = innerPadding.calculateTopPadding(),
@@ -214,13 +362,55 @@ fun EngineerHome(
 
                 hasContentError.isNotEmpty() -> {
                     item {
-                        Header(
-                            name = "Gilmar",
-                            navigationController = navigationController,
-                            onItemClick = {
-                                isHeaderMenuVisible = true
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 30.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = setColorInText(
+                                    texto = "Olá, ",
+                                    textoASerDestacado = "usuário!",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    corEmDestaque = VERDE_CLARO,
+                                    ordemInversa = false
+                                ),
+                                style = Typography.headlineSmall,
+                                color = PRETO
+                            )
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Notifications(
+                                    error = hasContentError
+                                )
+
+                                Menu(
+                                    dropDownItems = listOf(
+                                        DropDownItem(
+                                            option = MenuOption(
+                                                icon = R.drawable.baseline_logout_24,
+                                                text = "Sair"
+                                            ),
+                                            optionSelected = {
+                                                isHeaderMenuVisible = true
+                                            }
+                                        ),
+                                        DropDownItem(
+                                            option = MenuOption(
+                                                icon = R.drawable.fieldiconedit,
+                                                text = "Editar"
+                                            ),
+                                            optionSelected = {}
+                                        )
+                                    )
+                                )
                             }
-                        )
+                        }
 
                         if (isHeaderMenuVisible) {
                             Modal(
@@ -262,23 +452,83 @@ fun EngineerHome(
                         HandlingAllStates(
                             modifier = Modifier
                                 .fillParentMaxHeight(0.7f),
-                            text = "Ocorreu um erro ao carregar\n as atividades recentes...",
-                            buttonText = "Tentar Novamente",
-                            icon = ImageVector.vectorResource(id = R.drawable.homeiconretry),
-                            onClick = {}
+                            text = if (hasContentError.contains("tokenVerificationError")) "Sua sessão expirou!\nSuas credenciais estao incorretas.\nLogue novamente." else "Ocorreu um erro...",
+                            buttonText = if (hasContentError.contains("tokenVerificationError")) "Sair" else "Tentar Novamente",
+                            buttonBackgroundColor = VERMELHO,
+                            icon = if (hasContentError.contains("tokenVerificationError")) ImageVector.vectorResource(
+                                id = R.drawable.baseline_logout_24
+                            ) else ImageVector.vectorResource(id = R.drawable.homeiconretry),
+                            onClick = {
+                                if (hasContentError.contains("tokenVerificationError")) {
+                                    tokenViewModel.clearAll()
+                                    navigationController.navigate("Login")
+                                } else {
+                                    getEngineerByIdViewModel.getEngineerById()
+                                }
+                            }
                         )
                     }
                 }
 
                 else -> {
                     item {
-                        Header(
-                            name = "Gilmar",
-                            navigationController = navigationController,
-                            onItemClick = {
-                                isHeaderMenuVisible = true
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 30.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = setColorInText(
+                                    texto = "Olá, ",
+                                    textoASerDestacado = "${
+                                        getFirstName(
+                                            tokenViewModel.getToken(
+                                                "engineerName"
+                                            ) ?: engineerName
+                                        )
+                                    }!",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    corEmDestaque = VERDE_CLARO,
+                                    ordemInversa = false
+                                ),
+                                style = Typography.headlineSmall,
+                                color = PRETO
+                            )
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Notifications()
+
+                                Menu(
+                                    dropDownItems = listOf(
+                                        DropDownItem(
+                                            option = MenuOption(
+                                                icon = R.drawable.baseline_logout_24,
+                                                text = "Sair"
+                                            ),
+                                            optionSelected = {
+                                                isHeaderMenuVisible = true
+                                            }
+                                        ),
+                                        DropDownItem(
+                                            option = MenuOption(
+                                                icon = R.drawable.fieldiconedit,
+                                                text = "Editar"
+                                            ),
+                                            optionSelected = {
+                                                navigationController.navigate(
+                                                    "UpdateUserInformation"
+                                                )
+                                            }
+                                        )
+                                    )
+                                )
                             }
-                        )
+                        }
 
                         if (isHeaderMenuVisible) {
                             Modal(
@@ -334,63 +584,85 @@ fun EngineerHome(
                     }
 
                     item {
-                        Column(
-                            modifier = Modifier
-                                .padding(
-                                    bottom = 60.dp
+                        TitleSection(
+                            "Clientes",
+                            isRowList = false,
+                            onClickClickableText = {
+                                navigationController.navigate(
+                                    "Clients"
                                 )
-                                .fillMaxWidth()
-                        ) {
-                            TitleSection(
-                                "Clientes",
-                                isRowList = false,
-                                onClickClickableText = {
-                                    navigationController.navigate(
-                                        "Clients"
-                                    )
-                                },
-                                onClickArrowButton = {
-                                    navigationController.navigate(
-                                        "Clients"
-                                    )
-                                }
-                            )
+                            },
+                            onClickArrowButton = {
+                                navigationController.navigate(
+                                    "Clients"
+                                )
+                            }
+                        )
+                    }
 
-                            LazyRow(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(
-                                    space = 25.dp
+                    when {
+                        clientsLoading -> {
+                            item {
+                                ListClientsHomeSkeleton()
+                            }
+                        }
+
+                        hasClientsError.isNotEmpty() -> {
+                            item {
+                                HandlingAllStates(
+                                    modifier = Modifier
+                                        .padding(
+                                            bottom = 60.dp
+                                        ),
+                                    text = "Ocorreu um erro \nao carregar seus clientes...",
+                                    buttonText = "Tentar Novamente",
+                                    icon = ImageVector.vectorResource(id = R.drawable.homeiconretry),
+                                    onClick = {}
                                 )
-                            ) {
-                                items(
-                                    count = clients.take(5).size,
-                                    key = {
-                                        clients[it]
-                                    }
+                            }
+                        }
+
+                        else -> {
+                            item {
+                                LazyRow(
+                                    modifier = Modifier
+                                        .padding(
+                                            bottom = 60.dp
+                                        )
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(
+                                        space = 25.dp
+                                    )
                                 ) {
-                                    ClientCard(
-                                        name = clients[it],
-                                        hasPaddingStart = it == 0,
-                                        onClick = {
-                                            navigationController.navigate("ClientInformation")
+                                    items(
+                                        count = clients.take(5).size,
+                                        key = {
+                                            clients[it]
                                         }
-                                    )
-                                }
+                                    ) {
+                                        ClientCard(
+                                            name = clients[it],
+                                            hasPaddingStart = it == 0,
+                                            onClick = {
+                                                navigationController.navigate("ClientInformation")
+                                            }
+                                        )
+                                    }
 
-                                item {
-                                    AddNewCard(
-                                        height = 122.dp,
-                                        width = 177.dp,
-                                        icon = ImageVector.vectorResource(id = R.drawable.addclient),
-                                        isEngineerHome = true,
-                                        onClick = {
-                                            navigationController.navigate(
-                                                "ClientAggregation"
-                                            )
-                                        }
-                                    )
+                                    item {
+                                        AddNewCard(
+                                            height = 122.dp,
+                                            width = 177.dp,
+                                            icon = ImageVector.vectorResource(id = R.drawable.addclient),
+                                            isEngineerHome = true,
+                                            onClick = {
+                                                navigationController.navigate(
+                                                    "ClientAggregation"
+                                                )
+                                            }
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -406,7 +678,7 @@ fun EngineerHome(
                         ) {
                             TitleSection(
                                 "Ferramentas",
-                                 isRowList = false,
+                                isRowList = false,
                                 onClickClickableText = {
                                     navigationController.navigate("Tools")
                                 },
@@ -443,14 +715,16 @@ fun EngineerHome(
                                         onClick = {
                                             when (tools[it]) {
                                                 "Calagem" -> {
-                                                    navigationController.navigate("NewLimingCalculation")
+                                                    navigationController.navigate("NewEngineerLimingAnalysis")
                                                 }
 
                                                 "N.P.K" -> {
-                                                    navigationController.navigate("NewFertilizationRecommendation")
+                                                    navigationController.navigate("NewEngineerFertilizationRecommendationAnalysis")
                                                 }
 
-                                                "Escanear" -> {}
+                                                "Escanear" -> {
+                                                    navigationController.navigate("Scanner")
+                                                }
 
                                                 else -> {}
                                             }

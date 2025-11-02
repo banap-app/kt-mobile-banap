@@ -216,7 +216,8 @@ fun NewLimingCalculation(
                             informationIconOnClick = {
                                 navigationController.navigate(
                                     Screen.ExplanationFormData.createRoute(
-                                        id = "sba"
+                                        id = "sba",
+                                        typeUser = "producer"
                                     )
                                 )
                             }
@@ -241,7 +242,8 @@ fun NewLimingCalculation(
                             informationIconOnClick = {
                                 navigationController.navigate(
                                     Screen.ExplanationFormData.createRoute(
-                                        id = "ctc"
+                                        id = "ctc",
+                                        typeUser = "producer"
                                     )
                                 )
                             }
@@ -267,7 +269,8 @@ fun NewLimingCalculation(
                             informationIconOnClick = {
                                 navigationController.navigate(
                                     Screen.ExplanationFormData.createRoute(
-                                        id = "prnt"
+                                        id = "prnt",
+                                        typeUser = "producer"
                                     )
                                 )
                             }

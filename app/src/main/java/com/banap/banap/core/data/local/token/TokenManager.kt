@@ -55,6 +55,12 @@ class TokenManager @Inject constructor(
             .apply()
     }
 
+    fun clearTokens(keyList: List<String>) {
+        prefs.edit().apply {
+            keyList.forEach { remove(it) }
+        }.apply()
+    }
+
     fun clearAll() {
         prefs.edit().clear().apply()
     }

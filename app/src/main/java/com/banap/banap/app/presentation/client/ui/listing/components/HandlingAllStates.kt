@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -26,6 +27,7 @@ fun HandlingAllStates(
     modifier: Modifier = Modifier,
     text: String,
     buttonText: String = "Agregar Cliente",
+    buttonBackgroundColor: Color = VERDE_CLARO,
     icon: ImageVector = Icons.Outlined.Add,
     hasButton: Boolean = true,
     onClick: () -> Unit = {}
@@ -56,7 +58,7 @@ fun HandlingAllStates(
                 icon = icon,
                 shape = ShapeProperty.small,
                 onClick = onClick,
-                backgroundColor = VERDE_CLARO,
+                backgroundColor = buttonBackgroundColor,
                 contentColor = BRANCO,
                 defaultElevetion = 3.dp
             )

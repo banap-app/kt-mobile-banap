@@ -33,7 +33,7 @@ import com.banap.banap.domain.model.producer.ProducerState
 fun Header(
     name: String,
     navigationController: NavController,
-    getProducerByIdState: ProducerState? = null,
+    getProducerByIdState: ProducerState,
     onItemClick: (DropDownItem) -> Unit
 ) {
     var error: String by remember {
@@ -44,15 +44,15 @@ fun Header(
         mutableStateOf(false)
     }
 
-    LaunchedEffect(getProducerByIdState?.error) {
-        getProducerByIdState?.error?.let {
+    LaunchedEffect(getProducerByIdState.error) {
+        getProducerByIdState.error?.let {
             Log.d("ERROR", it)
             error = it
         }
     }
 
-    LaunchedEffect(getProducerByIdState?.isLoading) {
-        getProducerByIdState?.isLoading?.let {
+    LaunchedEffect(getProducerByIdState.isLoading) {
+        getProducerByIdState.isLoading?.let {
             Log.d("LOADING", it.toString())
             loading = it
         }
@@ -145,11 +145,7 @@ fun Header(
                                     icon = R.drawable.fieldiconedit,
                                     text = "Editar"
                                 ),
-                                optionSelected = {
-                                    navigationController.navigate(
-                                        "UpdateUserInformation"
-                                    )
-                                }
+                                optionSelected = {}
                             )
                         )
                     )

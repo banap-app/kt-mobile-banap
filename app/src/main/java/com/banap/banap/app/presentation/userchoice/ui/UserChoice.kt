@@ -79,8 +79,13 @@ fun UserChoice(
 
     LaunchedEffect(true) {
         tokenViewModel.clearToken("name")
+        tokenViewModel.clearToken("nameError")
         tokenViewModel.clearToken("email")
+        tokenViewModel.clearToken("emailError")
         tokenViewModel.clearToken("password")
+        tokenViewModel.clearToken("passwordError")
+        tokenViewModel.clearToken("crea")
+        tokenViewModel.clearToken("creaError")
     }
 
     val backgroundColor by animateColorAsState(

@@ -43,6 +43,10 @@ class TokenViewModel @Inject constructor (
         tokenManager.clearToken(key)
     }
 
+    fun clearTokens(keyList: List<String>) {
+        tokenManager.clearTokens(keyList)
+    }
+
     fun clearAll() {
         tokenManager.clearAll()
     }

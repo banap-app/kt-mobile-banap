@@ -48,7 +48,8 @@ import com.banap.banap.core.ui.theme.VERDE_ESCURO
 fun ExplanationFormData(
     navigationController: NavController,
     tokenViewModel: TokenViewModel,
-    id: String
+    id: String,
+    typeUser: String
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
@@ -57,6 +58,12 @@ fun ExplanationFormData(
     LaunchedEffect(true) {
         if (!id.contains("id")) {
             tokenViewModel.saveToken("id", id)
+        }
+    }
+
+    LaunchedEffect(true) {
+        if (!typeUser.contains("typeUser")) {
+            tokenViewModel.saveToken("typeUser", typeUser)
         }
     }
 
@@ -76,7 +83,13 @@ fun ExplanationFormData(
         ) {
             IconButton(
                 onClick = {
-                    navigationController.navigate("NewLimingCalculation")
+                    tokenViewModel.getToken("typeUser")?.let {
+                        if (it == "producer") {
+                            navigationController.navigate("NewLimingCalculation")
+                        } else {
+                            navigationController.navigate("NewEngineerLimingAnalysis")
+                        }
+                    }
                 },
                 modifier = Modifier
                     .padding(
@@ -319,7 +332,6 @@ fun ExplanationFormData(
                         }
                     }
                 }
-
                 ?: run {
                     Column(
                         modifier = Modifier

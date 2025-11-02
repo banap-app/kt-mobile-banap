@@ -28,6 +28,18 @@ class FieldNameTextFieldViewModel (
                 )
             }
 
+            is NameTextFieldFormEvent.LoadName -> {
+                state = state.copy(
+                    name = event.name
+                )
+            }
+
+            is NameTextFieldFormEvent.SetError -> {
+                state = state.copy(
+                    nameError = event.errorMessage
+                )
+            }
+
             is NameTextFieldFormEvent.Submit -> {
                 submitData()
             }

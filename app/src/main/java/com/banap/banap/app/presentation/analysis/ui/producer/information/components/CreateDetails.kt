@@ -29,8 +29,6 @@ fun CreateDetails(
     createdAt: String
 ) {
     Row (
-        modifier = Modifier
-            .fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(
             space = 10.dp
         ),

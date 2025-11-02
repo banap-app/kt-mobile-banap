@@ -61,10 +61,6 @@ fun NewObservation(
         mutableStateOf(false)
     }
 
-    var hasContentError: String by remember {
-        mutableStateOf("")
-    }
-
     // Variaveis do TextField de Name
 
     val viewModelName = viewModel<NameTextFieldViewModel>()

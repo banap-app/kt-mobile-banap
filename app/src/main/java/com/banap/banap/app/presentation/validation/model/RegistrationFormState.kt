@@ -24,5 +24,9 @@ data class RegistrationFormState(
     val phosphorus: String = "",
     val phosphorusError: String? = null,
     val potassium: String = "",
-    val potassiumError: String? = null
+    val potassiumError: String? = null,
+    val plantSpace: String = "",
+    val plantSpaceError: String? = null,
+    val lineSpace: String = "",
+    val lineSpaceError: String? = null
 )

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.banap.banap.R
@@ -38,12 +40,15 @@ import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.CINZA_CLARO
 import com.banap.banap.core.ui.theme.CINZA_ESCURO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
+import com.banap.banap.domain.viewmodel.engineer.AssociateProducerViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun ClientAggregation(
     navigationController: NavController,
-    tokenViewModel: TokenViewModel
+    tokenViewModel: TokenViewModel,
+    associateProducerViewModel: AssociateProducerViewModel = hiltViewModel()
 ) {
     // Variaveis da Tela
 
@@ -57,10 +62,6 @@ fun ClientAggregation(
 
     var hasLoadingScreen: Boolean by remember {
         mutableStateOf(false)
-    }
-
-    var hasContentError: String by remember {
-        mutableStateOf("")
     }
 
     // Variaveis do TextField de Email
@@ -132,13 +133,29 @@ fun ClientAggregation(
         mutableStateOf(false)
     }
 
-    // Launched
+    // Variaveis e Launcheds da Associação do Engenheiro com o Produtor
 
-    LaunchedEffect(hasLoadingScreen) {
-        if (hasLoadingScreen) {
-            delay(2_000)
-            hasLoadingScreen = false
-            isNotificationSent = true
+    val associateProducerState = associateProducerViewModel.state.value
+
+    LaunchedEffect(associateProducerState.response) {
+        associateProducerState.response?.let {
+            if (it.statusCode == 204) {
+                isNotificationSent = true
+            }
+        }
+    }
+
+    LaunchedEffect(associateProducerState.isLoading) {
+        hasLoadingScreen = associateProducerState.isLoading
+    }
+
+    LaunchedEffect(associateProducerState.errors) {
+        associateProducerState.errors?.let {
+            snackBarHostState.showSnackbar(
+                message = it.message,
+                actionLabel = "Entendi",
+                duration = SnackbarDuration.Indefinite
+            )
         }
     }
 
@@ -156,7 +173,7 @@ fun ClientAggregation(
         ) {
             RegistrationHeader(
                 navigationController = navigationController,
-                fallbackRoute = "Home"
+                fallbackRoute = "EngineerHome"
             )
 
             EngineerTitleRegistration(
@@ -197,7 +214,7 @@ fun ClientAggregation(
                         viewModelEmail.onEvent(EmailTextFieldFormEvent.Submit)
 
                         if (isValidationSuccessful) {
-                            hasLoadingScreen = true
+                            associateProducerViewModel.associateProducer(stateEmail.email)
                         }
                     },
                     buttonValue = "Agregar",

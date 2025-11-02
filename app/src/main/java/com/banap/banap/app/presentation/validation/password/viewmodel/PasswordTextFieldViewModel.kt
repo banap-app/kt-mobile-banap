@@ -24,7 +24,20 @@ class PasswordTextFieldViewModel (
         when (event) {
             is PasswordTextFieldFormEvent.PasswordChanged -> {
                 state = state.copy(
+                    password = event.password,
+                    passwordError = null
+                )
+            }
+
+            is PasswordTextFieldFormEvent.LoadPassword -> {
+                state = state.copy(
                     password = event.password
+                )
+            }
+
+            is PasswordTextFieldFormEvent.SetError -> {
+                state = state.copy(
+                    passwordError = event.errorMessage
                 )
             }
 

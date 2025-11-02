@@ -80,7 +80,7 @@ fun Tools(
                             name = "Calagem",
                             icon = R.drawable.analysisiconliming,
                             onClick = {
-                                navigationController.navigate("")
+                                navigationController.navigate("NewEngineerLimingAnalysis")
                             }
                         )
 
@@ -88,7 +88,7 @@ fun Tools(
                             name = "N.P.K",
                             icon = R.drawable.analysisiconnpk,
                             onClick = {
-                                navigationController.navigate("")
+                                navigationController.navigate("NewEngineerFertilizationRecommendationAnalysis")
                             }
                         )
 
@@ -112,7 +112,9 @@ fun Tools(
                             icon = R.drawable.singlespacing,
                             iconSize = 1f,
                             space = 10.dp,
-                            onClick = {}
+                            onClick = {
+                                navigationController.navigate("NewSingleSpacingCalculation")
+                            }
                         )
 
                         ToolsCard(
@@ -120,7 +122,9 @@ fun Tools(
                             icon = R.drawable.pencilandruler,
                             iconSize = 1f,
                             space = 10.dp,
-                            onClick = {}
+                            onClick = {
+                                navigationController.navigate("NewMeasurementAndConversionsCalculation")
+                            }
                         )
                     }
                 }

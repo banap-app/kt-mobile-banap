@@ -2,7 +2,7 @@ package com.banap.banap.domain.use_case.validation
 
 class ValidateCrea {
 
-    private val creaRegex = Regex("^\\d{7,10}$")
+    private val creaRegex = Regex("^\\d{4,6}-[A-Z]{2}$")
 
     fun execute (crea: String) : ValidationResult {
         if (crea.isBlank()) {
@@ -15,7 +15,7 @@ class ValidateCrea {
         if (!creaRegex.matches(crea)) {
             return ValidationResult(
                 successful = false,
-                errorMessage = "O CREA precisa ao menos de 7 numeros"
+                errorMessage = "O CREA precisa ao menos de 7 numeros e da identificação do estado (RJ, SP, etc...)"
             )
         }
 

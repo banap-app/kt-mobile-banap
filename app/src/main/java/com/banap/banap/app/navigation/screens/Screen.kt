@@ -92,15 +92,19 @@ sealed class Screen (
 
     data object ExplanationFormData : Screen(route = "ExplanationFormData") {
         const val EXPLANATION_ARGUMENT = "id"
-        val routeWithArgument = "$route/{$EXPLANATION_ARGUMENT}"
+        const val EXPLANATION_TYPE_USER = "screen"
+        val routeWithArgument = "$route/{$EXPLANATION_ARGUMENT}/{$EXPLANATION_TYPE_USER}"
 
         val arguments = listOf(
             navArgument(EXPLANATION_ARGUMENT) {
                 type = NavType.StringType
+            },
+            navArgument(EXPLANATION_TYPE_USER) {
+                type = NavType.StringType
             }
         )
 
-        fun createRoute(id: String) = "$route/$id"
+        fun createRoute(id: String, typeUser: String) = "$route/$id/$typeUser"
     }
 
     data object NewProperty : Screen(route = "NewProperty") {

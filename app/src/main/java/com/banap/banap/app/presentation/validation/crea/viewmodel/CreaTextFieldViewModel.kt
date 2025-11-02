@@ -24,7 +24,14 @@ class CreaTextFieldViewModel (
         when (event) {
             is CreaTextFieldFormEvent.CreaChanged -> {
                 state = state.copy(
-                    crea = event.crea
+                    crea = event.crea,
+                    creaError = null
+                )
+            }
+
+            is CreaTextFieldFormEvent.SetError -> {
+                state = state.copy(
+                    creaError = event.errorMessage
                 )
             }
 

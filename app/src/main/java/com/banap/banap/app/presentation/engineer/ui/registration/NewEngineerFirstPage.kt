@@ -1,5 +1,6 @@
 package com.banap.banap.app.presentation.engineer.ui.registration
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -128,23 +129,56 @@ fun NewEngineerFirstPage(
     }
 
     LaunchedEffect(true) {
-        tokenViewModel.getToken("name")?.let {
-            viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
-            viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("nameError")?.let {
+            viewModelName.onEvent(
+                NameTextFieldFormEvent.LoadName(
+                    tokenViewModel.getToken("name") ?: ""
+                )
+            )
+            viewModelName.onEvent(NameTextFieldFormEvent.SetError(it))
+        } ?: run {
+            tokenViewModel.getToken("name")?.let {
+                viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
+                viewModelName.onEvent(NameTextFieldFormEvent.Submit)
+            }
         }
     }
 
     LaunchedEffect(true) {
-        tokenViewModel.getToken("email")?.let {
-            viewModelEmail.onEvent(EmailTextFieldFormEvent.EmailChanged(it))
-            viewModelEmail.onEvent(EmailTextFieldFormEvent.Submit)
+        tokenViewModel.getToken("emailError")?.let {
+            viewModelEmail.onEvent(
+                EmailTextFieldFormEvent.LoadEmail(
+                    tokenViewModel.getToken("email") ?: ""
+                )
+            )
+            viewModelEmail.onEvent(EmailTextFieldFormEvent.SetError(it))
+        } ?: run {
+            tokenViewModel.getToken("email")?.let {
+                viewModelEmail.onEvent(EmailTextFieldFormEvent.EmailChanged(it))
+                viewModelEmail.onEvent(EmailTextFieldFormEvent.Submit)
+            }
         }
     }
 
     LaunchedEffect(true) {
-        tokenViewModel.getToken("password")?.let {
-            viewModelPassword.onEvent(PasswordTextFieldFormEvent.PasswordChanged(it))
-            viewModelPassword.onEvent(PasswordTextFieldFormEvent.Submit)
+        tokenViewModel.getToken("passwordError")?.let {
+            viewModelPassword.onEvent(
+                PasswordTextFieldFormEvent.LoadPassword(
+                    tokenViewModel.getToken(
+                        "password"
+                    ) ?: ""
+                )
+            )
+            viewModelPassword.onEvent(PasswordTextFieldFormEvent.SetError(it))
+        } ?: run {
+            tokenViewModel.getToken("password")?.let {
+                viewModelPassword.onEvent(PasswordTextFieldFormEvent.PasswordChanged(it))
+                viewModelPassword.onEvent(PasswordTextFieldFormEvent.Submit)
+            }
         }
     }
 
@@ -191,6 +225,9 @@ fun NewEngineerFirstPage(
                         viewModelName.onEvent(NameTextFieldFormEvent.NameChanged(it))
                         viewModelName.onEvent(NameTextFieldFormEvent.Submit)
 
+                        tokenViewModel.getToken("nameError")?.let {
+                            tokenViewModel.clearToken("nameError")
+                        }
                         tokenViewModel.saveToken("name", it)
                     },
                     isError = stateName.nameError != null,
@@ -208,6 +245,9 @@ fun NewEngineerFirstPage(
                         viewModelEmail.onEvent(EmailTextFieldFormEvent.EmailChanged(it))
                         viewModelEmail.onEvent(EmailTextFieldFormEvent.Submit)
 
+                        tokenViewModel.getToken("emailError")?.let {
+                            tokenViewModel.clearToken("emailError")
+                        }
                         tokenViewModel.saveToken("email", it)
                     },
                     isError = stateEmail.emailError != null,
@@ -225,6 +265,9 @@ fun NewEngineerFirstPage(
                         viewModelPassword.onEvent(PasswordTextFieldFormEvent.PasswordChanged(it))
                         viewModelPassword.onEvent(PasswordTextFieldFormEvent.Submit)
 
+                        tokenViewModel.getToken("passwordError")?.let {
+                            tokenViewModel.clearToken("passwordError")
+                        }
                         tokenViewModel.saveToken("password", it)
                     },
                     isError = statePassword.passwordError != null,

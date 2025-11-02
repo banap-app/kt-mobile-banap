@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,6 +18,8 @@ import androidx.navigation.compose.rememberNavController
 import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.navigation.viewmodel.NavigationViewModel
 import com.banap.banap.app.presentation.analysis.ui.engineer.information.screen.ClientAnalysis
+import com.banap.banap.app.presentation.analysis.ui.engineer.registration.NewEngineerFertilizationRecommendationAnalysis
+import com.banap.banap.app.presentation.analysis.ui.engineer.registration.NewEngineerLimingAnalysis
 import com.banap.banap.app.presentation.analysis.ui.listing.screen.Analysis
 import com.banap.banap.app.presentation.analysis.ui.producer.information.screen.AnalysisInformation
 import com.banap.banap.app.presentation.analysis.ui.readmore.screen.ReadMore
@@ -35,12 +39,15 @@ import com.banap.banap.app.presentation.home.ui.engineer.screen.EngineerHome
 import com.banap.banap.app.presentation.home.ui.producer.screen.Home
 import com.banap.banap.app.presentation.home.ui.producer.screen.UpdateUserInformation
 import com.banap.banap.app.presentation.login.ui.screen.Login
+import com.banap.banap.app.presentation.measurementsandconversions.ui.registration.screen.NewMeasurementAndConversionsCalculation
 import com.banap.banap.app.presentation.producer.ui.registration.NewProducer
 import com.banap.banap.app.presentation.property.ui.engineer.listing.ClientProperty
 import com.banap.banap.app.presentation.property.ui.producer.listing.screen.Property
 import com.banap.banap.app.presentation.property.ui.producer.registration.NewProperty
 import com.banap.banap.app.presentation.readytostart.ui.ReadyToStart
+import com.banap.banap.app.presentation.scanner.ui.screen.Scanner
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
+import com.banap.banap.app.presentation.singlespacing.ui.registration.screen.NewSingleSpacingCalculation
 import com.banap.banap.app.presentation.task.ui.registration.screen.NewTask
 import com.banap.banap.app.presentation.tools.ui.listing.Tools
 import com.banap.banap.app.presentation.tutorial.ui.Tutorial
@@ -49,6 +56,7 @@ import com.banap.banap.core.ui.components.SplashScreen
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
 import com.banap.banap.domain.viewmodel.analysis.ListAnalysisViewModel
+import com.banap.banap.domain.viewmodel.engineer.GetEngineerByIdViewModel
 import com.banap.banap.domain.viewmodel.field.ListFieldsViewModel
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.producer.GetProducerByIdViewModel
@@ -71,6 +79,7 @@ fun Navigation() {
     val listFieldsViewModel: ListFieldsViewModel = hiltViewModel()
     val listAnalysisViewModel: ListAnalysisViewModel = hiltViewModel()
     val getProducerByIdViewModel: GetProducerByIdViewModel = hiltViewModel()
+    val getEngineerByIdViewModel: GetEngineerByIdViewModel = hiltViewModel()
     val animationDuration: Int = 700
 
     val taskListHome: MutableList<TaskList> = mutableListOf()
@@ -409,11 +418,13 @@ fun Navigation() {
         ) { backStackEntry ->
             val id =
                 backStackEntry.arguments?.getString(Screen.ExplanationFormData.EXPLANATION_ARGUMENT)
+            val typeUser = backStackEntry.arguments?.getString(Screen.ExplanationFormData.EXPLANATION_TYPE_USER)
 
             ExplanationFormData(
                 navigationController,
                 tokenViewModel = tokenViewModel,
-                id = id ?: ""
+                id = id ?: "",
+                typeUser = typeUser ?: ""
             )
         }
 
@@ -539,12 +550,14 @@ fun Navigation() {
             }
         ) {
             val getProducerByIdState by getProducerByIdViewModel.state
+            val getEngineerByIdState by getEngineerByIdViewModel.state
 
             UpdateUserInformation(
                 navigationController,
                 tokenViewModel = tokenViewModel,
-                name = getProducerByIdState.response?.name ?: "",
-                email = getProducerByIdState.response?.email ?: "",
+                name = getProducerByIdState.response?.name ?: getEngineerByIdState.response?.data?.name ?: "",
+                email = getProducerByIdState.response?.email ?: getEngineerByIdState.response?.data?.email ?: "",
+                crea = getEngineerByIdState.response?.data?.crea ?: ""
             )
         }
 
@@ -564,7 +577,10 @@ fun Navigation() {
             EngineerHome(
                 navigationController,
                 tokenViewModel = tokenViewModel,
+                tokenVerificationViewModel = tokenVerificationViewModel,
+                locationViewModel = locationViewModel,
                 weatherViewModel = weatherViewModel,
+                getEngineerByIdViewModel = getEngineerByIdViewModel,
                 logList = logList
             )
         }
@@ -717,7 +733,8 @@ fun Navigation() {
         ) {
             Analysis(
                 navigationController,
-                tokenViewModel = tokenViewModel
+                tokenViewModel = tokenViewModel,
+                listAnalysisViewModel = listAnalysisViewModel
             )
         }
 
@@ -738,6 +755,104 @@ fun Navigation() {
                 navigationController,
                 tokenViewModel = tokenViewModel
             )
+        }
+
+        composable (
+            route = "NewEngineerLimingAnalysis",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            NewEngineerLimingAnalysis(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "NewEngineerFertilizationRecommendationAnalysis",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            NewEngineerFertilizationRecommendationAnalysis(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "NewSingleSpacingCalculation",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            NewSingleSpacingCalculation(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "NewMeasurementAndConversionsCalculation",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            NewMeasurementAndConversionsCalculation(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "Scanner",
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth ->
+                        fullWidth
+                    },
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth ->
+                        fullWidth
+                    },
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            Scanner()
         }
     }
 }
