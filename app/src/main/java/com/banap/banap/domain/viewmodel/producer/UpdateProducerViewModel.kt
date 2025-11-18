@@ -19,7 +19,7 @@ class UpdateProducerViewModel @Inject constructor(
     private val _state = mutableStateOf((WithoutResponseState()))
     val state: State<WithoutResponseState> = _state
 
-    fun updateProducer(name: String, email: String, password: String) {
+    fun updateProducer(name: String? = null, email: String? = null, password: String? = null) {
         updateProducerUseCase(name, email, password).onEach { result ->
             when (result) {
                 is Resource.Success -> {

@@ -45,14 +45,14 @@ fun Header(
     }
 
     LaunchedEffect(getProducerByIdState.error) {
-        getProducerByIdState.error?.let {
+        getProducerByIdState.error.let {
             Log.d("ERROR", it)
             error = it
         }
     }
 
     LaunchedEffect(getProducerByIdState.isLoading) {
-        getProducerByIdState.isLoading?.let {
+        getProducerByIdState.isLoading.let {
             Log.d("LOADING", it.toString())
             loading = it
         }
@@ -89,19 +89,12 @@ fun Header(
                         dropDownItems = listOf(
                             DropDownItem(
                                 option = MenuOption(
-                                    icon = R.drawable.baseline_logout_24,
-                                    text = "Sair"
-                                ),
-                                optionSelected = onItemClick
-                            ),
-                            DropDownItem(
-                                option = MenuOption(
-                                    icon = R.drawable.fieldiconedit,
-                                    text = "Editar"
+                                    icon = R.drawable.baseline_settings_24,
+                                    text = "Configurações"
                                 ),
                                 optionSelected = {
                                     navigationController.navigate(
-                                        "UpdateUserInformation"
+                                        "Settings"
                                     )
                                 }
                             )
@@ -135,15 +128,8 @@ fun Header(
                         dropDownItems = listOf(
                             DropDownItem(
                                 option = MenuOption(
-                                    icon = R.drawable.baseline_logout_24,
-                                    text = "Sair"
-                                ),
-                                optionSelected = onItemClick
-                            ),
-                            DropDownItem(
-                                option = MenuOption(
-                                    icon = R.drawable.fieldiconedit,
-                                    text = "Editar"
+                                    icon = R.drawable.baseline_settings_24,
+                                    text = "Configurações"
                                 ),
                                 optionSelected = {}
                             )

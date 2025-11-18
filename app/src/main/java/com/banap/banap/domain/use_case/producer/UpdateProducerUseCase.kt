@@ -13,9 +13,9 @@ class UpdateProducerUseCase @Inject constructor(
     private val repository: ProducerRepositoryImpl
 ) {
     operator fun invoke(
-        name: String,
-        email: String,
-        password: String
+        name: String? = null,
+        email: String? = null,
+        password: String? = null
     ): Flow<Resource<WithoutResponse>> = flow {
         try {
             emit(Resource.Loading())

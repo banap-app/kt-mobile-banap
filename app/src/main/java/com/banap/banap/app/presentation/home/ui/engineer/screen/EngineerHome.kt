@@ -163,7 +163,6 @@ fun EngineerHome(
         tokenViewModel.getToken("crea")?.let {
             tokenViewModel.clearToken("password")
         }
-
         tokenViewModel.getToken("password")?.let {
             tokenViewModel.clearToken("crea")
         }
@@ -171,8 +170,8 @@ fun EngineerHome(
         tokenViewModel.getToken("token")?.let {
             tokenVerificationViewModel.verifyToken(it)
         } ?: run {
-//            tokenViewModel.clearAll()
-//            navigationController.navigate("Login")
+            tokenViewModel.clearAll()
+            navigationController.navigate("Login")
         }
     }
 
@@ -245,6 +244,7 @@ fun EngineerHome(
             if (it.statusCode == 200) {
                 engineerName = it.data?.name.toString()
                 tokenViewModel.saveToken("engineerName", it.data?.name.toString())
+                tokenViewModel.saveToken("engineerId", it.data?.id.toString())
             }
         }
     }
@@ -312,7 +312,7 @@ fun EngineerHome(
     }
 
     var logListLoading: Boolean by remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
     }
 
     var hasLogListError: String by remember {
@@ -332,7 +332,7 @@ fun EngineerHome(
     }
 
     var analysisLoading: Boolean by remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
     }
 
     var hasAnalysisError: String by remember {
@@ -393,46 +393,18 @@ fun EngineerHome(
                                     dropDownItems = listOf(
                                         DropDownItem(
                                             option = MenuOption(
-                                                icon = R.drawable.baseline_logout_24,
-                                                text = "Sair"
+                                                icon = R.drawable.baseline_settings_24,
+                                                text = "Configurações"
                                             ),
                                             optionSelected = {
-                                                isHeaderMenuVisible = true
+                                                navigationController.navigate(
+                                                    "Settings"
+                                                )
                                             }
-                                        ),
-                                        DropDownItem(
-                                            option = MenuOption(
-                                                icon = R.drawable.fieldiconedit,
-                                                text = "Editar"
-                                            ),
-                                            optionSelected = {}
                                         )
                                     )
                                 )
                             }
-                        }
-
-                        if (isHeaderMenuVisible) {
-                            Modal(
-                                onConfirm = {
-                                    tokenViewModel.clearAll()
-                                    navigationController.navigate("Login")
-                                },
-                                onDismiss = {
-                                    isHeaderMenuVisible = false
-                                },
-                                icon = ImageVector.vectorResource(id = R.drawable.baseline_logout_24),
-                                iconColor = VERMELHO,
-                                title = "Tem certeza que\n deseja sair?",
-                                description = "",
-                                onConfirmText = "Sair",
-                                onConfirmButtonBackgroundColor = VERMELHO,
-                                onConfirmButtonContentColor = BRANCO,
-                                onDismissText = "Cancelar",
-                                onDismissButtonBackgroundColor = CINZA_INTERMEDIARIO,
-                                onDismissButtonContentColor = PRETO,
-                                space = 40.dp
-                            )
                         }
                     }
 
@@ -452,9 +424,9 @@ fun EngineerHome(
                         HandlingAllStates(
                             modifier = Modifier
                                 .fillParentMaxHeight(0.7f),
-                            text = if (hasContentError.contains("tokenVerificationError")) "Sua sessão expirou!\nSuas credenciais estao incorretas.\nLogue novamente." else "Ocorreu um erro...",
+                            text = if (hasContentError.contains("tokenVerificationError")) "Sua sessão expirou!\nSuas credenciais estao incorretas.\nLogue novamente." else "Ocorreu um erro\nao carregar seus dados...",
                             buttonText = if (hasContentError.contains("tokenVerificationError")) "Sair" else "Tentar Novamente",
-                            buttonBackgroundColor = VERMELHO,
+                            buttonBackgroundColor = VERDE_CLARO,
                             icon = if (hasContentError.contains("tokenVerificationError")) ImageVector.vectorResource(
                                 id = R.drawable.baseline_logout_24
                             ) else ImageVector.vectorResource(id = R.drawable.homeiconretry),
@@ -507,50 +479,18 @@ fun EngineerHome(
                                     dropDownItems = listOf(
                                         DropDownItem(
                                             option = MenuOption(
-                                                icon = R.drawable.baseline_logout_24,
-                                                text = "Sair"
-                                            ),
-                                            optionSelected = {
-                                                isHeaderMenuVisible = true
-                                            }
-                                        ),
-                                        DropDownItem(
-                                            option = MenuOption(
-                                                icon = R.drawable.fieldiconedit,
-                                                text = "Editar"
+                                                icon = R.drawable.baseline_settings_24,
+                                                text = "Configurações"
                                             ),
                                             optionSelected = {
                                                 navigationController.navigate(
-                                                    "UpdateUserInformation"
+                                                    "Settings"
                                                 )
                                             }
                                         )
                                     )
                                 )
                             }
-                        }
-
-                        if (isHeaderMenuVisible) {
-                            Modal(
-                                onConfirm = {
-                                    tokenViewModel.clearAll()
-                                    navigationController.navigate("Login")
-                                },
-                                onDismiss = {
-                                    isHeaderMenuVisible = false
-                                },
-                                icon = ImageVector.vectorResource(id = R.drawable.baseline_logout_24),
-                                iconColor = VERMELHO,
-                                title = "Tem certeza que\n deseja sair?",
-                                description = "",
-                                onConfirmText = "Sair",
-                                onConfirmButtonBackgroundColor = VERMELHO,
-                                onConfirmButtonContentColor = BRANCO,
-                                onDismissText = "Cancelar",
-                                onDismissButtonBackgroundColor = CINZA_INTERMEDIARIO,
-                                onDismissButtonContentColor = PRETO,
-                                space = 40.dp
-                            )
                         }
                     }
 

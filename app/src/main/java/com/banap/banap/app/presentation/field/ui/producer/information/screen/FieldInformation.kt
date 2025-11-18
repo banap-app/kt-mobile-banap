@@ -1,7 +1,6 @@
 package com.banap.banap.app.presentation.field.ui.producer.information.screen
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,15 +26,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -67,7 +62,6 @@ import com.banap.banap.core.ui.theme.VERDE_CLARO
 import com.banap.banap.core.ui.theme.VERDE_ESCURO
 import com.banap.banap.core.ui.theme.VERMELHO
 import com.banap.banap.core.ui.util.ISOConverter
-import com.banap.banap.core.ui.util.clickableText
 import com.banap.banap.core.ui.util.getFirstName
 import com.banap.banap.core.ui.util.shimmerEffect
 import com.banap.banap.data.model.analysis.AnalysisResponse

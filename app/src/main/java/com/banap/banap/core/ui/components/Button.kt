@@ -31,6 +31,7 @@ fun Button(
     modifier: Modifier,
     hasIcon: Boolean,
     hasLeftIcon: Boolean = false,
+    isAllRotated: Boolean = false,
     icon: ImageVector = Icons.Outlined.Add,
     shape: Shape,
     disableButton: Boolean = false,
@@ -87,7 +88,7 @@ fun Button(
                     contentDescription = "Icone de adicionar nova propriedade",
                     modifier = Modifier
                         .scale(1F)
-                        .rotate(90F)
+                        .rotate(if (isAllRotated) 180F else 90F)
                 )
             }
         }

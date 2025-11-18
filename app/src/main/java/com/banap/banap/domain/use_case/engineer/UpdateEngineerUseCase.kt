@@ -14,10 +14,10 @@ class UpdateEngineerUseCase @Inject constructor(
     private val repository: EngineerRepositoryImpl
 ) {
     operator fun invoke(
-        name: String,
-        email: String,
-        password: String,
-        crea: String
+        name: String? = null,
+        email: String? = null,
+        password: String? = null,
+        crea: String? = null
     ): Flow<Resource<EngineerResponse>> = flow {
         try {
             emit(Resource.Loading())

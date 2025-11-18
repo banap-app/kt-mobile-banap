@@ -129,7 +129,7 @@ fun Login(
             tokenViewModel.saveToken("token", token)
 
             if (tokenViewModel.getToken("token") != null) {
-                navigationController.navigate("home")
+                navigationController.navigate("Home")
             }
         }
     }

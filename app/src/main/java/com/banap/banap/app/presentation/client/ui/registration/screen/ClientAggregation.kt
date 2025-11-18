@@ -161,6 +161,9 @@ fun ClientAggregation(
 
     ScaffoldCustomizedForEngineerScreens(
         snackBarHostState = snackBarHostState,
+        snackBarContainerColor = BRANCO,
+        snackBarContentColor = VERDE_CLARO,
+        snackBarActionColor = VERDE_CLARO,
         hasLoadingScreen = hasLoadingScreen
     ) { innerPadding ->
         Column(

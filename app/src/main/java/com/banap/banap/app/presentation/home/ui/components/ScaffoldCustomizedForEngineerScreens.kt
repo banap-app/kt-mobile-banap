@@ -8,6 +8,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.banap.banap.core.ui.components.LoadingScreen
 import com.banap.banap.core.ui.theme.BRANCO
 import com.banap.banap.core.ui.theme.VERDE_CLARO
@@ -16,6 +17,9 @@ import com.banap.banap.core.ui.theme.VERDE_CLARO
 fun ScaffoldCustomizedForEngineerScreens(
     modifier: Modifier = Modifier,
     snackBarHostState: SnackbarHostState,
+    snackBarContainerColor: Color = VERDE_CLARO,
+    snackBarContentColor: Color = BRANCO,
+    snackBarActionColor: Color = BRANCO,
     hasLoadingScreen: Boolean = false,
     floatingActionButton: @Composable () -> Unit = {},
     content: @Composable (innerPadding: PaddingValues) -> Unit
@@ -30,9 +34,9 @@ fun ScaffoldCustomizedForEngineerScreens(
             ) { data ->
                 Snackbar(
                     snackbarData = data,
-                    containerColor = VERDE_CLARO,
-                    contentColor = BRANCO,
-                    actionColor = BRANCO
+                    containerColor = snackBarContainerColor,
+                    contentColor = snackBarContentColor,
+                    actionColor = snackBarActionColor
                 )
             }
         },

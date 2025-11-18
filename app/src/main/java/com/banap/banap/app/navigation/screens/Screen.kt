@@ -120,7 +120,7 @@ sealed class Screen (
         fun createRoute(propertyId: String) = "$route/$propertyId"
     }
 
-//    data object UpdateUserInformation : Screen(route = "UpdateUserInformation") {
+//    data object UpdateUserNameAndEmail : Screen(route = "UpdateUserNameAndEmail") {
 //        const val USER_NAME_ARGUMENT = "name"
 //        const val USER_EMAIL_ARGUMENT = "email"
 //        val routeWithArgument = "$route/{$USER_NAME_ARGUMENT}/{$USER_EMAIL_ARGUMENT}"

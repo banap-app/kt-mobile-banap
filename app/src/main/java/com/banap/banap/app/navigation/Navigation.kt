@@ -35,9 +35,11 @@ import com.banap.banap.app.presentation.field.ui.engineer.information.screen.Cli
 import com.banap.banap.app.presentation.field.ui.engineer.observation.screen.NewObservation
 import com.banap.banap.app.presentation.field.ui.producer.information.screen.FieldInformation
 import com.banap.banap.app.presentation.field.ui.producer.registration.screen.NewField
+import com.banap.banap.app.presentation.home.ui.components.Settings
+import com.banap.banap.app.presentation.home.ui.components.UpdatePassword
 import com.banap.banap.app.presentation.home.ui.engineer.screen.EngineerHome
 import com.banap.banap.app.presentation.home.ui.producer.screen.Home
-import com.banap.banap.app.presentation.home.ui.producer.screen.UpdateUserInformation
+import com.banap.banap.app.presentation.home.ui.components.UpdateUserNameAndEmail
 import com.banap.banap.app.presentation.login.ui.screen.Login
 import com.banap.banap.app.presentation.measurementsandconversions.ui.registration.screen.NewMeasurementAndConversionsCalculation
 import com.banap.banap.app.presentation.producer.ui.registration.NewProducer
@@ -531,33 +533,29 @@ fun Navigation() {
         }
 
         composable (
-            route = "UpdateUserInformation",
+            route = "UpdateUserNameAndEmail",
             enterTransition = {
-                slideInVertically(
-                    initialOffsetY = { fullHeight ->
-                        fullHeight
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth ->
+                        fullWidth
                     },
                     animationSpec = tween(animationDuration)
                 )
             },
             exitTransition = {
-                slideOutVertically(
-                    targetOffsetY = { fullHeight ->
-                        fullHeight
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth ->
+                        fullWidth
                     },
                     animationSpec = tween(animationDuration)
                 )
             }
         ) {
-            val getProducerByIdState by getProducerByIdViewModel.state
-            val getEngineerByIdState by getEngineerByIdViewModel.state
-
-            UpdateUserInformation(
+            UpdateUserNameAndEmail(
                 navigationController,
                 tokenViewModel = tokenViewModel,
-                name = getProducerByIdState.response?.name ?: getEngineerByIdState.response?.data?.name ?: "",
-                email = getProducerByIdState.response?.email ?: getEngineerByIdState.response?.data?.email ?: "",
-                crea = getEngineerByIdState.response?.data?.crea ?: ""
+                getProducerByIdViewModel = getProducerByIdViewModel,
+                getEngineerByIdViewModel = getEngineerByIdViewModel
             )
         }
 
@@ -852,7 +850,60 @@ fun Navigation() {
                 )
             }
         ) {
-            Scanner()
+            Scanner(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "Settings",
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth ->
+                        fullWidth
+                    },
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth ->
+                        fullWidth
+                    },
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            Settings(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "UpdatePassword",
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth ->
+                        fullWidth
+                    },
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth ->
+                        fullWidth
+                    },
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            UpdatePassword(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
         }
     }
 }

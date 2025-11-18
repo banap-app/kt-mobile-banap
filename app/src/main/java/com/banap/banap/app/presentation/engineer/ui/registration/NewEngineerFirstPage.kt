@@ -1,6 +1,5 @@
 package com.banap.banap.app.presentation.engineer.ui.registration
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -126,10 +125,6 @@ fun NewEngineerFirstPage(
         else -> {
             CINZA_ESCURO
         }
-    }
-
-    LaunchedEffect(true) {
-
     }
 
     LaunchedEffect(true) {

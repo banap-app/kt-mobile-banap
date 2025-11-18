@@ -50,7 +50,7 @@ fun RecentActivities(
                         space = 10.dp
                     )
                 ) {
-                    list.forEach { activity ->
+                    list.take(5).forEach { activity ->
                         Activities(
                             autor = activity.author,
                             atividade = activity.activity

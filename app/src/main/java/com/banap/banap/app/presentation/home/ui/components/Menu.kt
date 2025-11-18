@@ -63,7 +63,7 @@ fun Menu(
         modifier = Modifier
             .background(BRANCO),
         shape = RoundedCornerShape(10.dp),
-        offset = DpOffset(x = (-30).dp, y = 5.dp)
+        offset = DpOffset(x = 0.dp, y = 10.dp)
     ) {
         dropDownItems.forEach { item ->
             DropdownMenuItem(

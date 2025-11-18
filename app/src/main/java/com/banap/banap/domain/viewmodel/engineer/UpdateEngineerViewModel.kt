@@ -19,7 +19,12 @@ class UpdateEngineerViewModel @Inject constructor(
     private val _state = mutableStateOf((EngineerState()))
     val state: State<EngineerState> = _state
 
-    fun updateEngineer(name: String, email: String, password: String, crea: String) {
+    fun updateEngineer(
+        name: String? = null,
+        email: String? = null,
+        password: String? = null,
+        crea: String? = null
+    ) {
         updateEngineerUseCase(name, email, password, crea).onEach { result ->
             when (result) {
                 is Resource.Success -> {

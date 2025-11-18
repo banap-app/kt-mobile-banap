@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -39,6 +40,8 @@ fun Modal(
     description: String,
     disableOnConfirmButton: Boolean = false,
     onConfirmText: String,
+    onConfirmTextStyle: TextStyle = Typography.bodyLarge,
+    onConfirmTextFontWeight: FontWeight = FontWeight.Black,
     onConfirmButtonBackgroundColor: Color,
     onConfirmButtonContentColor: Color,
     onDismissText: String = "Cancelar",
@@ -133,7 +136,9 @@ fun Modal(
                         onClick = onConfirm,
                         backgroundColor = onConfirmButtonBackgroundColor,
                         contentColor = onConfirmButtonContentColor,
-                        defaultElevetion = 0.dp
+                        defaultElevetion = 0.dp,
+                        style = onConfirmTextStyle,
+                        fontWeight = onConfirmTextFontWeight
                     )
 
                     if (hasDismissButton) {

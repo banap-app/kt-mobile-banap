@@ -111,8 +111,11 @@ fun Property(
 
     LaunchedEffect(true) {
         if (tokenViewModel.getToken("propertyId").isNullOrEmpty()) {
-            listFieldsViewModel.listFields(propertyId)
-            Log.d("ID_VINDO", propertyId)
+            if (!propertyId.contains("propertyId") && propertyId.isNotEmpty()) {
+                listFieldsViewModel.listFields(propertyId)
+                tokenViewModel.saveToken("propertyId", propertyId)
+                Log.d("ID_VINDO", propertyId)
+            }
         } else {
             listFieldsViewModel.listFields(tokenViewModel.getToken("propertyId") ?: "")
             Log.d("ID_TOKEN", tokenViewModel.getToken("propertyId") ?: "")
@@ -127,7 +130,6 @@ fun Property(
         listFieldsState.response.let {
             it.forEach { (id, listFields) ->
                 fields = listFields
-                tokenViewModel.saveToken("propertyId", id)
                 Log.d("ID_SALVO", tokenViewModel.getToken("propertyId") ?: "")
             }
         }

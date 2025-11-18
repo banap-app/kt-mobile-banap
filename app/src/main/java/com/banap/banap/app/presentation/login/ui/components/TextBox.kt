@@ -98,9 +98,7 @@ fun TextBox(
             }
         }
 
-
         if (icon != null) {
-
             if (passwordTextBox) {
                 TextField(
                     value = value,
@@ -211,9 +209,7 @@ fun TextBox(
                     isError = isError
                 )
             }
-
         } else {
-
             if (passwordTextBox) {
                 TextField(
                     value = value,
@@ -306,7 +302,6 @@ fun TextBox(
                     isError = isError
                 )
             }
-
         }
     }
 }

@@ -249,7 +249,7 @@ fun NewEngineerSecondPage(
                         errorState = stateCrea.creaError,
                         label = "CREA",
                         placeholder = "123456-SP",
-                        tipoTeclado = KeyboardType.Number,
+                        tipoTeclado = KeyboardType.Text,
                         modifier = Modifier
                             .fillMaxWidth(),
                         lastOne = true

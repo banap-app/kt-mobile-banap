@@ -308,6 +308,7 @@ fun Home(
             Log.d("PRODUCER", it.toString())
             username = it.name
             producerId = it.id
+            tokenViewModel.saveToken("producerId", it.id)
         }
     }
 
