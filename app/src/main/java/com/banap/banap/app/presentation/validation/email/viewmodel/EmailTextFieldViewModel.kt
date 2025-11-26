@@ -24,7 +24,20 @@ class EmailTextFieldViewModel (
         when (event) {
             is EmailTextFieldFormEvent.EmailChanged -> {
                 state = state.copy(
+                    email = event.email,
+                    emailError = null
+                )
+            }
+
+            is EmailTextFieldFormEvent.LoadEmail -> {
+                state = state.copy(
                     email = event.email
+                )
+            }
+
+            is EmailTextFieldFormEvent.SetError -> {
+                state = state.copy(
+                    emailError = event.errorMessage
                 )
             }
 

@@ -1,10 +1,12 @@
 package com.banap.banap.core.network
 
 import com.banap.banap.common.Constants.AUTH_URL
+import com.banap.banap.common.Constants.ENGINEER_URL
 import com.banap.banap.common.Constants.PRODUCER_URL
 import com.banap.banap.common.Constants.WEATHER_URL
 import com.banap.banap.core.data.local.token.TokenManager
 import com.banap.banap.data.remote.analysis.AnalysisService
+import com.banap.banap.data.remote.engineer.EngineerService
 import com.banap.banap.data.remote.field.FieldService
 import com.banap.banap.data.remote.login.LoginService
 import com.banap.banap.data.remote.producer.ProducerService
@@ -79,6 +81,16 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    @Named("ENGINEER_RETROFIT")
+    fun provideEngineerRetrofit(client: OkHttpClient): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(ENGINEER_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+    @Provides
+    @Singleton
     fun provideLoginService(
         @Named("AUTH_RETROFIT") retrofit: Retrofit
     ): LoginService =
@@ -118,4 +130,11 @@ object NetworkModule {
         @Named("PRODUCER_RETROFIT") retrofit: Retrofit
     ): AnalysisService =
         retrofit.create(AnalysisService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideEngineerService(
+        @Named("ENGINEER_RETROFIT") retrofit: Retrofit
+    ): EngineerService =
+        retrofit.create(EngineerService::class.java)
 }

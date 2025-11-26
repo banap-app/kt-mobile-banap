@@ -7,6 +7,10 @@ data class RegistrationFormState(
     val emailError: String? = null,
     val password: String = "",
     val passwordError: String? = null,
+    val newPassword: String = "",
+    val newPasswordError: String? = null,
+    val confirmPassword: String = "",
+    val confirmPasswordError: String? = null,
     val crea: String = "",
     val creaError: String? = null,
     val description: String = "",
@@ -24,5 +28,9 @@ data class RegistrationFormState(
     val phosphorus: String = "",
     val phosphorusError: String? = null,
     val potassium: String = "",
-    val potassiumError: String? = null
+    val potassiumError: String? = null,
+    val plantSpace: String = "",
+    val plantSpaceError: String? = null,
+    val lineSpace: String = "",
+    val lineSpaceError: String? = null
 )

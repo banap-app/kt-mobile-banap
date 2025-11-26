@@ -58,6 +58,10 @@ kapt {
 }
 
 dependencies {
+    implementation(libs.camera.view)
+    implementation(libs.camera.lifecycle)
+    implementation(libs.camera.camera2)
+    implementation(libs.camera.core)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.hilt.navigation.compose)

@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,30 +17,48 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.navigation.viewmodel.NavigationViewModel
-import com.banap.banap.app.presentation.analysis.ui.information.screen.AnalysisInformation
+import com.banap.banap.app.presentation.analysis.ui.engineer.information.screen.ClientAnalysis
+import com.banap.banap.app.presentation.analysis.ui.engineer.registration.NewEngineerFertilizationRecommendationAnalysis
+import com.banap.banap.app.presentation.analysis.ui.engineer.registration.NewEngineerLimingAnalysis
+import com.banap.banap.app.presentation.analysis.ui.listing.screen.Analysis
+import com.banap.banap.app.presentation.analysis.ui.producer.information.screen.AnalysisInformation
 import com.banap.banap.app.presentation.analysis.ui.readmore.screen.ReadMore
-import com.banap.banap.app.presentation.analysis.ui.registration.screen.ExplanationFormData
-import com.banap.banap.app.presentation.analysis.ui.registration.screen.NewFertilizationRecommendation
-import com.banap.banap.app.presentation.analysis.ui.registration.screen.NewLimingCalculation
+import com.banap.banap.app.presentation.analysis.ui.producer.registration.screen.ExplanationFormData
+import com.banap.banap.app.presentation.analysis.ui.producer.registration.screen.NewFertilizationRecommendation
+import com.banap.banap.app.presentation.analysis.ui.producer.registration.screen.NewLimingCalculation
+import com.banap.banap.app.presentation.client.ui.information.screen.ClientInformation
+import com.banap.banap.app.presentation.client.ui.listing.screen.Clients
+import com.banap.banap.app.presentation.client.ui.registration.screen.ClientAggregation
 import com.banap.banap.app.presentation.engineer.ui.registration.NewEngineerFirstPage
 import com.banap.banap.app.presentation.engineer.ui.registration.NewEngineerSecondPage
-import com.banap.banap.app.presentation.field.ui.information.screen.FieldInformation
-import com.banap.banap.app.presentation.field.ui.registration.screen.NewField
-import com.banap.banap.app.presentation.home.ui.screen.Home
-import com.banap.banap.app.presentation.home.ui.screen.UpdateUserInformation
+import com.banap.banap.app.presentation.field.ui.engineer.information.screen.ClientField
+import com.banap.banap.app.presentation.field.ui.engineer.observation.screen.NewObservation
+import com.banap.banap.app.presentation.field.ui.producer.information.screen.FieldInformation
+import com.banap.banap.app.presentation.field.ui.producer.registration.screen.NewField
+import com.banap.banap.app.presentation.home.ui.components.Settings
+import com.banap.banap.app.presentation.home.ui.components.UpdatePassword
+import com.banap.banap.app.presentation.home.ui.engineer.screen.EngineerHome
+import com.banap.banap.app.presentation.home.ui.producer.screen.Home
+import com.banap.banap.app.presentation.home.ui.components.UpdateUserNameAndEmail
 import com.banap.banap.app.presentation.login.ui.screen.Login
+import com.banap.banap.app.presentation.measurementsandconversions.ui.registration.screen.NewMeasurementAndConversionsCalculation
 import com.banap.banap.app.presentation.producer.ui.registration.NewProducer
-import com.banap.banap.app.presentation.property.ui.listing.screen.Property
-import com.banap.banap.app.presentation.property.ui.registration.NewProperty
+import com.banap.banap.app.presentation.property.ui.engineer.listing.ClientProperty
+import com.banap.banap.app.presentation.property.ui.producer.listing.screen.Property
+import com.banap.banap.app.presentation.property.ui.producer.registration.NewProperty
 import com.banap.banap.app.presentation.readytostart.ui.ReadyToStart
+import com.banap.banap.app.presentation.scanner.ui.screen.Scanner
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
+import com.banap.banap.app.presentation.singlespacing.ui.registration.screen.NewSingleSpacingCalculation
 import com.banap.banap.app.presentation.task.ui.registration.screen.NewTask
+import com.banap.banap.app.presentation.tools.ui.listing.Tools
 import com.banap.banap.app.presentation.tutorial.ui.Tutorial
 import com.banap.banap.app.presentation.userchoice.ui.UserChoice
 import com.banap.banap.core.ui.components.SplashScreen
 import com.banap.banap.data.model.producer.LogList
 import com.banap.banap.data.model.producer.TaskList
 import com.banap.banap.domain.viewmodel.analysis.ListAnalysisViewModel
+import com.banap.banap.domain.viewmodel.engineer.GetEngineerByIdViewModel
 import com.banap.banap.domain.viewmodel.field.ListFieldsViewModel
 import com.banap.banap.domain.viewmodel.location.LocationViewModel
 import com.banap.banap.domain.viewmodel.producer.GetProducerByIdViewModel
@@ -61,6 +81,7 @@ fun Navigation() {
     val listFieldsViewModel: ListFieldsViewModel = hiltViewModel()
     val listAnalysisViewModel: ListAnalysisViewModel = hiltViewModel()
     val getProducerByIdViewModel: GetProducerByIdViewModel = hiltViewModel()
+    val getEngineerByIdViewModel: GetEngineerByIdViewModel = hiltViewModel()
     val animationDuration: Int = 700
 
     val taskListHome: MutableList<TaskList> = mutableListOf()
@@ -399,11 +420,13 @@ fun Navigation() {
         ) { backStackEntry ->
             val id =
                 backStackEntry.arguments?.getString(Screen.ExplanationFormData.EXPLANATION_ARGUMENT)
+            val typeUser = backStackEntry.arguments?.getString(Screen.ExplanationFormData.EXPLANATION_TYPE_USER)
 
             ExplanationFormData(
                 navigationController,
                 tokenViewModel = tokenViewModel,
-                id = id ?: ""
+                id = id ?: "",
+                typeUser = typeUser ?: ""
             )
         }
 
@@ -510,31 +533,376 @@ fun Navigation() {
         }
 
         composable (
-            route = "UpdateUserInformation",
+            route = "UpdateUserNameAndEmail",
             enterTransition = {
-                slideInVertically(
-                    initialOffsetY = { fullHeight ->
-                        fullHeight
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth ->
+                        fullWidth
                     },
                     animationSpec = tween(animationDuration)
                 )
             },
             exitTransition = {
-                slideOutVertically(
-                    targetOffsetY = { fullHeight ->
-                        fullHeight
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth ->
+                        fullWidth
                     },
                     animationSpec = tween(animationDuration)
                 )
             }
         ) {
-            val getProducerByIdState by getProducerByIdViewModel.state
-
-            UpdateUserInformation(
+            UpdateUserNameAndEmail(
                 navigationController,
                 tokenViewModel = tokenViewModel,
-                name = getProducerByIdState.response?.name ?: "",
-                email = getProducerByIdState.response?.email ?: "",
+                getProducerByIdViewModel = getProducerByIdViewModel,
+                getEngineerByIdViewModel = getEngineerByIdViewModel
+            )
+        }
+
+        composable (
+            route = "EngineerHome",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            EngineerHome(
+                navigationController,
+                tokenViewModel = tokenViewModel,
+                tokenVerificationViewModel = tokenVerificationViewModel,
+                locationViewModel = locationViewModel,
+                weatherViewModel = weatherViewModel,
+                getEngineerByIdViewModel = getEngineerByIdViewModel,
+                logList = logList
+            )
+        }
+
+        composable (
+            route = "Clients",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            Clients(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "ClientInformation",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            ClientInformation(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "ClientProperty",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            ClientProperty(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "ClientField",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            ClientField(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "ClientAnalysis",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            ClientAnalysis(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "ClientAggregation",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            ClientAggregation(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "NewObservation",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            NewObservation(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "Analysis",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            Analysis(
+                navigationController,
+                tokenViewModel = tokenViewModel,
+                listAnalysisViewModel = listAnalysisViewModel
+            )
+        }
+
+        composable (
+            route = "Tools",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            Tools(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "NewEngineerLimingAnalysis",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            NewEngineerLimingAnalysis(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "NewEngineerFertilizationRecommendationAnalysis",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            NewEngineerFertilizationRecommendationAnalysis(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "NewSingleSpacingCalculation",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            NewSingleSpacingCalculation(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "NewMeasurementAndConversionsCalculation",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            NewMeasurementAndConversionsCalculation(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "Scanner",
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth ->
+                        fullWidth
+                    },
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth ->
+                        fullWidth
+                    },
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            Scanner(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "Settings",
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth ->
+                        fullWidth
+                    },
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth ->
+                        fullWidth
+                    },
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            Settings(
+                navigationController,
+                tokenViewModel = tokenViewModel
+            )
+        }
+
+        composable (
+            route = "UpdatePassword",
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth ->
+                        fullWidth
+                    },
+                    animationSpec = tween(animationDuration)
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth ->
+                        fullWidth
+                    },
+                    animationSpec = tween(animationDuration)
+                )
+            }
+        ) {
+            UpdatePassword(
+                navigationController,
+                tokenViewModel = tokenViewModel
             )
         }
     }

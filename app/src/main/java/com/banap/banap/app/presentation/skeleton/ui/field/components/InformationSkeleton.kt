@@ -17,11 +17,14 @@ import com.banap.banap.core.ui.util.shimmerEffect
 @Composable
 fun InformationSkeleton(
     space: Dp = 20.dp,
+    isEngineerHome: Boolean = false,
     child: @Composable () -> Unit
 ) {
     Column(
         modifier = Modifier
-            .padding(horizontal = 30.dp),
+            .padding(
+                horizontal = if (isEngineerHome) 0.dp else 30.dp
+            ),
         verticalArrangement = Arrangement.spacedBy(
             space = space
         )

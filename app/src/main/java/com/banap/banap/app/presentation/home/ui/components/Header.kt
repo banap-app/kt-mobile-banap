@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.banap.banap.R
-import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.skeleton.ui.home.components.HeaderHomeSkeleton
 import com.banap.banap.core.ui.theme.PRETO
 import com.banap.banap.core.ui.theme.Typography
@@ -33,7 +32,6 @@ import com.banap.banap.domain.model.producer.ProducerState
 @Composable
 fun Header(
     name: String,
-    producerId: String,
     navigationController: NavController,
     getProducerByIdState: ProducerState,
     onItemClick: (DropDownItem) -> Unit
@@ -91,19 +89,12 @@ fun Header(
                         dropDownItems = listOf(
                             DropDownItem(
                                 option = MenuOption(
-                                    icon = R.drawable.baseline_logout_24,
-                                    text = "Sair"
-                                ),
-                                optionSelected = onItemClick
-                            ),
-                            DropDownItem(
-                                option = MenuOption(
-                                    icon = R.drawable.fieldiconedit,
-                                    text = "Editar"
+                                    icon = R.drawable.baseline_settings_24,
+                                    text = "Configurações"
                                 ),
                                 optionSelected = {
                                     navigationController.navigate(
-                                        "UpdateUserInformation"
+                                        "Settings"
                                     )
                                 }
                             )
@@ -137,21 +128,10 @@ fun Header(
                         dropDownItems = listOf(
                             DropDownItem(
                                 option = MenuOption(
-                                    icon = R.drawable.baseline_logout_24,
-                                    text = "Sair"
+                                    icon = R.drawable.baseline_settings_24,
+                                    text = "Configurações"
                                 ),
-                                optionSelected = onItemClick
-                            ),
-                            DropDownItem(
-                                option = MenuOption(
-                                    icon = R.drawable.fieldiconedit,
-                                    text = "Editar"
-                                ),
-                                optionSelected = {
-                                    navigationController.navigate(
-                                        "UpdateUserInformation"
-                                    )
-                                }
+                                optionSelected = {}
                             )
                         )
                     )

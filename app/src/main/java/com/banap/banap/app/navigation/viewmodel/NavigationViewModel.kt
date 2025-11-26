@@ -18,7 +18,7 @@ class NavigationViewModel @Inject constructor(
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
-            "Home"
+            "EngineerHome"
         )
 
     fun recordRoute(route: String) {

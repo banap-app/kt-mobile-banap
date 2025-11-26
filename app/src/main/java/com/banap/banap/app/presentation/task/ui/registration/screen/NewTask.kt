@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.banap.banap.app.navigation.screens.Screen
 import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
 import com.banap.banap.app.presentation.task.ui.registration.components.Scheduling
 import com.banap.banap.app.presentation.validation.dropdown.event.DropdownTextFieldFormEvent
@@ -99,7 +100,8 @@ fun NewTask(
         endTime = endTime.value
     )
 
-    val isValidationSuccessful = validationDataName && validationDataOptionField && validationDataDropdownPriority && validationDataScheduling
+    val isValidationSuccessful =
+        validationDataName && validationDataOptionField && validationDataDropdownPriority && validationDataScheduling
 
     LaunchedEffect(startTime.value) {
         if (startTime.value.isNotEmpty()) {
@@ -146,15 +148,24 @@ fun NewTask(
         if (isLoading) {
             delay(2_000)
 
-            if (!navigationController.popBackStack()) {
-                navigationController.navigate("Information")
+            tokenViewModel.getToken("fieldId")?.let {
+                navigationController.navigate(
+                    Screen.Information.createRoute(
+                        fieldId = tokenViewModel.getToken("fieldId") ?: "",
+                        userName = tokenViewModel.getToken("userName") ?: "",
+                    )
+                )
+            } ?: run {
+                navigationController.navigate("Home")
             }
         }
     }
 
     RegistrationScreenPattern(
         navigationController = navigationController,
-        fallbackRoute = "Information",
+        fieldId = tokenViewModel.getToken("fieldId"),
+        userName = tokenViewModel.getToken("userName"),
+        fallbackRoute = "Home",
         texto = "Criando uma ",
         textoASerDestacado = "tarefa...",
         tamanhoTextoDestacado = 36,

@@ -100,7 +100,7 @@ fun SplashScreen(
         tokenVerificationState.response?.success?.let {
             tokenViewModel.saveToken("verifiedToken", it.toString())
             val target = when {
-                lastRoute.isBlank() || lastRoute.contains("SplashScreen") -> "Home"
+                lastRoute.isBlank() || lastRoute.contains("SplashScreen") -> "EngineerHome"
                 else -> lastRoute
             }
 

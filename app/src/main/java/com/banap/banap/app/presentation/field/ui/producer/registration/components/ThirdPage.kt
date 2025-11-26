@@ -1,0 +1,423 @@
+package com.banap.banap.app.presentation.field.ui.producer.registration.components
+
+import android.content.Context
+import android.util.Log
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.banap.banap.R
+import com.banap.banap.app.navigation.screens.Screen
+import com.banap.banap.app.presentation.session.viewmodel.TokenViewModel
+import com.banap.banap.app.presentation.validation.description.event.DescriptionTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.description.utils.validationDataDescription
+import com.banap.banap.app.presentation.validation.description.viewmodel.DescriptionTextFieldViewModel
+import com.banap.banap.app.presentation.validation.dropdown.event.DropdownTextFieldFormEvent
+import com.banap.banap.app.presentation.validation.dropdown.utils.validationDataDropdown
+import com.banap.banap.app.presentation.validation.dropdown.viewmodel.DropdownTextFieldViewModel
+import com.banap.banap.app.presentation.validation.model.RegistrationFormState
+import com.banap.banap.app.util.enumerator.FieldPage
+import com.banap.banap.core.ui.components.ButtonRegistration
+import com.banap.banap.core.ui.components.DropdownTextField
+import com.banap.banap.core.ui.components.LoadingScreen
+import com.banap.banap.core.ui.components.TextBoxRegistration
+import com.banap.banap.core.ui.components.TitleRegistration
+import com.banap.banap.core.ui.theme.BRANCO
+import com.banap.banap.core.ui.theme.CINZA_CLARO
+import com.banap.banap.core.ui.theme.CINZA_ESCURO
+import com.banap.banap.core.ui.theme.VERDE_CLARO
+import com.banap.banap.core.ui.theme.VERDE_ESCURO
+import com.banap.banap.core.ui.util.convertLatLngToFieldBoundary
+import com.banap.banap.data.model.producer.LogList
+import com.banap.banap.domain.model.field.FieldBoundary
+import com.banap.banap.domain.viewmodel.field.CreateFieldViewModel
+import com.banap.banap.domain.viewmodel.field.UpdateFieldViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+@Composable
+fun ThirdPage(
+    navigationController: NavController,
+    createFieldViewModel: CreateFieldViewModel = hiltViewModel(),
+    updateFieldViewModel: UpdateFieldViewModel = hiltViewModel(),
+    currentPage: MutableState<FieldPage>,
+    snackBarHostState: SnackbarHostState,
+    context: Context,
+    producerId: String,
+    propertyId: String,
+    stateName: RegistrationFormState,
+    logList: MutableList<LogList>,
+    isValidationSuccessful: MutableState<Boolean>,
+    innerPadding: PaddingValues,
+    tokenViewModel: TokenViewModel,
+    viewModelDescription: DescriptionTextFieldViewModel,
+    stateDescription: RegistrationFormState,
+    viewModelDropdown: DropdownTextFieldViewModel,
+    stateDropdown: RegistrationFormState
+) {
+    val createFieldState = createFieldViewModel.state.value
+    val updateFieldState = updateFieldViewModel.state.value
+
+    val fieldBoundary: List<FieldBoundary> = tokenViewModel.getMarkers("markers")
+        .map { it.convertLatLngToFieldBoundary() }
+
+    val validationDataDescription = validationDataDescription(
+        context = context,
+        viewModelDescription = viewModelDescription,
+        stateDescription = stateDescription
+    )
+
+    val validationDataDropdown = validationDataDropdown(
+        context = context,
+        viewModelDropdown = viewModelDropdown,
+        stateDropdown = stateDropdown
+    )
+
+    isValidationSuccessful.value = validationDataDescription && validationDataDropdown
+
+    var isLoading: Boolean by remember {
+        mutableStateOf(false)
+    }
+
+    var error: String by remember {
+        mutableStateOf("")
+    }
+
+    var backgroundColorButton by remember {
+        mutableStateOf(CINZA_CLARO)
+    }
+
+    var contentColorButton by remember {
+        mutableStateOf(CINZA_ESCURO)
+    }
+
+    val backgroundColor by animateColorAsState(
+        targetValue = backgroundColorButton,
+        label = "Button Background color",
+        animationSpec = tween(
+            durationMillis = 200,
+            easing = LinearEasing
+        )
+    )
+
+    val contentColor by animateColorAsState(
+        targetValue = contentColorButton,
+        label = "Button Content Color",
+        animationSpec = tween(
+            durationMillis = 200,
+            easing = LinearEasing
+        )
+    )
+
+    backgroundColorButton = when {
+        isValidationSuccessful.value -> {
+            VERDE_CLARO
+        }
+
+        else -> {
+            CINZA_CLARO
+        }
+    }
+
+    contentColorButton = when {
+        isValidationSuccessful.value -> {
+            BRANCO
+        }
+
+        else -> {
+            CINZA_ESCURO
+        }
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("description")?.let {
+            viewModelDescription.onEvent(
+                DescriptionTextFieldFormEvent.DescriptionChanged(
+                    it
+                )
+            )
+            viewModelDescription.onEvent(DescriptionTextFieldFormEvent.Submit)
+        }
+    }
+
+    LaunchedEffect(true) {
+        tokenViewModel.getToken("culture")?.let {
+            viewModelDropdown.onEvent(
+                DropdownTextFieldFormEvent.OptionChanged(
+                    it
+                )
+            )
+            viewModelDropdown.onEvent(DropdownTextFieldFormEvent.Submit)
+        }
+    }
+
+    LaunchedEffect(createFieldState.response) {
+        createFieldState.response?.let {
+            navigationController.navigate("Home")
+        }
+    }
+
+    LaunchedEffect(createFieldState.error) {
+        if (createFieldState.error.isNotEmpty()) {
+            isLoading = false
+
+            var message = ""
+            var showSnackBar = false
+
+            when {
+                createFieldState.error.contains("500") -> {
+                    Log.d("Error", createFieldState.error)
+                }
+
+                else -> {
+                    showSnackBar = true
+                    message = "Não foi possível se conectar ao servidor!"
+                }
+            }
+
+            Log.d("Error", createFieldState.error)
+
+            val autoDismissJob = launch {
+                delay(5_000L)
+                snackBarHostState.currentSnackbarData?.dismiss()
+            }
+
+            if (showSnackBar) {
+                snackBarHostState.showSnackbar(
+                    message = message,
+                    actionLabel = "Entendi",
+                    duration = SnackbarDuration.Indefinite
+                )
+            }
+
+            autoDismissJob.cancel()
+        }
+    }
+
+    LaunchedEffect(updateFieldState.response) {
+        updateFieldState.response?.let {
+            if (it.success) {
+                navigationController.navigate(
+                    Screen.Information.createRoute(
+                        fieldId = tokenViewModel.getToken("fieldId")
+                            .let { token ->
+                                token ?: ""
+                            },
+                        userName = tokenViewModel.getToken("userName")
+                    )
+                )
+            }
+        }
+    }
+
+    LaunchedEffect(updateFieldState.isLoading) {
+        isLoading = updateFieldState.isLoading
+    }
+
+    LaunchedEffect(updateFieldState.error) {
+
+    }
+
+    if (!isLoading) {
+        Column(
+            modifier = Modifier
+                .padding(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding()
+                )
+        ) {
+            Box {
+                Image(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.linhas_propriedade),
+                    contentDescription = "Vetor de linhas",
+                    modifier = Modifier
+                        .padding(
+                            top = 17.dp
+                        )
+                        .fillMaxWidth()
+                        .scale(1.2F)
+                )
+
+                IconButton(
+                    onClick = {
+                        currentPage.value = FieldPage.SECOND
+                    },
+                    modifier = Modifier
+                        .padding(
+                            top = 40.dp,
+                            start = 20.dp,
+                            bottom = 40.dp
+                        )
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.arrow_left),
+                        contentDescription = "Icone de voltar",
+                        modifier = Modifier
+                            .scale(1.2F)
+                    )
+                }
+            }
+
+            TitleRegistration(
+                texto = if (tokenViewModel.getToken("fieldId")
+                        ?.isNotEmpty() == true && tokenViewModel.getToken("fieldId")
+                        ?.contains("fieldId") == false
+                ) "Atualizando seu " else "Cadastrando seu ",
+                textoASerDestacado = "Talhão...",
+                corEmDestaque = VERDE_ESCURO,
+                subTexto = "",
+                tamanhoTextoDestacado = 36.sp,
+                paginaUsuario = false,
+                subtituloDestacado = "",
+                subtitulo = ""
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(40.dp)
+                ) {
+                    TextBoxRegistration(
+                        value = stateDescription.description,
+                        onValueChange = {
+                            viewModelDescription.onEvent(
+                                DescriptionTextFieldFormEvent.DescriptionChanged(
+                                    it
+                                )
+                            )
+                            viewModelDescription.onEvent(DescriptionTextFieldFormEvent.Submit)
+
+                            tokenViewModel.saveToken("description", it)
+                        },
+                        isError = stateDescription.descriptionError != null,
+                        errorState = stateDescription.descriptionError,
+                        label = "Descrição",
+                        placeholder = "Descreva seu talhão",
+                        tipoTeclado = KeyboardType.Text,
+                        modifier = Modifier
+                            .heightIn(
+                                min = 70.dp,
+                                max = 100.dp
+                            )
+                            .fillMaxWidth(),
+                        lastOne = true,
+                        maxLines = 10
+                    )
+
+                    DropdownTextField(
+                        label = "Cultura",
+                        value = stateDropdown.option,
+                        placeholder = "Escolha uma cultura",
+                        options = listOf(
+                            "Banana Nanica",
+                            "Banana Prata",
+                            "Banana da Terra",
+                            "Banana Maçã",
+                            "Banana Ouro"
+                        ),
+                        onOptionSelected = {
+                            viewModelDropdown.onEvent(
+                                DropdownTextFieldFormEvent.OptionChanged(
+                                    it
+                                )
+                            )
+                            viewModelDropdown.onEvent(DropdownTextFieldFormEvent.Submit)
+
+                            tokenViewModel.saveToken("culture", it)
+                        },
+                        errorState = stateDropdown.optionError
+                    )
+                }
+
+                ButtonRegistration(
+                    onClick = {
+                        viewModelDescription.onEvent(DescriptionTextFieldFormEvent.Submit)
+                        viewModelDropdown.onEvent(DropdownTextFieldFormEvent.Submit)
+
+                        if (isValidationSuccessful.value) {
+                            if (tokenViewModel.getToken("fieldId")
+                                    ?.isNotEmpty() == true && tokenViewModel.getToken("fieldId")
+                                    ?.contains("fieldId") == false
+                            ) {
+                                updateFieldViewModel.updateField(
+                                    id = tokenViewModel.getToken("fieldId") ?: "",
+                                    producerId = tokenViewModel.getToken("producerId")
+                                        ?: producerId,
+                                    propertyId = tokenViewModel.getToken("propertyId")
+                                        ?: propertyId,
+                                    name = stateName.name,
+                                    description = stateDescription.description,
+                                    crop = stateDropdown.option,
+                                    fieldBoundary = fieldBoundary
+                                )
+                            } else {
+                                createFieldViewModel.createField(
+                                    producerId = tokenViewModel.getToken("producerId")
+                                        ?: producerId,
+                                    propertyId = tokenViewModel.getToken("propertyId")
+                                        ?: propertyId,
+                                    name = stateName.name,
+                                    description = stateDescription.description,
+                                    crop = stateDropdown.option,
+                                    fieldBoundary = fieldBoundary
+                                )
+                            }
+
+                            logList.add(
+                                LogList(
+                                    author = "Gilmar",
+                                    activity = "cadastrou um talhão."
+                                )
+                            )
+
+                            isLoading = true
+                        }
+                    },
+                    buttonValue = if (tokenViewModel.getToken("fieldId")
+                            ?.isNotEmpty() == true && tokenViewModel.getToken("fieldId")
+                            ?.contains("fieldId") == false
+                    ) {
+                        "Atualizar"
+                    } else {
+                        "Cadastrar"
+                    },
+                    backgroundColor = backgroundColor,
+                    contentColor = contentColor
+                )
+            }
+        }
+    } else {
+        LoadingScreen()
+    }
+}

@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -29,6 +30,8 @@ fun Button(
     texto: String,
     modifier: Modifier,
     hasIcon: Boolean,
+    hasLeftIcon: Boolean = false,
+    isAllRotated: Boolean = false,
     icon: ImageVector = Icons.Outlined.Add,
     shape: Shape,
     disableButton: Boolean = false,
@@ -37,7 +40,8 @@ fun Button(
     contentColor: Color,
     defaultElevetion: Dp,
     style: TextStyle = Typography.bodyMedium,
-    fontWeight: FontWeight = FontWeight.ExtraBold
+    fontWeight: FontWeight = FontWeight.ExtraBold,
+    isClientInformation: Boolean = false
 ) {
     Card (
         shape = shape,
@@ -60,7 +64,7 @@ fun Button(
                     imageVector = icon,
                     contentDescription = "Icone de adicionar nova propriedade",
                     modifier = Modifier
-                        .scale(scale = 1.2F)
+                        .scale(scale = if (isClientInformation) 0.8F else 1.2F)
                 )
 
                 if (texto.isNotEmpty()) {
@@ -73,6 +77,20 @@ fun Button(
                 style = style,
                 fontWeight = fontWeight
             )
+
+            if (hasLeftIcon) {
+                if (texto.isNotEmpty()) {
+                    Spacer(modifier = Modifier.width(5.dp))
+                }
+
+                Icon(
+                    imageVector = icon,
+                    contentDescription = "Icone de adicionar nova propriedade",
+                    modifier = Modifier
+                        .scale(1F)
+                        .rotate(if (isAllRotated) 180F else 90F)
+                )
+            }
         }
     }
 }

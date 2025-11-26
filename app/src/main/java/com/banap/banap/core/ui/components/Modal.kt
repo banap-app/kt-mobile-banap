@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.banap.banap.core.ui.theme.BRANCO
+import com.banap.banap.core.ui.theme.CINZA_INTERMEDIARIO
 import com.banap.banap.core.ui.theme.PRETO
 import com.banap.banap.core.ui.theme.ShapeProperty
 import com.banap.banap.core.ui.theme.Typography
@@ -38,11 +40,14 @@ fun Modal(
     description: String,
     disableOnConfirmButton: Boolean = false,
     onConfirmText: String,
+    onConfirmTextStyle: TextStyle = Typography.bodyLarge,
+    onConfirmTextFontWeight: FontWeight = FontWeight.Black,
     onConfirmButtonBackgroundColor: Color,
     onConfirmButtonContentColor: Color,
-    onDismissText: String,
-    onDismissButtonBackgroundColor: Color,
-    onDismissButtonContentColor: Color,
+    onDismissText: String = "Cancelar",
+    onDismissButtonBackgroundColor: Color = CINZA_INTERMEDIARIO,
+    onDismissButtonContentColor: Color = PRETO,
+    hasDismissButton: Boolean = true,
     space: Dp = 40.dp,
     child: @Composable () -> Unit = {}
 ) {
@@ -131,23 +136,27 @@ fun Modal(
                         onClick = onConfirm,
                         backgroundColor = onConfirmButtonBackgroundColor,
                         contentColor = onConfirmButtonContentColor,
-                        defaultElevetion = 0.dp
+                        defaultElevetion = 0.dp,
+                        style = onConfirmTextStyle,
+                        fontWeight = onConfirmTextFontWeight
                     )
 
-                    Button(
-                        texto = onDismissText,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp),
-                        hasIcon = false,
-                        shape = ShapeProperty.small,
-                        onClick = onDismiss,
-                        backgroundColor = onDismissButtonBackgroundColor,
-                        contentColor = onDismissButtonContentColor,
-                        defaultElevetion = 0.dp,
-                        style = Typography.bodyLarge,
-                        fontWeight = FontWeight.Normal
-                    )
+                    if (hasDismissButton) {
+                        Button(
+                            texto = onDismissText,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp),
+                            hasIcon = false,
+                            shape = ShapeProperty.small,
+                            onClick = onDismiss,
+                            backgroundColor = onDismissButtonBackgroundColor,
+                            contentColor = onDismissButtonContentColor,
+                            defaultElevetion = 0.dp,
+                            style = Typography.bodyLarge,
+                            fontWeight = FontWeight.Normal
+                        )
+                    }
                 }
             }
         }

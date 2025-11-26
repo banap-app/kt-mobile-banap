@@ -95,6 +95,10 @@ fun AnalysisInformationSkeleton() {
 
     InformationSkeleton {
         Column(
+            modifier = Modifier
+                .padding(
+                    bottom = 60.dp
+                ),
             verticalArrangement = Arrangement.spacedBy(
                 space = 40.dp
             )

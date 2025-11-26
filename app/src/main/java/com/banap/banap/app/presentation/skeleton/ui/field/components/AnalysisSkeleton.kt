@@ -25,7 +25,7 @@ fun AnalysisSkeleton() {
                     shape = RoundedCornerShape(30.dp)
                 )
                 .fillMaxWidth(0.9f)
-                .height(117.dp)
+                .height(100.dp)
                 .shimmerEffect(),
             content = {}
         )

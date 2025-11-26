@@ -214,10 +214,6 @@ fun NewProducer(
         createProducerState.response?.let {
             if (it.id.isNotEmpty()) {
                 navigationController.navigate("login")
-//                loginViewModel.authenticateUser(
-//                    stateEmail.email,
-//                    statePassword.password
-//                )
             }
         }
     }
@@ -237,7 +233,7 @@ fun NewProducer(
 
                 else -> {
                     showSnackBar = true
-                    message = "[PRODUCER] Não foi possível se conectar ao servidor!"
+                    message = "Não foi possível se conectar ao servidor!"
                 }
             }
 
@@ -262,56 +258,6 @@ fun NewProducer(
             createProducerViewModel.clearError()
         }
     }
-
-//    LaunchedEffect(loginState.response) {
-//        loginState.response?.token?.let { token ->
-//            tokenViewModel.saveToken("token", token)
-//
-//            if (tokenViewModel.getToken("token") != null) {
-//                navigationController.navigate("home")
-//            }
-//        }
-//    }
-
-//    LaunchedEffect(loginState.error) {
-//        if (loginState.error.isNotEmpty()) {
-//            isLoading = false
-//
-//            var message: String = ""
-//            var showSnackBar: Boolean = false
-//
-//            when {
-//                loginState.error.contains("422") -> {
-//                    Log.d("LOGIN Error", loginState.error)
-//                }
-//
-//                else -> {
-//                    showSnackBar = true
-//                    message = "[LOGIN] Não foi possível se conectar ao servidor"
-//                }
-//            }
-//
-//            Log.d("LOGIN Error", loginState.error)
-//
-//            val autoDismissJob = launch {
-//                delay(5_000L)
-//                loginViewModel.clearError()
-//                snackBarHostState.currentSnackbarData?.dismiss()
-//            }
-//
-//            if (showSnackBar) {
-//                snackBarHostState.showSnackbar(
-//                    message = message,
-//                    actionLabel = "Entendi",
-//                    duration = SnackbarDuration.Indefinite
-//                )
-//            }
-//
-//            autoDismissJob.cancel()
-//
-//            loginViewModel.clearError()
-//        }
-//    }
 
     Scaffold(
         modifier = Modifier
